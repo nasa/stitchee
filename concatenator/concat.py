@@ -53,9 +53,21 @@ def concat_netcdf_files(original_input_files,
 
     logger.info(f'Creating new record dimension from dim={dim_for_record_dim}')
     for i, file in enumerate(input_files):
-        print(f"{i} | ncks on file: {file}")
-        nco.ncks(input=file, output=file,
-                 options=["-O", f"--mk_rec_dmn {dim_for_record_dim}"])
+        print(f"Checking for record dimension in file {i} ({file})..")
+
+        # Check whether the dataset already contains a record (AKA unlimited) dimension.
+        dim_names = nc.Dataset(file).dimensions
+        contains_record_dim = False
+        for d in dim_names:
+            if nc.Dataset(file).dimensions[d].isunlimited():
+                contains_record_dim = True
+                print(f"  Existing record dimension identified ---> <{d}>.")
+
+        # Convert an existing dimension to be a record dimension if one did not already exist.
+        if not contains_record_dim:
+            print(f"  No record dimension exists; making <{dim_for_record_dim}> into a record dimension..")
+            nco.ncks(input=file, output=file,
+                     options=["-O", f"--mk_rec_dmn {dim_for_record_dim}"])
 
     # -- concatenate datasets --
     logger.info('Concatenating datasets...')
