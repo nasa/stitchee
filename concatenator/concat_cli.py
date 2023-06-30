@@ -11,7 +11,7 @@ def main():
     """Main CLI entrypoint"""
 
     parser = ArgumentParser(
-        prog='recon',
+        prog='bumblebee',
         description='Simple CLI wrapper around the granule record concatenator module.')
     parser.add_argument(
         'data_dir',
