@@ -6,7 +6,7 @@ from unittest import TestCase
 import netCDF4 as nc
 import pytest
 
-from concatenator import concat
+from concatenator.concat_with_nco import concat_netcdf_files
 
 
 def is_file_empty(parent_group):
@@ -41,7 +41,9 @@ class TestConcat(TestCase):
         input_files = [str(x) for x in data_path.iterdir()]
 
         dim_for_record_dim = 'mirror_step'
-        concat.concat_netcdf_files(input_files, output_path, dim_for_record_dim=dim_for_record_dim)
+        concat_netcdf_files(input_files, output_path,
+                            dim_for_record_dim=dim_for_record_dim,
+                            decompress_datasets=True)
 
         merged_dataset = nc.Dataset(output_path)
 

@@ -4,7 +4,7 @@ import logging
 from argparse import ArgumentParser
 from pathlib import Path
 
-from concatenator.concat import concat_netcdf_files
+from concatenator.concat_with_nco import concat_netcdf_files
 
 
 def main():
