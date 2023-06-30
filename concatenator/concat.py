@@ -22,6 +22,7 @@ def _is_file_empty(parent_group):
 def concat_netcdf_files(original_input_files,
                         output_file,
                         dim_for_record_dim='mirror_step',
+                        decompress_datasets=False,
                         logger=default_logger):
     """
     Main entrypoint to merge implementation. Merges n >= 2 granules together as a single
@@ -51,7 +52,6 @@ def concat_netcdf_files(original_input_files,
             if is_empty is False:
                 input_files.append(file)
 
-    logger.info(f'Creating new record dimension from dim={dim_for_record_dim}')
     for i, file in enumerate(input_files):
         print(f"Checking for record dimension in file {i} ({file})..")
 
@@ -69,8 +69,13 @@ def concat_netcdf_files(original_input_files,
             nco.ncks(input=file, output=file,
                      options=["-O", f"--mk_rec_dmn {dim_for_record_dim}"])
 
+        if decompress_datasets:
+            nco.ncks(input=file, output=file,
+                     options=["-L 0"])
+
     # -- concatenate datasets --
     logger.info('Concatenating datasets...')
-    nco.ncrcat(input=input_files, output=output_file)
+    nco.ncrcat(input=input_files, output=output_file,
+               options=["--no_tmp_fl"])
 
     logger.info('Done.')
