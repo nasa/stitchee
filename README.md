@@ -1,6 +1,6 @@
-# recon
+# bumblebee
 
-
+Concatenate netCDF data from multiple files along an existing dimension.
 
 ## Getting started
 
