@@ -21,4 +21,6 @@ poetry run pytest tests/
 TBD
 
 ## Roadmap
-Next major milestone: Incorporate this service into Harmony as a Docker image.
+Next major milestone(s):
+- Conduct extensive tests
+- Incorporate this service into Harmony as a Docker image.
