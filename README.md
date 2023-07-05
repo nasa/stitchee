@@ -5,7 +5,7 @@ Harmony service for concatenating netCDF data *along an existing dimension*.
 ## Getting started, with poetry
 
 1. Follow the instructions for installing `poetry` [here](https://python-poetry.org/docs/).
-2. Install l2ss-py, with its dependencies, by running the following from the repository directory:
+2. Install `bumblebee`, with its dependencies, by running the following from the repository directory:
 
 ```shell
 poetry install
