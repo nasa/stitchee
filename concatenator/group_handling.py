@@ -182,7 +182,7 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
 
         # Copy dimensions
         for dim_name, _ in dataset.dims.items():
-            new_dim_name = str(dim_name).rsplit(GROUP_DELIM)
+            new_dim_name = str(dim_name).rsplit(GROUP_DELIM, 1)[-1]
             dim_group = _get_nested_group(base_dataset, str(dim_name))
             dim_group.createDimension(new_dim_name, dataset.dims[dim_name])
             # dst.createDimension(
@@ -190,7 +190,7 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
 
         # Copy variables
         for var_name, var in dataset.variables.items():
-            new_var_name = str(var_name).rsplit(GROUP_DELIM)
+            new_var_name = str(var_name).rsplit(GROUP_DELIM, 1)[-1]
             var_group = _get_nested_group(base_dataset, str(var_name))
             # grouping = '/'.join(var_name.split(GROUP_DELIM)[:-1])
             try:
@@ -212,7 +212,7 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
                     new_var_dims = (new_var_name,)
                     chunk_sizes = None
                 else:
-                    new_var_dims = tuple(str(d).rsplit(GROUP_DELIM) for d in var.dims)
+                    new_var_dims = tuple(str(d).rsplit(GROUP_DELIM, 1)[-1] for d in var.dims)
                     dim_sizes = [_get_dimension_size(base_dataset, dim) for dim in new_var_dims]
 
                     chunk_sizes = _calculate_chunks(dim_sizes, default_low_dim_chunksize=4000)
