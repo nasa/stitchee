@@ -7,7 +7,7 @@ Functions for converting multidimensional data structures
 import re
 from typing import List, Tuple
 
-import netCDF4 as nc
+import netCDF4 as nc  # type: ignore
 import numpy as np
 import xarray as xr
 
@@ -174,7 +174,7 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
         # Create Groups
         group_lst = []
         for var_name, _ in dataset.variables.items():  # need logic if there is data in the top level not in a group
-            group_lst.append('/'.join(var_name.split(GROUP_DELIM)[:-1]))
+            group_lst.append('/'.join(str(var_name).split(GROUP_DELIM)[:-1]))
         group_lst = ['/' if group == '' else group for group in group_lst]
         groups = set(group_lst)
         for group in groups:
@@ -182,16 +182,16 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
 
         # Copy dimensions
         for dim_name, _ in dataset.dims.items():
-            new_dim_name = dim_name.split(GROUP_DELIM)[-1]
-            dim_group = _get_nested_group(base_dataset, dim_name)
+            new_dim_name = str(dim_name).rsplit(GROUP_DELIM)
+            dim_group = _get_nested_group(base_dataset, str(dim_name))
             dim_group.createDimension(new_dim_name, dataset.dims[dim_name])
             # dst.createDimension(
             #     name, (len(dimension) if not dimension.isunlimited() else None))
 
         # Copy variables
         for var_name, var in dataset.variables.items():
-            new_var_name = var_name.split(GROUP_DELIM)[-1]
-            var_group = _get_nested_group(base_dataset, var_name)
+            new_var_name = str(var_name).rsplit(GROUP_DELIM)
+            var_group = _get_nested_group(base_dataset, str(var_name))
             # grouping = '/'.join(var_name.split(GROUP_DELIM)[:-1])
             try:
                 this_dtype = var.dtype
@@ -212,7 +212,7 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
                     new_var_dims = (new_var_name,)
                     chunk_sizes = None
                 else:
-                    new_var_dims = tuple(d.split(GROUP_DELIM)[-1] for d in var.dims)
+                    new_var_dims = tuple(str(d).rsplit(GROUP_DELIM) for d in var.dims)
                     dim_sizes = [_get_dimension_size(base_dataset, dim) for dim in new_var_dims]
 
                     chunk_sizes = _calculate_chunks(dim_sizes, default_low_dim_chunksize=4000)
@@ -221,7 +221,7 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
                 if var.dtype == "O":
                     vartype = "S1"
                 else:
-                    vartype = var.dtype
+                    vartype = str(var.dtype)
                 var_group.createVariable(new_var_name, vartype,
                                          dimensions=new_var_dims, chunksizes=chunk_sizes,
                                          compression='zlib', complevel=7,

@@ -1,8 +1,8 @@
 """Concatenation service that appends data along an existing dimension, using NCO operators."""
 from logging import getLogger
 
-import netCDF4 as nc
-from nco import Nco
+import netCDF4 as nc  # type: ignore
+from nco import Nco  # type: ignore
 
 default_logger = getLogger(__name__)
 

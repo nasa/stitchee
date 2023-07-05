@@ -5,7 +5,7 @@ import time
 from logging import Logger
 from pathlib import Path
 
-import netCDF4 as nc
+import netCDF4 as nc  # type: ignore
 import xarray as xr
 
 from concatenator.group_handling import (flatten_grouped_dataset,
