@@ -15,18 +15,6 @@ from concatenator import concat_with_nco
 from concatenator.bumblebee import bumblebee
 
 
-def is_file_empty(parent_group):
-    """
-    Function to test if a all variable size in a dataset is 0
-    """
-    for var in parent_group.variables.values():
-        if var.size != 0:
-            return False
-    for child_group in parent_group.groups.values():
-        return is_file_empty(child_group)
-    return True
-
-
 @pytest.mark.usefixtures("pass_options")
 class TestConcat(TestCase):
     """Main concatenation testing class."""

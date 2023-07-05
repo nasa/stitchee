@@ -4,6 +4,7 @@ import logging
 import time
 from logging import Logger
 from pathlib import Path
+from typing import Union
 
 import netCDF4 as nc  # type: ignore
 import xarray as xr
@@ -36,9 +37,17 @@ def bumblebee(files_to_concat: list[str],
         pathlib_x = Path(x)
         return str(pathlib_x.parent / f"{pathlib_x.stem}_flat_intermediate{pathlib_x.suffix}")
 
-    num_files = len(files_to_concat)
+    # only concatenate files that are not empty
+    input_files = []
+    for file in files_to_concat:
+        with nc.Dataset(file, 'r') as dataset:
+            is_empty = _is_file_empty(dataset)
+            if is_empty is False:
+                input_files.append(file)
+
+    num_files = len(input_files)
     logger.debug("Flattening all input files...")
-    for i, filepath in enumerate(files_to_concat):
+    for i, filepath in enumerate(input_files):
         # The group structure is flattened.
         start_time = time.time()
         logger.debug("    ..file %03d/%d <%s>..", i, num_files, filepath)
@@ -81,3 +90,14 @@ def bumblebee(files_to_concat: list[str],
     logger.info("-- total time: %f", total_time)
 
     return output_file
+
+def _is_file_empty(parent_group: Union[nc.Dataset, nc.Group]) -> bool:
+    """
+    Function to test if a all variable size in a dataset is 0
+    """
+    for var in parent_group.variables.values():
+        if var.size != 0:
+            return False
+    for child_group in parent_group.groups.values():
+        return _is_file_empty(child_group)
+    return True

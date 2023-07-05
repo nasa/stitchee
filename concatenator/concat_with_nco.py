@@ -4,20 +4,9 @@ from logging import getLogger
 import netCDF4 as nc  # type: ignore
 from nco import Nco  # type: ignore
 
+from concatenator.bumblebee import _is_file_empty
+
 default_logger = getLogger(__name__)
-
-
-def _is_file_empty(parent_group):
-    """
-    Function to test if a all variable size in a dataset is 0
-    """
-
-    for var in parent_group.variables.values():
-        if var.size != 0:
-            return False
-    for child_group in parent_group.groups.values():
-        return _is_file_empty(child_group)
-    return True
 
 
 def concat_netcdf_files(original_input_files,

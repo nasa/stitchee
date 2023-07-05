@@ -1,37 +1,34 @@
-"""A simple CLI wrapper around the main merge function"""
-
+"""A simple CLI wrapper around the main NCO concatenation function"""
 import logging
-from argparse import ArgumentParser
+import sys
 from pathlib import Path
 
 from concatenator.concat_with_nco import concat_netcdf_files
+from concatenator.run_bumblebee import parse_args
 
 
-def main():
-    """Main CLI entrypoint"""
+def run_nco_concat(args: list) -> None:
+    """
+    Parse arguments and run subsetter on the specified input file
+    """
+    data_dir, output_path = parse_args(args)
 
-    parser = ArgumentParser(
-        prog='bumblebee',
-        description='Simple CLI wrapper around the granule record concatenator module.')
-    parser.add_argument(
-        'data_dir',
-        help='The directory containing the files to be merged.')
-    parser.add_argument(
-        'output_path',
-        help='The output filename for the merged output.')
-    parser.add_argument(
-        '-v', '--verbose',
-        help='Enable verbose output to stdout; useful for debugging',
-        action='store_true'
+    input_files = list(Path(data_dir).resolve().iterdir())
+    num_inputs = len(input_files)
+
+    logging.info('Executing NCO concatenation on %d files...', num_inputs)
+    concat_netcdf_files(input_files, output_path)
+    logging.info('NCO concatenation complete. Result in %s', output_path)
+
+
+def main() -> None:
+    """Entry point to the script"""
+    logging.basicConfig(
+        stream=sys.stdout,
+        format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s',
+        level=logging.DEBUG
     )
-
-    args = parser.parse_args()
-
-    if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
-
-    input_files = list(Path(args.data_dir).resolve().iterdir())
-    concat_netcdf_files(input_files, args.output_path)
+    run_nco_concat(sys.argv[1:])
 
 
 if __name__ == '__main__':
