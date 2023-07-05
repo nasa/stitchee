@@ -18,7 +18,27 @@ poetry run pytest tests/
 ```
 
 ## Usage
-TBD
+
+```shell
+% poetry run bumblebee --help
+usage: bumblebee [-h] [-v] data_dir output_path
+
+Run the along-existing-dimension concatenator.
+
+positional arguments:
+  data_dir       The directory containing the files to be merged.
+  output_path    The output filename for the merged output.
+
+options:
+  -h, --help     show this help message and exit
+  -v, --verbose  Enable verbose output to stdout; useful for debugging
+```
+
+For example:
+
+```shell
+poetry run bumblebee /path/to/netcdf/directory/ /path/to/output.nc
+```
 
 ## Roadmap
 Next major milestone(s):
