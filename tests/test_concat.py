@@ -1,19 +1,24 @@
+"""Tests for concatenation logic."""
+
+# pylint: disable=C0116
+
+import shutil
 from pathlib import Path
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
 
-import netCDF4 as nc
+import netCDF4 as nc  # type: ignore
 import pytest
 
-from concatenator.concat_with_nco import concat_netcdf_files
+from concatenator import concat_with_nco
+from concatenator.bumblebee import bumblebee
 
 
 def is_file_empty(parent_group):
     """
     Function to test if a all variable size in a dataset is 0
     """
-
     for var in parent_group.variables.values():
         if var.size != 0:
             return False
@@ -24,6 +29,8 @@ def is_file_empty(parent_group):
 
 @pytest.mark.usefixtures("pass_options")
 class TestConcat(TestCase):
+    """Main concatenation testing class."""
+
     @classmethod
     def setUpClass(cls):
         cls.__test_path = Path(__file__).parent.resolve()
@@ -35,15 +42,19 @@ class TestConcat(TestCase):
         if not cls.KEEP_TMP:  # pylint: disable=no-member
             rmtree(cls.__output_path)
 
-    def run_verification(self, data_dir, output_name, process_count=None):
+    def run_verification_with_bumblebee(self, data_dir, output_name):
         output_path = str(self.__output_path.joinpath(output_name))
         data_path = self.__test_data_path.joinpath(data_dir)
-        input_files = [str(x) for x in data_path.iterdir()]
+
+        input_files = []
+        for filepath in data_path.iterdir():
+            if Path(filepath).suffix == ".nc":
+                copied_input_new_path = self.__output_path / Path(filepath).name
+                shutil.copyfile(filepath, copied_input_new_path)
+                input_files.append(str(copied_input_new_path))
 
         dim_for_record_dim = 'mirror_step'
-        concat_netcdf_files(input_files, output_path,
-                            dim_for_record_dim=dim_for_record_dim,
-                            decompress_datasets=True)
+        output_path = bumblebee(files_to_concat=input_files, output_file=output_path)
 
         merged_dataset = nc.Dataset(output_path)
 
@@ -54,8 +65,39 @@ class TestConcat(TestCase):
             length_sum += len(nc.Dataset(file).variables[dim_for_record_dim])
         assert length_sum == len(merged_dataset.variables[dim_for_record_dim])
 
-    def test_tempo_no2_concat(self):
-        self.run_verification('tempo_no2', 'tempo_no2_concat.nc')
+    def run_verification_with_nco(self, data_dir, output_name):
+        output_path = str(self.__output_path.joinpath(output_name))
+        data_path = self.__test_data_path.joinpath(data_dir)
 
-    def test_tempo_hcho_concat(self):
-        self.run_verification('tempo_hcho', 'tempo_hcho_concat.nc')
+        input_files = []
+        for filepath in data_path.iterdir():
+            if Path(filepath).suffix == ".nc":
+                copied_input_new_path = self.__output_path / Path(filepath).name
+                shutil.copyfile(filepath, copied_input_new_path)
+                input_files.append(str(copied_input_new_path))
+
+        dim_for_record_dim = 'mirror_step'
+        concat_with_nco.concat_netcdf_files(input_files, output_path,
+                                            dim_for_record_dim=dim_for_record_dim,
+                                            decompress_datasets=True)
+
+        merged_dataset = nc.Dataset(output_path)
+
+        # Verify that the length of the record dimension in the concatenated file equals
+        #   the sum of the lengths across the input files
+        length_sum = 0
+        for file in input_files:
+            length_sum += len(nc.Dataset(file).variables[dim_for_record_dim])
+        assert length_sum == len(merged_dataset.variables[dim_for_record_dim])
+
+    def test_tempo_no2_concat_with_bumblebee(self):
+        self.run_verification_with_bumblebee('tempo_no2', 'tempo_no2_concat_with_bumblebee.nc')
+
+    def test_tempo_hcho_concat_with_bumblebee(self):
+        self.run_verification_with_bumblebee('tempo_hcho', 'tempo_hcho_concat_with_bumblebee.nc')
+
+    # def test_tempo_no2_concat_with_nco(self):
+    #     self.run_verification_with_nco('tempo_no2', 'tempo_no2_concat_with_nco.nc')
+    #
+    # def test_tempo_hcho_concat_with_nco(self):
+    #     self.run_verification_with_nco('tempo_hcho', 'tempo_hcho_concat_with_nco.nc')
