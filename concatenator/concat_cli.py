@@ -1,7 +1,6 @@
 """A simple CLI wrapper around the main NCO concatenation function"""
 import logging
 import sys
-from pathlib import Path
 
 from concatenator.concat_with_nco import concat_netcdf_files
 from concatenator.run_bumblebee import parse_args
@@ -11,9 +10,7 @@ def run_nco_concat(args: list) -> None:
     """
     Parse arguments and run subsetter on the specified input file
     """
-    data_dir, output_path = parse_args(args)
-
-    input_files = list(Path(data_dir).resolve().iterdir())
+    input_files, output_path = parse_args(args)
     num_inputs = len(input_files)
 
     logging.info('Executing NCO concatenation on %d files...', num_inputs)
