@@ -33,15 +33,24 @@ def bumblebee(files_to_concat: list[str],
     intermediate_flat_filepaths: list[str] = []
     benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
 
-    # only concatenate files that are not empty
+    # Only concatenate files that are not empty.
     input_files = []
     for file in files_to_concat:
-        with nc.Dataset(file, 'r') as dataset:
-            is_empty = _is_file_empty(dataset)
-            if is_empty is False:
-                input_files.append(file)
+        try:
+            with nc.Dataset(file, 'r') as dataset:
+                is_empty = _is_file_empty(dataset)
+                if is_empty is False:
+                    input_files.append(file)
+        except OSError:
+            logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
 
+    # Exit cleanly if no workable netCDF files found.
     num_files = len(input_files)
+    if num_files < 1:
+        logger.info("No non-empty netCDF files found. Exiting.")
+        return ""
+
+
     logger.debug("Flattening all input files...")
     for i, filepath in enumerate(input_files):
         # The group structure is flattened.
