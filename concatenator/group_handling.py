@@ -41,10 +41,6 @@ def walk(group_node: nc.Group,
             # Copy variables to root group with new name
             for var_name, var in item.variables.items():
 
-                if var_name == "imager_addl_central_wavelength":
-                    print("DEBUGing")
-                    pass
-
                 var_group_name = f'{group_path}{GROUP_DELIM}{var_name}'
                 new_dataset.variables[var_group_name] = var
 
@@ -199,13 +195,10 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
             # grouping = '/'.join(var_name.split(GROUP_DELIM)[:-1])
             try:
                 this_dtype = var.dtype
-                if np.issubdtype(this_dtype, np.integer):
-                    """Only Use Shuffle Filter on Integer Data.
-                    See, e.g.: https://www.linkedin.com/pulse/netcdf-4hdf5-only-use-shuffle-filter-integer-data-edward-hartnett/
-                    """
-                    shuffle = True
-                else:
-                    shuffle = False
+
+                # Only Use Shuffle Filter on Integer Data.
+                # See, e.g.: https://www.linkedin.com/pulse/netcdf-4hdf5-only-use-shuffle-filter-integer-data-edward-hartnett/
+                shuffle = bool(np.issubdtype(this_dtype, np.integer))
 
                 # Get the fill value (since it's not included in xarray var.attrs)
                 try:
@@ -333,18 +326,18 @@ def _calculate_chunks(dim_sizes: list, default_low_dim_chunksize=4000) -> tuple:
     return chunk_sizes
 
 
-def _get_dimension_size(nc_Dataset: nc.Dataset, dim_name: str) -> int:
+def _get_dimension_size(dataset: nc.Dataset, dim_name: str) -> int:
     # Determine if the dimension is defined at the root level
-    if dim_name in nc_Dataset.dimensions.keys():
-        dim_size = nc_Dataset.dimensions[dim_name].size
+    if dim_name in dataset.dimensions.keys():
+        dim_size = dataset.dimensions[dim_name].size
 
     # Search groups if dim_name is not found at the root level
     else:
         dim_size = None
         # loop through groups until the dimension name is found
-        for grp in nc_Dataset.groups.keys():
-            if dim_name in nc_Dataset.groups[grp].dimensions.keys():
-                dim_size = nc_Dataset.groups[grp].dimensions[dim_name].size
+        for grp in dataset.groups.keys():
+            if dim_name in dataset.groups[grp].dimensions.keys():
+                dim_size = dataset.groups[grp].dimensions[dim_name].size
                 break
 
     if dim_size is None:

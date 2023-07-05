@@ -1,3 +1,4 @@
+"""Concatenation service that appends data along an existing dimension, using NCO operators."""
 from logging import getLogger
 
 import netCDF4 as nc
@@ -58,10 +59,10 @@ def concat_netcdf_files(original_input_files,
         # Check whether the dataset already contains a record (AKA unlimited) dimension.
         dim_names = nc.Dataset(file).dimensions
         contains_record_dim = False
-        for d in dim_names:
-            if nc.Dataset(file).dimensions[d].isunlimited():
+        for name in dim_names:
+            if nc.Dataset(file).dimensions[name].isunlimited():
                 contains_record_dim = True
-                print(f"  Existing record dimension identified ---> <{d}>.")
+                print(f"  Existing record dimension identified ---> <{name}>.")
 
         # Convert an existing dimension to be a record dimension if one did not already exist.
         if not contains_record_dim:

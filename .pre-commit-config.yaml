@@ -19,7 +19,8 @@ repos:
       - id: isort
         exclude: doc/data/messages/(r/reimported|w/wrong-import-order|u/ungrouped-imports|m/misplaced-future|m/multiple-imports)/bad.py
 
-  - repo: local
+  - repo: https://github.com/pylint-dev/pylint
+    rev: v2.17.4
     hooks:
       - id: pylint
         name: pylint
@@ -30,7 +31,7 @@ repos:
           [
             "-rn", # Only display messages
             "-sn", # Don't display the score
-            "--rcfile=pylintrc", # Link to your config file
+            "--rcfile=.pylintrc", # Link to your config file
           ]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
