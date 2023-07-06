@@ -1,7 +1,9 @@
 """A simple CLI wrapper around the main concatenation process."""
 import logging
+import os
 import shutil
 import sys
+import uuid
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Tuple
@@ -33,6 +35,15 @@ def parse_args(args: list) -> Tuple[list[str], str]:
         help='Make a duplicate of the input directory to avoid modification of input files. '
              'This is useful for testing, but uses more disk space.')
     parser.add_argument(
+        '--rm_dir_copy',
+        action='store_true',
+        help="Remove the input directory copy (created by '--make_dir_copy') after successful execution. "
+             "Ignored if '--make_dir_copy' is not used.")
+    parser.add_argument(
+        '-O', '--overwrite',
+        action='store_true',
+        help='Overwrite output file if it already exists.')
+    parser.add_argument(
         '-v', '--verbose',
         help='Enable verbose output to stdout; useful for debugging',
         action='store_true'
@@ -43,16 +54,31 @@ def parse_args(args: list) -> Tuple[list[str], str]:
     if parsed.verbose:
         logging.basicConfig(level=logging.DEBUG)
 
+    # The output file path is validated.
+    output_path = Path(parsed.output_path).resolve()
+    if output_path.is_file():  # the file already exists
+        if parsed.overwrite:
+            os.remove(output_path)
+        else:
+            raise FileExistsError(f"File already exists at <{output_path}>. Run again with option '-O' to overwrite.")
+
+    # The input directory is validated.
     data_dir = Path(parsed.data_dir).resolve()
+    if not data_dir.is_dir():
+        raise TypeError("'data_dir' must be an existing directory.")
+
+    # If requested, make a copy of the input directory
     if parsed.make_dir_copy:
-        new_data_dir = add_label_to_path(str(data_dir), label="_copy")
+        new_data_dir = add_label_to_path(str(data_dir), label=f"_copy{str(uuid.uuid4())}")
         shutil.copytree(data_dir, new_data_dir)
+
         print('Created temporary directory: %s', new_data_dir)
         data_dir = Path(new_data_dir).resolve()
 
-    input_files = [str(f) for f in data_dir.iterdir()]
+    # Get list of files (ignoring hidden files) in directory.
+    input_files = [str(f) for f in data_dir.iterdir() if not f.name.startswith(".")]
 
-    return input_files, parsed.output_path
+    return input_files, str(output_path)
 
 def run_bumblebee(args: list) -> None:
     """
