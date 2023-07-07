@@ -15,7 +15,7 @@ GROUP_DELIM = '__'
 
 COORD_DELIM = "  "
 
-_string_dimension_name_pattern = re.compile("__char[0-9]+")
+_string_dimension_name_pattern = re.compile(r"__char[0-9]+")
 
 
 def walk(group_node: nc.Group,
@@ -139,7 +139,6 @@ def flatten_grouped_dataset(nc_dataset: nc.Dataset,
 
             # Create a coordinate variable, if it doesn't already exist.
             if ensure_all_dims_are_coords and (new_dim_name not in list(nc_dataset.variables.keys())):
-                print(f"Creating coordinate variable for {new_dim_name}...")
                 nc_dataset.createVariable(dim.name, datatype=np.int32, dimensions=(dim.name,))
                 temporary_coordinate_variables.append(dim.name)
 
