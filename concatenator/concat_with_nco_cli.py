@@ -1,4 +1,7 @@
 """A simple CLI wrapper around the main NCO concatenation function"""
+
+# pylint: disable=R0801
+
 import logging
 import shutil
 import sys
