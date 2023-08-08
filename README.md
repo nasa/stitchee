@@ -1,6 +1,8 @@
 # bumblebee
 
-Harmony service for concatenating netCDF data *along an existing dimension*.
+Tool for concatenating netCDF data *along an existing dimension*,
+which is deigned as both a standalone utility and
+for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
 
 ## Getting started, with poetry
 
@@ -17,7 +19,7 @@ poetry install
 poetry run pytest tests/
 ```
 
-## Usage
+## Usage (with poetry)
 
 ```shell
 $ poetry run bumblebee --help
@@ -39,6 +41,12 @@ For example:
 
 ```shell
 poetry run bumblebee /path/to/netcdf/directory/ /path/to/output.nc
+```
+
+## Usage (without poetry)
+
+```shell
+python entry.py --help
 ```
 
 ## Roadmap
