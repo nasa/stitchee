@@ -4,7 +4,7 @@ from logging import getLogger
 import netCDF4 as nc  # type: ignore
 from nco import Nco  # type: ignore
 
-from concatenator.bumblebee import _is_file_empty
+from concatenator.bumblebee import _validate_workable_files
 
 default_logger = getLogger(__name__)
 
@@ -30,17 +30,10 @@ def concat_netcdf_files(original_input_files,
         logger object
     """
     nco = Nco()
-
-    # -- initial preprocessing --
     logger.info('Preprocessing data...')
-    input_files = []
 
-    # only concatenate files that are not empty
-    for file in original_input_files:
-        with nc.Dataset(file, 'r') as dataset:
-            is_empty = _is_file_empty(dataset)
-            if is_empty is False:
-                input_files.append(file)
+    # Proceed to concatenate only files that are workable (can be opened and are not empty).
+    input_files, _ = _validate_workable_files(original_input_files, logger)
 
     for i, file in enumerate(input_files):
         print(f"Checking for record dimension in file {i} ({file})..")

@@ -4,7 +4,7 @@ import logging
 import os
 import time
 from logging import Logger
-from typing import Union
+from typing import Tuple, Union
 
 import netCDF4 as nc  # type: ignore
 import xarray as xr
@@ -36,20 +36,11 @@ def bumblebee(files_to_concat: list[str],
     intermediate_flat_filepaths: list[str] = []
     benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
 
-    # Proceed to concatenate only files that are 'open-able' and not empty.
-    input_files = []
-    for file in files_to_concat:
-        try:
-            with nc.Dataset(file, 'r') as dataset:
-                is_empty = _is_file_empty(dataset)
-                if is_empty is False:
-                    input_files.append(file)
-        except OSError:
-            logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
+    # Proceed to concatenate only files that are workable (can be opened and are not empty).
+    input_files, num_input_files = _validate_workable_files(files_to_concat, logger)
 
     # Exit cleanly if no workable netCDF files found.
-    num_files = len(input_files)
-    if num_files < 1:
+    if num_input_files < 1:
         logger.info("No non-empty netCDF files found. Exiting.")
         return ""
 
@@ -57,7 +48,7 @@ def bumblebee(files_to_concat: list[str],
     for i, filepath in enumerate(input_files):
         # The group structure is flattened.
         start_time = time.time()
-        logger.debug("    ..file %03d/%03d <%s>..", i + 1, num_files, filepath)
+        logger.debug("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
         flat_dataset, coord_vars, string_vars = flatten_grouped_dataset(nc.Dataset(filepath, 'r'), filepath,
                                                                         ensure_all_dims_are_coords=True)
         xrds = xr.open_dataset(xr.backends.NetCDF4DataStore(flat_dataset),
@@ -104,6 +95,23 @@ def bumblebee(files_to_concat: list[str],
         os.remove(tmp_flat_concatenated_path)
 
     return output_file
+
+
+def _validate_workable_files(files_to_concat, logger) -> Tuple[list[str], int]:
+    """Remove files from list that are not open-able as netCDF or that are empty."""
+    workable_files = []
+    for file in files_to_concat:
+        try:
+            with nc.Dataset(file, 'r') as dataset:
+                is_empty = _is_file_empty(dataset)
+                if is_empty is False:
+                    workable_files.append(file)
+        except OSError:
+            logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
+
+    number_of_workable_files = len(workable_files)
+
+    return workable_files, number_of_workable_files
 
 
 def _is_file_empty(parent_group: Union[nc.Dataset, nc.Group]) -> bool:
