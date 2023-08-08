@@ -50,12 +50,11 @@ def bumblebee(files_to_concat: list[str],
         logger.info("No non-empty netCDF files found. Exiting.")
         return ""
 
-
     logger.debug("Flattening all input files...")
     for i, filepath in enumerate(input_files):
         # The group structure is flattened.
         start_time = time.time()
-        logger.debug("    ..file %03d/%d <%s>..", i, num_files, filepath)
+        logger.debug("    ..file %03d/%03d <%s>..", i + 1, num_files, filepath)
         flat_dataset, coord_vars, string_vars = flatten_grouped_dataset(nc.Dataset(filepath, 'r'), filepath,
                                                                         ensure_all_dims_are_coords=True)
         xrds = xr.open_dataset(xr.backends.NetCDF4DataStore(flat_dataset),
