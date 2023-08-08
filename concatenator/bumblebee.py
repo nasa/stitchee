@@ -18,6 +18,7 @@ default_logger = logging.getLogger(__name__)
 
 def bumblebee(files_to_concat: list[str],
               output_file: str,
+              write_tmp_flat_concatenated: bool = False,
               keep_tmp_files: bool = True,
               logger: Logger = default_logger) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -71,10 +72,13 @@ def bumblebee(files_to_concat: list[str],
                                     compat='override')
     benchmark_log['concatenating'] = time.time() - start_time
 
-    logger.debug("Writing concatenated flattened temporary file to disk...")
-    # Concatenated, yet still flat, file is written to disk for debugging.
-    tmp_flat_concatenated_path = add_label_to_path(output_file, label="_flat_intermediate")
-    combined_ds.to_netcdf(tmp_flat_concatenated_path)
+    if write_tmp_flat_concatenated:
+        logger.debug("Writing concatenated flattened temporary file to disk...")
+        # Concatenated, yet still flat, file is written to disk for debugging.
+        tmp_flat_concatenated_path = add_label_to_path(output_file, label="_flat_intermediate")
+        combined_ds.to_netcdf(tmp_flat_concatenated_path, format="NETCDF4")
+    else:
+        tmp_flat_concatenated_path = None
 
     # The group hierarchy of the concatenated file is reconstructed (using XARRAY).
     start_time = time.time()
@@ -93,7 +97,8 @@ def bumblebee(files_to_concat: list[str],
     if not keep_tmp_files:
         for file in intermediate_flat_filepaths:
             os.remove(file)
-        os.remove(tmp_flat_concatenated_path)
+        if tmp_flat_concatenated_path:
+            os.remove(tmp_flat_concatenated_path)
 
     return output_file
 

@@ -45,6 +45,7 @@ class TestConcat(TestCase):
                 input_files.append(str(copied_input_new_path))
 
         output_path = bumblebee(files_to_concat=input_files, output_file=output_path,
+                                write_tmp_flat_concatenated=True,
                                 keep_tmp_files=True)
 
         merged_dataset = nc.Dataset(output_path)

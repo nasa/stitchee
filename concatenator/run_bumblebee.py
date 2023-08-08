@@ -92,7 +92,9 @@ def run_bumblebee(args: list) -> None:
     num_inputs = len(input_files)
 
     logging.info('Executing bumblebee concatenation on %d files...', num_inputs)
-    bumblebee(input_files, output_path, keep_tmp_files=keep_tmp_files)
+    bumblebee(input_files, output_path,
+              write_tmp_flat_concatenated=keep_tmp_files,
+              keep_tmp_files=keep_tmp_files)
     logging.info('BUMBLEBEE complete. Result in %s', output_path)
 
     if not keep_tmp_files and temporary_dir_to_remove:
