@@ -36,7 +36,7 @@ def bumblebee(files_to_concat: list[str],
     intermediate_flat_filepaths: list[str] = []
     benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
 
-    # Only concatenate files that are not empty.
+    # Proceed to concatenate only files that are 'open-able' and not empty.
     input_files = []
     for file in files_to_concat:
         try:
