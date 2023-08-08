@@ -13,7 +13,6 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-nco = "^1.1.0"
 netcdf4 = "^1.6.4"
 xarray = "^2023.6.0"
 dask = "^2023.6.1"
@@ -22,6 +21,10 @@ dask = "^2023.6.1"
 pytest = "^7.3.1"
 mypy = "^1.4.1"
 pylint = "^2.17.4"
+
+
+[tool.poetry.group.extras.dependencies]
+nco = "^1.1.0"
 
 [tool.poetry.scripts]
 bumblebee = 'concatenator.run_bumblebee:main'
