@@ -24,8 +24,9 @@ def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
         prog='bumblebee',
         description='Run the along-existing-dimension concatenator.')
     parser.add_argument(
-        'data_dir',
-        help='The directory containing the files to be merged.')
+        'data_dir_or_file',
+        help='Can be either (1) a directory containing the files to be concatenated, '
+             'or (2) a file that has linebreak-separated paths of the files to be concatenated.')
     parser.add_argument(
         'output_path',
         help='The output filename for the merged output.')
@@ -63,26 +64,49 @@ def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
         else:
             raise FileExistsError(f"File already exists at <{output_path}>. Run again with option '-O' to overwrite.")
 
-    # The input directory is validated.
-    data_dir = Path(parsed.data_dir).resolve()
-    if not data_dir.is_dir():
-        raise TypeError("'data_dir' must be an existing directory.")
+    # The input directory or file is validated.
+    data_dir_or_file = Path(parsed.data_dir_or_file).resolve()
+    if data_dir_or_file.is_dir():
+        input_files = _get_list_of_filepaths_from_dir(data_dir_or_file)
+    elif data_dir_or_file.is_file():
+        input_files = _get_list_of_filepaths_from_file(data_dir_or_file)
+    else:
+        raise TypeError("'data_dir_or_file' must be an existing directory or file.")
 
-    # If requested, make a copy of the input directory
+    # If requested, make a temporary directory with copies of the original input files
     temporary_dir_to_remove = None
     if parsed.make_dir_copy:
-        new_data_dir = add_label_to_path(str(data_dir), label=f"_copy{str(uuid.uuid4())}")
-        shutil.copytree(data_dir, new_data_dir)
+        new_data_dir = Path(add_label_to_path(str(output_path.parent / "temp_copy"), label=str(uuid.uuid4()))).resolve()
+        os.makedirs(new_data_dir, exist_ok=True)
+        print('Created temporary directory: %s', str(new_data_dir))
 
-        print('Created temporary directory: %s', new_data_dir)
-        data_dir = Path(new_data_dir).resolve()
+        new_input_files = []
+        for file in input_files:
+            new_path = new_data_dir / Path(file).name
+            shutil.copyfile(file, new_path)
+            new_input_files.append(str(new_path))
 
-        temporary_dir_to_remove = str(data_dir)
-
-    # Get list of files (ignoring hidden files) in directory.
-    input_files = [str(f) for f in data_dir.iterdir() if not f.name.startswith(".")]
+        input_files = new_input_files
+        print('Copied files to temporary directory: %s', new_data_dir)
+        temporary_dir_to_remove = str(new_data_dir)
 
     return input_files, str(output_path), bool(parsed.keep_tmp_files), temporary_dir_to_remove
+
+
+def _get_list_of_filepaths_from_file(file_with_paths: Path):
+    # Each path listed in the specified file is resolved using pathlib for validation.
+    paths_list = []
+    with open(file_with_paths, encoding="utf-8") as file:
+        while line := file.readline():
+            paths_list.append(str(Path(line.rstrip()).resolve()))
+
+    return paths_list
+
+def _get_list_of_filepaths_from_dir(data_dir: Path):
+    # Get list of files (ignoring hidden files) in directory.
+    input_files = [str(f) for f in data_dir.iterdir() if not f.name.startswith(".")]
+    return input_files
+
 
 def run_bumblebee(args: list) -> None:
     """
