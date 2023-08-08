@@ -71,6 +71,7 @@ def bumblebee(files_to_concat: list[str],
                                     compat='override')
     benchmark_log['concatenating'] = time.time() - start_time
 
+    logger.debug("Writing concatenated flattened temporary file to disk...")
     # Concatenated, yet still flat, file is written to disk for debugging.
     tmp_flat_concatenated_path = add_label_to_path(output_file, label="_flat_intermediate")
     combined_ds.to_netcdf(tmp_flat_concatenated_path)
@@ -86,7 +87,7 @@ def bumblebee(files_to_concat: list[str],
     for k, v in benchmark_log.items():
         logger.info("%s: %f", k, v)
         total_time += v
-    logger.info("-- total time: %f", total_time)
+    logger.info("-- total processing time: %f", total_time)
 
     # If requested, remove temporary intermediate files.
     if not keep_tmp_files:
