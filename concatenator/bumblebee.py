@@ -1,6 +1,7 @@
 """Concatenation service that appends data along an existing dimension, using netCDF4 and xarray."""
 
 import logging
+import os
 import time
 from logging import Logger
 from typing import Union
@@ -17,6 +18,7 @@ default_logger = logging.getLogger(__name__)
 
 def bumblebee(files_to_concat: list[str],
               output_file: str,
+              keep_tmp_files: bool = True,
               logger: Logger = default_logger) -> str:
     """Concatenate netCDF data files along an existing dimension.
 
@@ -24,6 +26,7 @@ def bumblebee(files_to_concat: list[str],
     ----------
     files_to_concat : list[str]
     output_file : str
+    keep_tmp_files : bool
     logger : logging.Logger
 
     Returns
@@ -78,7 +81,8 @@ def bumblebee(files_to_concat: list[str],
     benchmark_log['concatenating'] = time.time() - start_time
 
     # Concatenated, yet still flat, file is written to disk for debugging.
-    combined_ds.to_netcdf(add_label_to_path(output_file, label="_flat_intermediate"))
+    tmp_flat_concatenated_path = add_label_to_path(output_file, label="_flat_intermediate")
+    combined_ds.to_netcdf(tmp_flat_concatenated_path)
 
     # The group hierarchy of the concatenated file is reconstructed (using XARRAY).
     start_time = time.time()
@@ -86,12 +90,18 @@ def bumblebee(files_to_concat: list[str],
     regroup_flattened_dataset(combined_ds, output_file)
     benchmark_log['reconstructing_groups'] = time.time() - start_time
 
-    print("--- Benchmark results ---")
+    logger.info("--- Benchmark results ---")
     total_time = 0.0
     for k, v in benchmark_log.items():
         logger.info("%s: %f", k, v)
         total_time += v
     logger.info("-- total time: %f", total_time)
+
+    # If requested, remove temporary intermediate files.
+    if not keep_tmp_files:
+        for file in intermediate_flat_filepaths:
+            os.remove(file)
+        os.remove(tmp_flat_concatenated_path)
 
     return output_file
 

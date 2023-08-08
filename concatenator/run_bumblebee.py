@@ -6,13 +6,13 @@ import sys
 import uuid
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Union
 
 from concatenator.bumblebee import bumblebee
 from concatenator.file_ops import add_label_to_path
 
 
-def parse_args(args: list) -> Tuple[list[str], str]:
+def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
     """
     Parse args for this script.
 
@@ -35,10 +35,11 @@ def parse_args(args: list) -> Tuple[list[str], str]:
         help='Make a duplicate of the input directory to avoid modification of input files. '
              'This is useful for testing, but uses more disk space.')
     parser.add_argument(
-        '--rm_dir_copy',
+        '--keep_tmp_files',
         action='store_true',
-        help="Remove the input directory copy (created by '--make_dir_copy') after successful execution. "
-             "Ignored if '--make_dir_copy' is not used.")
+        help="Prevents removal, after successful execution, of "
+             "(1) the flattened concatenated file and "
+             "(2) the input directory copy  if created by '--make_dir_copy'.")
     parser.add_argument(
         '-O', '--overwrite',
         action='store_true',
@@ -68,6 +69,7 @@ def parse_args(args: list) -> Tuple[list[str], str]:
         raise TypeError("'data_dir' must be an existing directory.")
 
     # If requested, make a copy of the input directory
+    temporary_dir_to_remove = None
     if parsed.make_dir_copy:
         new_data_dir = add_label_to_path(str(data_dir), label=f"_copy{str(uuid.uuid4())}")
         shutil.copytree(data_dir, new_data_dir)
@@ -75,21 +77,26 @@ def parse_args(args: list) -> Tuple[list[str], str]:
         print('Created temporary directory: %s', new_data_dir)
         data_dir = Path(new_data_dir).resolve()
 
+        temporary_dir_to_remove = str(data_dir)
+
     # Get list of files (ignoring hidden files) in directory.
     input_files = [str(f) for f in data_dir.iterdir() if not f.name.startswith(".")]
 
-    return input_files, str(output_path)
+    return input_files, str(output_path), bool(parsed.keep_tmp_files), temporary_dir_to_remove
 
 def run_bumblebee(args: list) -> None:
     """
     Parse arguments and run subsetter on the specified input file
     """
-    input_files, output_path = parse_args(args)
+    input_files, output_path, keep_tmp_files, temporary_dir_to_remove = parse_args(args)
     num_inputs = len(input_files)
 
     logging.info('Executing bumblebee concatenation on %d files...', num_inputs)
-    bumblebee(input_files, output_path)
+    bumblebee(input_files, output_path, keep_tmp_files=keep_tmp_files)
     logging.info('BUMBLEBEE complete. Result in %s', output_path)
+
+    if not keep_tmp_files and temporary_dir_to_remove:
+        shutil.rmtree(temporary_dir_to_remove)
 
 
 def main() -> None:
