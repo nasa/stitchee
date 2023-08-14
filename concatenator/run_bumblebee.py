@@ -23,12 +23,22 @@ def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
     parser = ArgumentParser(
         prog='bumblebee',
         description='Run the along-existing-dimension concatenator.')
-    parser.add_argument(
-        'data_dir_or_file',
-        help='Can be either (1) a directory containing the files to be concatenated, '
-             'or (2) a file that has linebreak-separated paths of the files to be concatenated.')
-    parser.add_argument(
-        'output_path',
+
+    # g = parser.add_mutually_exclusive_group(required=True)
+    req_grp = parser.add_argument_group(title='Required')
+    req_grp.add_argument(
+        'input',
+        metavar='path/directory or path list',
+        nargs='+',
+        help='Files to be concatenated, specified via a '
+             '(1) single directory containing the files to be concatenated, '
+             '(2) single text file containing linebreak-separated paths of the files to be concatenated, '
+             'or (3) multiple filepaths of the files to be concatenated.')
+    req_grp.add_argument(
+        '-o',
+        '--output_path',
+        metavar='output_path',
+        required=True,
         help='The output filename for the merged output.')
     parser.add_argument(
         '--make_dir_copy',
@@ -65,13 +75,20 @@ def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
             raise FileExistsError(f"File already exists at <{output_path}>. Run again with option '-O' to overwrite.")
 
     # The input directory or file is validated.
-    data_dir_or_file = Path(parsed.data_dir_or_file).resolve()
-    if data_dir_or_file.is_dir():
-        input_files = _get_list_of_filepaths_from_dir(data_dir_or_file)
-    elif data_dir_or_file.is_file():
-        input_files = _get_list_of_filepaths_from_file(data_dir_or_file)
+    print(f"parsed_input === {parsed.input}")
+    if len(parsed.input) > 1:
+        input_files = parsed.input
+    elif len(parsed.input) == 1:
+        directory_or_path = Path(parsed.input[0]).resolve()
+        if directory_or_path.is_dir():
+            input_files = _get_list_of_filepaths_from_dir(directory_or_path)
+        elif directory_or_path.is_file():
+            input_files = _get_list_of_filepaths_from_file(directory_or_path)
+        else:
+            raise TypeError("if one path is provided for 'data_dir_or_file_or_filepaths', "
+                            "then it must be an existing directory or file.")
     else:
-        raise TypeError("'data_dir_or_file' must be an existing directory or file.")
+        raise TypeError("input argument must be one path/directory or a list of paths.")
 
     # If requested, make a temporary directory with copies of the original input files
     temporary_dir_to_remove = None
