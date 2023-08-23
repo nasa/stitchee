@@ -2,7 +2,7 @@
 name = "bumblebee"
 version = "0.1.0"
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
-authors = ["<daniel.kaufman@nasa.gov>"]
+authors = ["Daniel Kaufman <daniel.kaufman@nasa.gov>"]
 readme = "README.md"
 classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules"
