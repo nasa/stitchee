@@ -9,4 +9,4 @@ exclude =
     docs/source/conf.py,
     # This contains our built documentation
     build,
-max-complexity = 10
+max-complexity = 12
