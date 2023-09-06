@@ -11,12 +11,12 @@ import netCDF4 as nc  # type: ignore
 import numpy as np
 import xarray as xr
 
-GROUP_DELIM = '__'
+from concatenator import GROUP_DELIM
+from concatenator.attribute_handling import (
+    flatten_coordinate_attribute_paths, regroup_coordinate_attribute)
 
-COORD_DELIM = "  "
-
+# Match dimension names such as "__char28" or "__char16". Used for CERES datasets.
 _string_dimension_name_pattern = re.compile(r"__char[0-9]+")
-
 
 def walk(group_node: nc.Group,
          path: str,
@@ -44,11 +44,8 @@ def walk(group_node: nc.Group,
                 var_group_name = f'{group_path}{GROUP_DELIM}{var_name}'
                 new_dataset.variables[var_group_name] = var
 
-                # Flatten the paths of variables referenced in the coordinates attribute.
-                if 'coordinates' in var.ncattrs():
-                    coord_att = var.getncattr('coordinates')
-                    new_dataset.variables[var_group_name].setncattr('coordinates',
-                                                                    _flatten_coordinate_attribute(coord_att))
+                # Flatten the paths of variables referenced in the coordinates attribute
+                flatten_coordinate_attribute_paths(new_dataset, var, var_group_name)
 
                 if (len(var.dimensions) == 1) and _string_dimension_name_pattern.fullmatch(var.dimensions[0]):
                     list_of_character_string_vars.append(var_group_name)
@@ -118,9 +115,7 @@ def flatten_grouped_dataset(nc_dataset: nc.Dataset,
             nc_dataset.variables[new_var_name] = var
 
             # Flatten the paths of variables referenced in the coordinates attribute.
-            if 'coordinates' in var.ncattrs():
-                coord_att = var.getncattr('coordinates')
-                nc_dataset.variables[new_var_name].setncattr('coordinates', _flatten_coordinate_attribute(coord_att))
+            flatten_coordinate_attribute_paths(nc_dataset, var, new_var_name)
 
             del nc_dataset.variables[var_name]  # Delete old variable
 
@@ -234,7 +229,7 @@ def regroup_flattened_dataset(dataset: xr.Dataset, output_file: str) -> None:  #
                 # Reconstruct the grouped paths of variables referenced in the coordinates attribute.
                 if 'coordinates' in var_group[new_var_name].ncattrs():
                     coord_att = var_group[new_var_name].getncattr('coordinates')
-                    var_group[new_var_name].setncattr('coordinates', _regroup_coordinate_attribute(coord_att))
+                    var_group[new_var_name].setncattr('coordinates', regroup_coordinate_attribute(coord_att))
 
             except Exception as err:
                 raise err
@@ -245,70 +240,6 @@ def _get_nested_group(dataset: nc.Dataset, group_path: str) -> nc.Group:
     for group in group_path.strip(GROUP_DELIM).split(GROUP_DELIM)[:-1]:
         nested_group = nested_group.groups[group]
     return nested_group
-
-
-def _flatten_coordinate_attribute(attribute_string: str) -> str:
-    """Converts attributes that specify group membership via "/" to use new group delimieter, even for the root level.
-
-    Examples
-    --------
-    >>> coord_att = "Time_and_Position/time  Time_and_Position/instrument_fov_latitude  Time_and_Position/instrument_fov_longitude"
-    >>> _flatten_coordinate_attribute(coord_att)
-        __Time_and_Position__time  __Time_and_Position__instrument_fov_latitude  __Time_and_Position__instrument_fov_longitude
-
-    Parameters
-    ----------
-    attribute_string : str
-
-    Returns
-    -------
-    str
-    """
-    # Use the separator that's in the attribute string only if all separators in the string are the same.
-    # Otherwise, we will use our own default separator.
-    whitespaces = re.findall(r'\s+', attribute_string)
-    if len(set(whitespaces)) <= 1:
-        new_sep = whitespaces[0]
-    else:
-        new_sep = COORD_DELIM
-
-    # A new string is constructed.
-    return new_sep.join(
-        f'{GROUP_DELIM}{c.replace("/", GROUP_DELIM)}'
-        for c
-        in attribute_string.split()  # split on any whitespace
-    )
-
-
-def _regroup_coordinate_attribute(attribute_string: str) -> str:
-    """
-    Examples
-    --------
-    >>> coord_att = "__Time_and_Position__time  __Time_and_Position__instrument_fov_latitude  __Time_and_Position__instrument_fov_longitude"
-    >>> _flatten_coordinate_attribute(coord_att)
-        Time_and_Position/time  Time_and_Position/instrument_fov_latitude  Time_and_Position/instrument_fov_longitude
-
-    Parameters
-    ----------
-    attribute_string : str
-
-    Returns
-    -------
-    str
-    """
-    # Use the separator that's in the attribute string only if all separators in the string are the same.
-    # Otherwise, we will use our own default separator.
-    whitespaces = re.findall(r'\s+', attribute_string)
-    if len(set(whitespaces)) <= 1:
-        new_sep = whitespaces[0]
-    else:
-        new_sep = COORD_DELIM
-
-    return new_sep.join(
-        '/'.join(c.split(GROUP_DELIM))[1:]
-        for c
-        in attribute_string.split()  # split on any whitespace
-    )
 
 
 def _calculate_chunks(dim_sizes: list, default_low_dim_chunksize=4000) -> tuple:

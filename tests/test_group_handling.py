@@ -1,9 +1,9 @@
 """Tests for manipulating netCDF groups."""
 
-# pylint: disable=C0116
+# pylint: disable=C0116, C0301
 
-from concatenator.group_handling import (_flatten_coordinate_attribute,
-                                         _regroup_coordinate_attribute)
+from concatenator.attribute_handling import (_flatten_coordinate_attribute,
+                                             regroup_coordinate_attribute)
 
 
 def test_coordinate_attribute_flattening():
@@ -20,11 +20,9 @@ def test_coordinate_attribute_flattening():
 
 def test_coordinate_attribute_regrouping():
     # Case with groups present and double spaces.
-    assert _regroup_coordinate_attribute(
-        '__Time_and_Position__time  __Time_and_Position__instrument_fov_latitude  __Time_and_Position__instrument_fov_longitude'
-    ) == "Time_and_Position/time  Time_and_Position/instrument_fov_latitude  Time_and_Position/instrument_fov_longitude"
+    assert regroup_coordinate_attribute(
+        '__Time_and_Position__time  __Time_and_Position__instrument_fov_latitude  __Time_and_Position__instrument_fov_longitude') == "Time_and_Position/time  Time_and_Position/instrument_fov_latitude  Time_and_Position/instrument_fov_longitude"
 
     # Case with NO groups present and single spaces.
-    assert _regroup_coordinate_attribute(
-        "__time __longitude __latitude __ozone_profile_pressure __ozone_profile_altitude"
-    ) == "time longitude latitude ozone_profile_pressure ozone_profile_altitude"
+    assert regroup_coordinate_attribute(
+        "__time __longitude __latitude __ozone_profile_pressure __ozone_profile_altitude") == "time longitude latitude ozone_profile_pressure ozone_profile_altitude"

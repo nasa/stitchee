@@ -44,9 +44,11 @@ class TestConcat(TestCase):
                 shutil.copyfile(filepath, copied_input_new_path)
                 input_files.append(str(copied_input_new_path))
 
-        output_path = bumblebee(files_to_concat=input_files, output_file=output_path,
+        output_path = bumblebee(files_to_concat=input_files,
+                                output_file=output_path,
                                 write_tmp_flat_concatenated=True,
-                                keep_tmp_files=True)
+                                keep_tmp_files=True,
+                                concat_dim=record_dim_name)
 
         merged_dataset = nc.Dataset(output_path)
 
@@ -82,11 +84,18 @@ class TestConcat(TestCase):
         assert length_sum == len(merged_dataset.variables[record_dim_name])
 
     def test_tempo_no2_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('tempo/tempo_no2',
+        self.run_verification_with_bumblebee('tempo/tempo_no2_two',
                                              'tempo_no2_concat_with_bumblebee.nc')
 
+    def test_tempo_no2_many_concat_with_bumblebee(self):
+        self.run_verification_with_bumblebee('tempo/tempo_no2_many',
+                                             'tempo_no2_concat_many_with_bumblebee.nc')
+
     def test_tempo_hcho_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('tempo/tempo_hcho', 'tempo_hcho_concat_with_bumblebee.nc')
+        self.run_verification_with_bumblebee('tempo/tempo_hcho_two', 'tempo_hcho_concat_with_bumblebee.nc')
+
+    def test_tempo_hcho_many_concat_with_bumblebee(self):
+        self.run_verification_with_bumblebee('tempo/tempo_hcho_many', 'tempo_hcho_concat_with_bumblebee.nc')
 
     def test_tempo_cld04_concat_with_bumblebee(self):
         self.run_verification_with_bumblebee('tempo/tempo_cld04', 'tempo_cld04_concat_with_bumblebee.nc')
