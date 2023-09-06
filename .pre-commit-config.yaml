@@ -20,7 +20,7 @@ repos:
         exclude: doc/data/messages/(r/reimported|w/wrong-import-order|u/ungrouped-imports|m/misplaced-future|m/multiple-imports)/bad.py
 
   - repo: https://github.com/pylint-dev/pylint
-    rev: v2.17.4
+    rev: v3.0.0a7
     hooks:
       - id: pylint
         name: pylint
@@ -34,14 +34,19 @@ repos:
             "--rcfile=.pylintrc", # Link to your config file
           ]
 
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.1.1
+    rev: v1.5.1
     hooks:
       - id: mypy
 
   # Other Linters
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.29.0
+    rev: v1.32.0
     hooks:
       - id: yamllint
         args: ["-d {extends: relaxed, rules: {line-length: {max: 120}}}"]
