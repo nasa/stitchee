@@ -9,6 +9,8 @@ from typing import Tuple, Union
 import netCDF4 as nc  # type: ignore
 import xarray as xr
 
+from concatenator import GROUP_DELIM
+from concatenator.dimension_cleanup import remove_duplicate_dims
 from concatenator.file_ops import add_label_to_path
 from concatenator.group_handling import (flatten_grouped_dataset,
                                          regroup_flattened_dataset)
@@ -20,6 +22,7 @@ def bumblebee(files_to_concat: list[str],
               output_file: str,
               write_tmp_flat_concatenated: bool = False,
               keep_tmp_files: bool = True,
+              concat_dim: str = "",
               logger: Logger = default_logger) -> str:
     """Concatenate netCDF data files along an existing dimension.
 
@@ -28,6 +31,7 @@ def bumblebee(files_to_concat: list[str],
     files_to_concat : list[str]
     output_file : str
     keep_tmp_files : bool
+    concat_dim : str, optional
     logger : logging.Logger
 
     Returns
@@ -46,30 +50,40 @@ def bumblebee(files_to_concat: list[str],
         return ""
 
     logger.debug("Flattening all input files...")
+    xrdataset_list = []
     for i, filepath in enumerate(input_files):
         # The group structure is flattened.
         start_time = time.time()
         logger.debug("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
-        flat_dataset, coord_vars, string_vars = flatten_grouped_dataset(nc.Dataset(filepath, 'r'), filepath,
+        flat_dataset, coord_vars, _ = flatten_grouped_dataset(nc.Dataset(filepath, 'r'), filepath,
                                                                         ensure_all_dims_are_coords=True)
+
+        flat_dataset = remove_duplicate_dims(flat_dataset)
+
         xrds = xr.open_dataset(xr.backends.NetCDF4DataStore(flat_dataset),
                                decode_times=False, decode_coords=False, drop_variables=coord_vars)
+
         benchmark_log['flattening'] = time.time() - start_time
 
         # The flattened file is written to disk.
-        flat_file_path = add_label_to_path(filepath, label="_flat_intermediate")
-        xrds.to_netcdf(flat_file_path, encoding={v_name: {'dtype': 'str'} for v_name in string_vars})
-        intermediate_flat_filepaths.append(flat_file_path)
+        # flat_file_path = add_label_to_path(filepath, label="_flat_intermediate")
+        # xrds.to_netcdf(flat_file_path, encoding={v_name: {'dtype': 'str'} for v_name in string_vars})
+        # intermediate_flat_filepaths.append(flat_file_path)
+        # xrdataset_list.append(xr.open_dataset(flat_file_path))
+        xrdataset_list.append(xrds)
 
     # Flattened files are concatenated together (Using XARRAY).
     start_time = time.time()
     logger.debug("Concatenating flattened files...")
-    combined_ds = xr.open_mfdataset(intermediate_flat_filepaths,
-                                    decode_times=False,
-                                    decode_coords=False,
-                                    data_vars='minimal',
-                                    coords='minimal',
-                                    compat='override')
+    # combined_ds = xr.open_mfdataset(intermediate_flat_filepaths,
+    #                                 decode_times=False,
+    #                                 decode_coords=False,
+    #                                 data_vars='minimal',
+    #                                 coords='minimal',
+    #                                 compat='override')
+
+    combined_ds = xr.concat(xrdataset_list, dim=GROUP_DELIM + concat_dim, data_vars='minimal', coords='minimal')
+
     benchmark_log['concatenating'] = time.time() - start_time
 
     if write_tmp_flat_concatenated:
