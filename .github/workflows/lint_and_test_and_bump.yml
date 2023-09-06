@@ -89,25 +89,25 @@ jobs:
       run: |
         poetry run pytest
 
-    - name: Commit Version Bump
-      # If building develop, a release branch, or main then we commit the version bump back to the repo
-      if: |
-        github.ref == 'refs/heads/develop' ||
-        github.ref == 'refs/heads/main'    ||
-        startsWith(github.ref, 'refs/heads/release')
-      run: |
-        git config --global user.name 'bumblebee bot'
-        git config --global user.email 'bumblebee@noreply.github.com'
-        git commit -am "/version ${{ env.software_version }}"
-        git push
-
-    - name: Push Tag
-      if: |
-        github.ref == 'refs/heads/develop' ||
-        github.ref == 'refs/heads/main'    ||
-        startsWith(github.ref, 'refs/heads/release')
-      run: |
-        git config user.name "${GITHUB_ACTOR}"
-        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-        git tag -a "${{ env.software_version }}" -m "Version ${{ env.software_version }}"
-        git push origin "${{ env.software_version }}"
+#    - name: Commit Version Bump
+#      # If building develop, a release branch, or main then we commit the version bump back to the repo
+#      if: |
+#        github.ref == 'refs/heads/develop' ||
+#        github.ref == 'refs/heads/main'    ||
+#        startsWith(github.ref, 'refs/heads/release')
+#      run: |
+#        git config --global user.name 'bumblebee bot'
+#        git config --global user.email 'bumblebee@noreply.github.com'
+#        git commit -am "/version ${{ env.software_version }}"
+#        git push
+#
+#    - name: Push Tag
+#      if: |
+#        github.ref == 'refs/heads/develop' ||
+#        github.ref == 'refs/heads/main'    ||
+#        startsWith(github.ref, 'refs/heads/release')
+#      run: |
+#        git config user.name "${GITHUB_ACTOR}"
+#        git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+#        git tag -a "${{ env.software_version }}" -m "Version ${{ env.software_version }}"
+#        git push origin "${{ env.software_version }}"
