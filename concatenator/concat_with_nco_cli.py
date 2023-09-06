@@ -14,7 +14,7 @@ def run_nco_concat(args: list) -> None:
     """
     Parse arguments and run subsetter on the specified input file
     """
-    input_files, output_path, keep_tmp_files, temporary_dir_to_remove = parse_args(args)
+    input_files, output_path, _, keep_tmp_files, temporary_dir_to_remove = parse_args(args)
     num_inputs = len(input_files)
 
     logging.info('Executing NCO concatenation on %d files...', num_inputs)
