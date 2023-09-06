@@ -12,7 +12,7 @@ from concatenator.bumblebee import bumblebee
 from concatenator.file_ops import add_label_to_path
 
 
-def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
+def parse_args(args: list) -> Tuple[list[str], str, str, bool, Union[str, None]]:
     """
     Parse args for this script.
 
@@ -24,7 +24,7 @@ def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
         prog='bumblebee',
         description='Run the along-existing-dimension concatenator.')
 
-    # g = parser.add_mutually_exclusive_group(required=True)
+    # Required arguments
     req_grp = parser.add_argument_group(title='Required')
     req_grp.add_argument(
         'input',
@@ -40,6 +40,13 @@ def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
         metavar='output_path',
         required=True,
         help='The output filename for the merged output.')
+
+    # Optional arguments
+    parser.add_argument(
+        '--concat_dim',
+        metavar='concat_dim',
+        nargs=1,
+        help='Dimension to concatenate along, if possible.')
     parser.add_argument(
         '--make_dir_copy',
         action='store_true',
@@ -107,7 +114,7 @@ def parse_args(args: list) -> Tuple[list[str], str, bool, Union[str, None]]:
         print('Copied files to temporary directory: %s', new_data_dir)
         temporary_dir_to_remove = str(new_data_dir)
 
-    return input_files, str(output_path), bool(parsed.keep_tmp_files), temporary_dir_to_remove
+    return input_files, str(output_path), parsed.concat_dim[0], bool(parsed.keep_tmp_files), temporary_dir_to_remove
 
 
 def _get_list_of_filepaths_from_file(file_with_paths: Path):
@@ -129,13 +136,14 @@ def run_bumblebee(args: list) -> None:
     """
     Parse arguments and run subsetter on the specified input file
     """
-    input_files, output_path, keep_tmp_files, temporary_dir_to_remove = parse_args(args)
+    input_files, output_path, concat_dim, keep_tmp_files, temporary_dir_to_remove = parse_args(args)
     num_inputs = len(input_files)
 
     logging.info('Executing bumblebee concatenation on %d files...', num_inputs)
     bumblebee(input_files, output_path,
               write_tmp_flat_concatenated=keep_tmp_files,
-              keep_tmp_files=keep_tmp_files)
+              keep_tmp_files=keep_tmp_files,
+              concat_dim=concat_dim)
     logging.info('BUMBLEBEE complete. Result in %s', output_path)
 
     if not keep_tmp_files and temporary_dir_to_remove:

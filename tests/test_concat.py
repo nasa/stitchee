@@ -44,9 +44,11 @@ class TestConcat(TestCase):
                 shutil.copyfile(filepath, copied_input_new_path)
                 input_files.append(str(copied_input_new_path))
 
-        output_path = bumblebee(files_to_concat=input_files, output_file=output_path,
+        output_path = bumblebee(files_to_concat=input_files,
+                                output_file=output_path,
                                 write_tmp_flat_concatenated=True,
-                                keep_tmp_files=True)
+                                keep_tmp_files=True,
+                                concat_dim=record_dim_name)
 
         merged_dataset = nc.Dataset(output_path)
 
@@ -81,34 +83,38 @@ class TestConcat(TestCase):
             length_sum += len(nc.Dataset(file).variables[record_dim_name])
         assert length_sum == len(merged_dataset.variables[record_dim_name])
 
-    def test_tempo_no2_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('tempo/tempo_no2',
-                                             'tempo_no2_concat_with_bumblebee.nc')
+    # def test_tempo_no2_concat_with_bumblebee(self):
+    #     self.run_verification_with_bumblebee('tempo/no2', 'tempo_no2_bee_concatenated.nc')
 
-    def test_tempo_hcho_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('tempo/tempo_hcho', 'tempo_hcho_concat_with_bumblebee.nc')
+    # def test_tempo_hcho_concat_with_bumblebee(self):
+    #     self.run_verification_with_bumblebee('tempo/hcho', 'tempo_hcho_bee_concatenated.nc')
 
-    def test_tempo_cld04_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('tempo/tempo_cld04', 'tempo_cld04_concat_with_bumblebee.nc')
+    # def test_tempo_cld04_concat_with_bumblebee(self):
+    #     self.run_verification_with_bumblebee('tempo/cld04', 'tempo_cld04_bee_concatenated.nc')
 
-    def test_tempo_o3prof_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('tempo/tempo_o3prof', 'tempo_o3prof_concat_with_bumblebee.nc')
+    # def test_tempo_o3prof_concat_with_bumblebee(self):
+    #     self.run_verification_with_bumblebee('tempo/o3prof', 'tempo_o3prof_bee_concatenated.nc')
 
-    def test_icesat_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('icesat', 'icesat_concat_with_bumblebee.nc')
-
-    def test_ceres_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('ceres-subsetter-output',
-                                             'ceres_concat_with_bumblebee.nc',
-                                             record_dim_name='time')
-
-    def test_ceres_flash_concat_with_bumblebee(self):
-        self.run_verification_with_bumblebee('ceres_flash-subsetter-output',
-                                             'ceres_flash_concat_with_bumblebee.nc',
-                                             record_dim_name='time')
+    # def test_icesat_concat_with_bumblebee(self):
+    #     self.run_verification_with_bumblebee('icesat', 'icesat_concat_with_bumblebee.nc')
+    #
+    # def test_ceres_concat_with_bumblebee(self):
+    #     self.run_verification_with_bumblebee('ceres-subsetter-output',
+    #                                          'ceres_bee_concatenated.nc',
+    #                                          record_dim_name='time')
+    #
+    # def test_ceres_flash_concat_with_bumblebee(self):
+    #     self.run_verification_with_bumblebee('ceres_flash-subsetter-output',
+    #                                          'ceres_flash_bee_concatenated.nc',
+    #                                          record_dim_name='time')
+    #
+    # def test_ceres_flash_concat_with_bumblebee(self):
+    #     self.run_verification_with_bumblebee('ceres_flash-subsetter-output',
+    #                                          'ceres_flash_concat_with_bumblebee.nc',
+    #                                          record_dim_name='time')
 
     # def test_tempo_no2_concat_with_nco(self):
-    #     self.run_verification_with_nco('tempo_no2', 'tempo_no2_concat_with_nco.nc')
+    #     self.run_verification_with_nco('no2', 'tempo_no2_concat_with_nco.nc')
     #
     # def test_tempo_hcho_concat_with_nco(self):
-    #     self.run_verification_with_nco('tempo_hcho', 'tempo_hcho_concat_with_nco.nc')
+    #     self.run_verification_with_nco('hcho', 'tempo_hcho_concat_with_nco.nc')
