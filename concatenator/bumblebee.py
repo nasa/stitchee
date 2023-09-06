@@ -56,7 +56,7 @@ def bumblebee(files_to_concat: list[str],
         start_time = time.time()
         logger.debug("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
         flat_dataset, coord_vars, _ = flatten_grouped_dataset(nc.Dataset(filepath, 'r'), filepath,
-                                                                        ensure_all_dims_are_coords=True)
+                                                              ensure_all_dims_are_coords=True)
 
         flat_dataset = remove_duplicate_dims(flat_dataset)
 

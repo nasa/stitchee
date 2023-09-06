@@ -37,8 +37,8 @@ def remove_duplicate_dims(nc_dataset: nc.Dataset) -> nc.Dataset:
         dim_dup_length = dup_var.shape[dup_var.dimensions.index(dim_dup)]  # length of the duplicated dimension
 
         # New dimension and variable names are created.
-        dim_dup_new = dim_dup+'_1'
-        var_name_new = dup_var_name+'_1'
+        dim_dup_new = dim_dup + '_1'
+        var_name_new = dup_var_name + '_1'
         dup_new_varnames.append(var_name_new)
 
         # The last dimension for the variable is replaced with the new name in a temporary list.
