@@ -25,18 +25,29 @@ poetry run pytest tests/
 
 ```shell
 $ poetry run stitchee --help
-usage: stitchee [-h] [--make_dir_copy] [-v] data_dir output_path
+usage: stitchee [-h] -o output_path [--concat_dim concat_dim] [--make_dir_copy] [--keep_tmp_files] [-O] [-v]
+                path/directory or path list [path/directory or path list ...]
 
 Run the along-existing-dimension concatenator.
 
-positional arguments:
-  data_dir         The directory containing the files to be merged.
-  output_path      The output filename for the merged output.
-
 options:
-  -h, --help       show this help message and exit
-  --make_dir_copy  Make a duplicate of the input directory to avoid modification of input files. This is useful for testing, but uses more disk space.
-  -v, --verbose    Enable verbose output to stdout; useful for debugging
+  -h, --help            show this help message and exit
+  --concat_dim concat_dim
+                        Dimension to concatenate along, if possible.
+  --make_dir_copy       Make a duplicate of the input directory to avoid modification of input files. This is useful for testing, but
+                        uses more disk space.
+  --keep_tmp_files      Prevents removal, after successful execution, of (1) the flattened concatenated file and (2) the input
+                        directory copy if created by '--make_dir_copy'.
+  -O, --overwrite       Overwrite output file if it already exists.
+  -v, --verbose         Enable verbose output to stdout; useful for debugging
+
+Required:
+  path/directory or path list
+                        Files to be concatenated, specified via a (1) single directory containing the files to be concatenated, (2)
+                        single text file containing linebreak-separated paths of the files to be concatenated, or (3) multiple
+                        filepaths of the files to be concatenated.
+  -o output_path, --output_path output_path
+                        The output filename for the merged output.
 ```
 
 For example:
