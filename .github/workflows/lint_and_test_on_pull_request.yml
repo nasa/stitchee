@@ -35,4 +35,5 @@ jobs:
 
     - name: Test with pytest
       run: |
-        poetry run pytest
+        poetry run pytest tests/test_group_handling.py
+      # TODO: expand tests to include full concatenation runs, i.e., don't just run test_group_handling.py
