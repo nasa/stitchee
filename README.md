@@ -1,4 +1,4 @@
-# bumblebee
+# stitchee
 
 Tool for concatenating netCDF data *along an existing dimension*,
 which is deigned as both a standalone utility and
@@ -7,13 +7,13 @@ for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
 ## Getting started, with poetry
 
 1. Follow the instructions for installing `poetry` [here](https://python-poetry.org/docs/).
-2. Install `bumblebee`, with its dependencies, by running the following from the repository directory:
+2. Install `stitchee`, with its dependencies, by running the following from the repository directory:
 
 ```shell
 poetry install
 ```
 
-## How to test `bumblebee` locally
+## How to test `stitchee` locally
 
 ```shell
 poetry run pytest tests/
@@ -22,8 +22,8 @@ poetry run pytest tests/
 ## Usage (with poetry)
 
 ```shell
-$ poetry run bumblebee --help
-usage: bumblebee [-h] [--make_dir_copy] [-v] data_dir output_path
+$ poetry run stitchee --help
+usage: stitchee [-h] [--make_dir_copy] [-v] data_dir output_path
 
 Run the along-existing-dimension concatenator.
 
@@ -40,7 +40,7 @@ options:
 For example:
 
 ```shell
-poetry run bumblebee /path/to/netcdf/directory/ /path/to/output.nc
+poetry run stitchee /path/to/netcdf/directory/ /path/to/output.nc
 ```
 
 ## Usage (without poetry)

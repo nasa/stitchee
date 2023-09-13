@@ -77,7 +77,7 @@ jobs:
         echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
         echo "venue=ops" >> $GITHUB_ENV
 
-    - name: Install bumblebee
+    - name: Install stitchee
       run: poetry install
 
     - name: Lint
@@ -96,8 +96,8 @@ jobs:
 #        github.ref == 'refs/heads/main'    ||
 #        startsWith(github.ref, 'refs/heads/release')
 #      run: |
-#        git config --global user.name 'bumblebee bot'
-#        git config --global user.email 'bumblebee@noreply.github.com'
+#        git config --global user.name 'stitchee bot'
+#        git config --global user.email 'stitchee@noreply.github.com'
 #        git commit -am "/version ${{ env.software_version }}"
 #        git push
 #
