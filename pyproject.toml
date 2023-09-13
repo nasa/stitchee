@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "bumblebee"
+name = "stitchee"
 version = "0.1.0"
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
 authors = ["Daniel Kaufman <daniel.kaufman@nasa.gov>"]
@@ -28,7 +28,7 @@ flake8 = "^6.1.0"
 nco = "^1.1.0"
 
 [tool.poetry.scripts]
-bumblebee = 'concatenator.run_bumblebee:main'
+stitchee = 'concatenator.run_stitchee:main'
 
 [build-system]
 requires = ["poetry-core"]
