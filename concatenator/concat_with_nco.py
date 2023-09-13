@@ -4,7 +4,7 @@ from logging import getLogger
 import netCDF4 as nc  # type: ignore
 from nco import Nco  # type: ignore
 
-from concatenator.bumblebee import _validate_workable_files
+from concatenator.stitchee import _validate_workable_files
 
 default_logger = getLogger(__name__)
 

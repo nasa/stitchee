@@ -18,12 +18,12 @@ from concatenator.group_handling import (flatten_grouped_dataset,
 default_logger = logging.getLogger(__name__)
 
 
-def bumblebee(files_to_concat: list[str],
-              output_file: str,
-              write_tmp_flat_concatenated: bool = False,
-              keep_tmp_files: bool = True,
-              concat_dim: str = "",
-              logger: Logger = default_logger) -> str:
+def stitchee(files_to_concat: list[str],
+             output_file: str,
+             write_tmp_flat_concatenated: bool = False,
+             keep_tmp_files: bool = True,
+             concat_dim: str = "",
+             logger: Logger = default_logger) -> str:
     """Concatenate netCDF data files along an existing dimension.
 
     Parameters
