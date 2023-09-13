@@ -1,14 +1,12 @@
 [<img src="https://github.com/danielfromearth/stitchee/assets/114174502/58052dfa-b6e1-49e5-96e5-4cb1e8d14c32" width="250"/>](stitchee_9_hex)
 
-# stitchee
-_______
+# Overview
+_____
 
-Tool for concatenating netCDF data *along an existing dimension*,
-which is deigned as both a standalone utility and
-for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
+_STITCHEE_ (STITCH by Extending a dimEnsion) is used for concatenating netCDF data *along an existing dimension*,
+and it is deigned as both a standalone utility and for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
 
 ## Getting started, with poetry
-_______
 
 1. Follow the instructions for installing `poetry` [here](https://python-poetry.org/docs/).
 2. Install `stitchee`, with its dependencies, by running the following from the repository directory:
@@ -24,7 +22,6 @@ poetry run pytest tests/
 ```
 
 ## Usage (with poetry)
-_______
 
 ```shell
 $ poetry run stitchee --help
@@ -55,7 +52,6 @@ python entry.py --help
 ```
 
 ## Roadmap
-_______
 Next major milestone(s):
 - Conduct extensive tests
 - Incorporate this service into Harmony as a Docker image.
