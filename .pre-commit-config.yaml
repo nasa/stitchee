@@ -13,31 +13,18 @@ repos:
             doc/data/messages/t/trailing-newlines/bad.py|
           )$
 
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: 'v0.0.290'
     hooks:
-      - id: isort
-        exclude: doc/data/messages/(r/reimported|w/wrong-import-order|u/ungrouped-imports|m/misplaced-future|m/multiple-imports)/bad.py
+      - id: ruff
+        args: [ "--fix" ]
 
-  - repo: https://github.com/pylint-dev/pylint
-    rev: v3.0.0a7
+  # https://github.com/python/black#version-control-integration
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
     hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
-        language: system
-        types: [ python ]
-        args:
-          [
-            "-rn", # Only display messages
-            "-sn", # Don't display the score
-            "--rcfile=.pylintrc", # Link to your config file
-          ]
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
+      - id: black-jupyter
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.5.1
