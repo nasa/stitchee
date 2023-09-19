@@ -8,7 +8,7 @@ from shutil import rmtree
 from tempfile import mkdtemp
 from unittest import TestCase
 
-import netCDF4 as nc  # type: ignore
+import netCDF4 as nc
 import pytest
 
 from concatenator import concat_with_nco
@@ -22,18 +22,17 @@ class TestConcat(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.__test_path = Path(__file__).parent.resolve()
-        cls.__test_data_path = cls.__test_path.joinpath('data')
-        cls.__output_path = Path(mkdtemp(prefix='tmp-', dir=cls.__test_data_path))
+        cls.__test_data_path = cls.__test_path.joinpath("data")
+        cls.__output_path = Path(mkdtemp(prefix="tmp-", dir=cls.__test_data_path))
 
     @classmethod
     def tearDownClass(cls):
         if not cls.KEEP_TMP:  # pylint: disable=no-member
             rmtree(cls.__output_path)
 
-    def run_verification_with_stitchee(self,
-                                       data_dir,
-                                       output_name,
-                                       record_dim_name: str = 'mirror_step'):
+    def run_verification_with_stitchee(
+        self, data_dir, output_name, record_dim_name: str = "mirror_step"
+    ):
         output_path = str(self.__output_path.joinpath(output_name))  # type: ignore
         data_path = self.__test_data_path.joinpath(data_dir)  # type: ignore
 
@@ -44,11 +43,13 @@ class TestConcat(TestCase):
                 shutil.copyfile(filepath, copied_input_new_path)
                 input_files.append(str(copied_input_new_path))
 
-        output_path = stitchee(files_to_concat=input_files,
-                               output_file=output_path,
-                               write_tmp_flat_concatenated=True,
-                               keep_tmp_files=True,
-                               concat_dim=record_dim_name)
+        output_path = stitchee(
+            files_to_concat=input_files,
+            output_file=output_path,
+            write_tmp_flat_concatenated=True,
+            keep_tmp_files=True,
+            concat_dim=record_dim_name,
+        )
 
         merged_dataset = nc.Dataset(output_path)
 
@@ -59,7 +60,7 @@ class TestConcat(TestCase):
             length_sum += len(nc.Dataset(file).variables[record_dim_name])
         assert length_sum == len(merged_dataset.variables[record_dim_name])
 
-    def run_verification_with_nco(self, data_dir, output_name, record_dim_name='mirror_step'):
+    def run_verification_with_nco(self, data_dir, output_name, record_dim_name="mirror_step"):
         output_path = str(self.__output_path.joinpath(output_name))
         data_path = self.__test_data_path.joinpath(data_dir)
 
@@ -70,9 +71,9 @@ class TestConcat(TestCase):
                 shutil.copyfile(filepath, copied_input_new_path)
                 input_files.append(str(copied_input_new_path))
 
-        concat_with_nco.concat_netcdf_files(input_files, output_path,
-                                            dim_for_record_dim=record_dim_name,
-                                            decompress_datasets=True)
+        concat_with_nco.concat_netcdf_files(
+            input_files, output_path, dim_for_record_dim=record_dim_name, decompress_datasets=True
+        )
 
         merged_dataset = nc.Dataset(output_path)
 
@@ -84,16 +85,16 @@ class TestConcat(TestCase):
         assert length_sum == len(merged_dataset.variables[record_dim_name])
 
     def test_tempo_no2_concat_with_stitchee(self):
-        self.run_verification_with_stitchee('tempo/no2', 'tempo_no2_bee_concatenated.nc')
+        self.run_verification_with_stitchee("tempo/no2", "tempo_no2_bee_concatenated.nc")
 
     def test_tempo_hcho_concat_with_stitchee(self):
-        self.run_verification_with_stitchee('tempo/hcho', 'tempo_hcho_bee_concatenated.nc')
+        self.run_verification_with_stitchee("tempo/hcho", "tempo_hcho_bee_concatenated.nc")
 
     def test_tempo_cld04_concat_with_stitchee(self):
-        self.run_verification_with_stitchee('tempo/cld04', 'tempo_cld04_bee_concatenated.nc')
+        self.run_verification_with_stitchee("tempo/cld04", "tempo_cld04_bee_concatenated.nc")
 
     def test_tempo_o3prof_concat_with_stitchee(self):
-        self.run_verification_with_stitchee('tempo/o3prof', 'tempo_o3prof_bee_concatenated.nc')
+        self.run_verification_with_stitchee("tempo/o3prof", "tempo_o3prof_bee_concatenated.nc")
 
     # def test_icesat_concat_with_stitchee(self):
     #     self.run_verification_with_stitchee('icesat', 'icesat_concat_with_stitchee.nc')

@@ -6,7 +6,7 @@ Functions for converting multidimensional data structures
 """
 import re
 
-import netCDF4 as nc  # type: ignore
+import netCDF4 as nc
 import numpy as np
 import xarray as xr
 

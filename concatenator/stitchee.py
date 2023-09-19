@@ -4,7 +4,7 @@ import os
 import time
 from logging import Logger
 
-import netCDF4 as nc  # type: ignore
+import netCDF4 as nc
 import xarray as xr
 
 from concatenator import GROUP_DELIM
