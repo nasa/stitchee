@@ -30,8 +30,7 @@ jobs:
 
     - name: Lint
       run: |
-        poetry run pylint concatenator
-        poetry run flake8 concatenator
+        poetry run ruff concatenator
 
     - name: Test with pytest
       run: |

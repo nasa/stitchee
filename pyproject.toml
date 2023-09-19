@@ -20,9 +20,8 @@ dask = "^2023.6.1"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
 mypy = "^1.4.1"
-pylint = "^2.17.4"
-flake8 = "^6.1.0"
-
+black = "^23.9.1"
+ruff = "^0.0.290"
 
 [tool.poetry.group.extras.dependencies]
 nco = "^1.1.0"
@@ -33,3 +32,34 @@ stitchee = 'concatenator.run_stitchee:main'
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[[tool.mypy.overrides]]
+module = "netCDF4.*"
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+builtins = ["ellipsis"]
+exclude = [
+  ".eggs",
+  "doc",
+  "_typed_ops.pyi",
+]
+target-version = "py310"
+# E402: module level import not at top of file
+# E501: line too long - let black worry about that
+# E731: do not assign a lambda expression, use a def
+ignore = [
+  "E402",
+  "E501",
+  "E731",
+]
+select = [
+  "F", # Pyflakes
+  "E", # Pycodestyle
+  "W",
+  "I", # isort
+  "UP", # Pyupgrade
+]
