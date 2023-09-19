@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [PR #1](https://github.com/danielfromearth/stitchee/pull/1): An initial GitHub Actions workflow
 ### Changed
   - [PR #12](https://github.com/danielfromearth/stitchee/pull/12): Changed name to "stitchee"
+  - [PR #15] (https://github.com/danielfromearth/stitchee/pull/15): Use ruff+black chain for pre-commit lint & format
 ### Deprecated
 ### Removed
 ### Fixed
