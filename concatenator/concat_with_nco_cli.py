@@ -7,7 +7,7 @@ import shutil
 import sys
 
 from concatenator.concat_with_nco import concat_netcdf_files
-from concatenator.run_bumblebee import parse_args
+from concatenator.run_stitchee import parse_args
 
 
 def run_nco_concat(args: list) -> None:

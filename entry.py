@@ -2,7 +2,7 @@
 import logging
 import sys
 
-from concatenator.run_bumblebee import run_bumblebee
+from concatenator.run_stitchee import run_stitchee
 
 
 def main() -> None:
@@ -12,7 +12,7 @@ def main() -> None:
         format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s',
         level=logging.DEBUG
     )
-    run_bumblebee(sys.argv[1:])
+    run_stitchee(sys.argv[1:])
 
 
 if __name__ == '__main__':

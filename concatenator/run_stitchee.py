@@ -8,8 +8,8 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Tuple, Union
 
-from concatenator.bumblebee import bumblebee
 from concatenator.file_ops import add_label_to_path
+from concatenator.stitchee import stitchee
 
 
 def parse_args(args: list) -> Tuple[list[str], str, str, bool, Union[str, None]]:
@@ -21,7 +21,7 @@ def parse_args(args: list) -> Tuple[list[str], str, str, bool, Union[str, None]]
     tuple
     """
     parser = ArgumentParser(
-        prog='bumblebee',
+        prog='stitchee',
         description='Run the along-existing-dimension concatenator.')
 
     # Required arguments
@@ -132,19 +132,19 @@ def _get_list_of_filepaths_from_dir(data_dir: Path):
     return input_files
 
 
-def run_bumblebee(args: list) -> None:
+def run_stitchee(args: list) -> None:
     """
     Parse arguments and run subsetter on the specified input file
     """
     input_files, output_path, concat_dim, keep_tmp_files, temporary_dir_to_remove = parse_args(args)
     num_inputs = len(input_files)
 
-    logging.info('Executing bumblebee concatenation on %d files...', num_inputs)
-    bumblebee(input_files, output_path,
-              write_tmp_flat_concatenated=keep_tmp_files,
-              keep_tmp_files=keep_tmp_files,
-              concat_dim=concat_dim)
-    logging.info('BUMBLEBEE complete. Result in %s', output_path)
+    logging.info('Executing stitchee concatenation on %d files...', num_inputs)
+    stitchee(input_files, output_path,
+             write_tmp_flat_concatenated=keep_tmp_files,
+             keep_tmp_files=keep_tmp_files,
+             concat_dim=concat_dim)
+    logging.info('STITCHEE complete. Result in %s', output_path)
 
     if not keep_tmp_files and temporary_dir_to_remove:
         shutil.rmtree(temporary_dir_to_remove)
@@ -157,7 +157,7 @@ def main() -> None:
         format='[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s',
         level=logging.DEBUG
     )
-    run_bumblebee(sys.argv[1:])
+    run_stitchee(sys.argv[1:])
 
 
 if __name__ == '__main__':
