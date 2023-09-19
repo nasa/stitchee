@@ -1,10 +1,8 @@
 """Concatenation service that appends data along an existing dimension, using netCDF4 and xarray."""
-
 import logging
 import os
 import time
 from logging import Logger
-from typing import Tuple, Union
 
 import netCDF4 as nc  # type: ignore
 import xarray as xr
@@ -12,18 +10,22 @@ import xarray as xr
 from concatenator import GROUP_DELIM
 from concatenator.dimension_cleanup import remove_duplicate_dims
 from concatenator.file_ops import add_label_to_path
-from concatenator.group_handling import (flatten_grouped_dataset,
-                                         regroup_flattened_dataset)
+from concatenator.group_handling import (
+    flatten_grouped_dataset,
+    regroup_flattened_dataset,
+)
 
 default_logger = logging.getLogger(__name__)
 
 
-def stitchee(files_to_concat: list[str],
-             output_file: str,
-             write_tmp_flat_concatenated: bool = False,
-             keep_tmp_files: bool = True,
-             concat_dim: str = "",
-             logger: Logger = default_logger) -> str:
+def stitchee(
+    files_to_concat: list[str],
+    output_file: str,
+    write_tmp_flat_concatenated: bool = False,
+    keep_tmp_files: bool = True,
+    concat_dim: str = "",
+    logger: Logger = default_logger,
+) -> str:
     """Concatenate netCDF data files along an existing dimension.
 
     Parameters
@@ -55,15 +57,20 @@ def stitchee(files_to_concat: list[str],
         # The group structure is flattened.
         start_time = time.time()
         logger.debug("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
-        flat_dataset, coord_vars, _ = flatten_grouped_dataset(nc.Dataset(filepath, 'r'), filepath,
-                                                              ensure_all_dims_are_coords=True)
+        flat_dataset, coord_vars, _ = flatten_grouped_dataset(
+            nc.Dataset(filepath, "r"), filepath, ensure_all_dims_are_coords=True
+        )
 
         flat_dataset = remove_duplicate_dims(flat_dataset)
 
-        xrds = xr.open_dataset(xr.backends.NetCDF4DataStore(flat_dataset),
-                               decode_times=False, decode_coords=False, drop_variables=coord_vars)
+        xrds = xr.open_dataset(
+            xr.backends.NetCDF4DataStore(flat_dataset),
+            decode_times=False,
+            decode_coords=False,
+            drop_variables=coord_vars,
+        )
 
-        benchmark_log['flattening'] = time.time() - start_time
+        benchmark_log["flattening"] = time.time() - start_time
 
         # The flattened file is written to disk.
         # flat_file_path = add_label_to_path(filepath, label="_flat_intermediate")
@@ -82,9 +89,11 @@ def stitchee(files_to_concat: list[str],
     #                                 coords='minimal',
     #                                 compat='override')
 
-    combined_ds = xr.concat(xrdataset_list, dim=GROUP_DELIM + concat_dim, data_vars='minimal', coords='minimal')
+    combined_ds = xr.concat(
+        xrdataset_list, dim=GROUP_DELIM + concat_dim, data_vars="minimal", coords="minimal"
+    )
 
-    benchmark_log['concatenating'] = time.time() - start_time
+    benchmark_log["concatenating"] = time.time() - start_time
 
     if write_tmp_flat_concatenated:
         logger.debug("Writing concatenated flattened temporary file to disk...")
@@ -98,7 +107,7 @@ def stitchee(files_to_concat: list[str],
     start_time = time.time()
     logger.debug("Reconstructing groups within concatenated file...")
     regroup_flattened_dataset(combined_ds, output_file)
-    benchmark_log['reconstructing_groups'] = time.time() - start_time
+    benchmark_log["reconstructing_groups"] = time.time() - start_time
 
     logger.info("--- Benchmark results ---")
     total_time = 0.0
@@ -117,12 +126,12 @@ def stitchee(files_to_concat: list[str],
     return output_file
 
 
-def _validate_workable_files(files_to_concat, logger) -> Tuple[list[str], int]:
+def _validate_workable_files(files_to_concat, logger) -> tuple[list[str], int]:
     """Remove files from list that are not open-able as netCDF or that are empty."""
     workable_files = []
     for file in files_to_concat:
         try:
-            with nc.Dataset(file, 'r') as dataset:
+            with nc.Dataset(file, "r") as dataset:
                 is_empty = _is_file_empty(dataset)
                 if is_empty is False:
                     workable_files.append(file)
@@ -134,7 +143,7 @@ def _validate_workable_files(files_to_concat, logger) -> Tuple[list[str], int]:
     return workable_files, number_of_workable_files
 
 
-def _is_file_empty(parent_group: Union[nc.Dataset, nc.Group]) -> bool:
+def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
     """
     Function to test if a all variable size in a dataset is 0
     """
