@@ -21,7 +21,7 @@ poetry install
 poetry run pytest tests/
 ```
 
-## Usage (with poetry)
+## Usage
 
 ```shell
 $ poetry run stitchee --help
@@ -54,12 +54,6 @@ For example:
 
 ```shell
 poetry run stitchee /path/to/netcdf/directory/ /path/to/output.nc
-```
-
-## Usage (without poetry)
-
-```shell
-python entry.py --help
 ```
 
 ## Roadmap
