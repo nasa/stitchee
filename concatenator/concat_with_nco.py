@@ -1,7 +1,7 @@
 """Concatenation service that appends data along an existing dimension, using NCO operators."""
 from logging import getLogger
 
-import netCDF4 as nc  # type: ignore
+import netCDF4 as nc
 from nco import Nco  # type: ignore
 
 from concatenator.stitchee import _validate_workable_files
@@ -9,11 +9,13 @@ from concatenator.stitchee import _validate_workable_files
 default_logger = getLogger(__name__)
 
 
-def concat_netcdf_files(original_input_files,
-                        output_file,
-                        dim_for_record_dim='mirror_step',
-                        decompress_datasets=False,
-                        logger=default_logger):
+def concat_netcdf_files(
+    original_input_files,
+    output_file,
+    dim_for_record_dim="mirror_step",
+    decompress_datasets=False,
+    logger=default_logger,
+):
     """
     Main entrypoint to merge implementation. Merges n >= 2 granules together as a single
     granule. Named in reference to original Java implementation.
@@ -30,7 +32,7 @@ def concat_netcdf_files(original_input_files,
         logger object
     """
     nco = Nco()
-    logger.info('Preprocessing data...')
+    logger.info("Preprocessing data...")
 
     # Proceed to concatenate only files that are workable (can be opened and are not empty).
     input_files, _ = _validate_workable_files(original_input_files, logger)
@@ -48,17 +50,16 @@ def concat_netcdf_files(original_input_files,
 
         # Convert an existing dimension to be a record dimension if one did not already exist.
         if not contains_record_dim:
-            print(f"  No record dimension exists; making <{dim_for_record_dim}> into a record dimension..")
-            nco.ncks(input=file, output=file,
-                     options=["-O", f"--mk_rec_dmn {dim_for_record_dim}"])
+            print(
+                f"  No record dimension exists; making <{dim_for_record_dim}> into a record dimension.."
+            )
+            nco.ncks(input=file, output=file, options=["-O", f"--mk_rec_dmn {dim_for_record_dim}"])
 
         if decompress_datasets:
-            nco.ncks(input=file, output=file,
-                     options=["-L 0"])
+            nco.ncks(input=file, output=file, options=["-L 0"])
 
     # -- concatenate datasets --
-    logger.info('Concatenating datasets...')
-    nco.ncrcat(input=input_files, output=output_file,
-               options=["--no_tmp_fl"])
+    logger.info("Concatenating datasets...")
+    nco.ncrcat(input=input_files, output=output_file, options=["--no_tmp_fl"])
 
-    logger.info('Done.')
+    logger.info("Done.")
