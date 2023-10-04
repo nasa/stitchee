@@ -24,6 +24,7 @@ def stitchee(
     write_tmp_flat_concatenated: bool = False,
     keep_tmp_files: bool = True,
     concat_dim: str = "",
+    concat_kwargs: dict | None = None,
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -89,8 +90,15 @@ def stitchee(
     #                                 coords='minimal',
     #                                 compat='override')
 
+    if concat_kwargs is None:
+        concat_kwargs = {}
+
     combined_ds = xr.concat(
-        xrdataset_list, dim=GROUP_DELIM + concat_dim, data_vars="minimal", coords="minimal"
+        xrdataset_list,
+        dim=GROUP_DELIM + concat_dim,
+        data_vars="minimal",
+        coords="minimal",
+        **concat_kwargs,
     )
 
     benchmark_log["concatenating"] = time.time() - start_time

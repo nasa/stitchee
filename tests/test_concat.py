@@ -31,7 +31,11 @@ class TestConcat(TestCase):
             rmtree(cls.__output_path)
 
     def run_verification_with_stitchee(
-        self, data_dir, output_name, record_dim_name: str = "mirror_step"
+        self,
+        data_dir,
+        output_name,
+        record_dim_name: str = "mirror_step",
+        concat_kwargs: dict | None = None,
     ):
         output_path = str(self.__output_path.joinpath(output_name))  # type: ignore
         data_path = self.__test_data_path.joinpath(data_dir)  # type: ignore
@@ -43,12 +47,16 @@ class TestConcat(TestCase):
                 shutil.copyfile(filepath, copied_input_new_path)
                 input_files.append(str(copied_input_new_path))
 
+        if concat_kwargs is None:
+            concat_kwargs = {}
+
         output_path = stitchee(
             files_to_concat=input_files,
             output_file=output_path,
             write_tmp_flat_concatenated=True,
             keep_tmp_files=True,
             concat_dim=record_dim_name,
+            concat_kwargs=concat_kwargs,
         )
 
         merged_dataset = nc.Dataset(output_path)
@@ -99,16 +107,21 @@ class TestConcat(TestCase):
     # def test_icesat_concat_with_stitchee(self):
     #     self.run_verification_with_stitchee('icesat', 'icesat_concat_with_stitchee.nc')
     #
-    # def test_ceres_concat_with_stitchee(self):
-    #     self.run_verification_with_stitchee('ceres-subsetter-output',
-    #                                          'ceres_bee_concatenated.nc',
-    #                                          record_dim_name='time')
-    #
-    # def test_ceres_flash_concat_with_stitchee(self):
-    #     self.run_verification_with_stitchee('ceres_flash-subsetter-output',
-    #                                          'ceres_flash_bee_concatenated.nc',
-    #                                          record_dim_name='time')
-    #
+    def test_ceres_concat_with_stitchee(self):
+        self.run_verification_with_stitchee(
+            "ceres-subsetter-output",
+            "ceres_bee_concatenated.nc",
+            record_dim_name="time",
+            concat_kwargs={"compat": "override"},
+        )
+
+    def test_ceres_flash_concat_with_stitchee(self):
+        self.run_verification_with_stitchee(
+            "ceres_flash-subsetter-output",
+            "ceres_flash_bee_concatenated.nc",
+            record_dim_name="time",
+        )
+
     # def test_ceres_flash_concat_with_stitchee(self):
     #     self.run_verification_with_stitchee('ceres_flash-subsetter-output',
     #                                          'ceres_flash_concat_with_stitchee.nc',
