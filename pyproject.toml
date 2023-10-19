@@ -22,7 +22,7 @@ harmony-service-lib = "^1.0.23"
 pytest = "^7.3.1"
 mypy = "^1.6.0"
 black = "^23.9.1"
-ruff = "^0.0.292"
+ruff = "^0.1.1"
 coverage = "^7.3.2"
 
 [tool.poetry.group.extras.dependencies]
