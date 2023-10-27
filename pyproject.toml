@@ -15,7 +15,7 @@ packages = [
 python = "^3.10"
 netcdf4 = "^1.6.5"
 xarray = "^2023.10.1"
-dask = "^2023.10.0"
+dask = "^2023.10.1"
 harmony-service-lib = "^1.0.23"
 
 [tool.poetry.group.dev.dependencies]
