@@ -1,10 +1,10 @@
+TEMPO_*.nc
+tests/*data*/
+.git
+.gitignore
 .travis.yaml
 .swagger-codegen-ignore
-README.md
 tox.ini
-git_push.sh
-test-requirements.txt
-setup.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -96,8 +96,7 @@ dmypy.json
 # Github integration settings
 .github
 
-# .dockerignore, Dockerfile and builder script themselves are not needed by
+# .dockerignore and builder script themselves are not needed by
 # docker build.
 .dockerignore
-Dockerfile*
 build-service
