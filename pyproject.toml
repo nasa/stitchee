@@ -29,6 +29,7 @@ coverage = "^7.3.2"
 nco = "^1.1.0"
 
 [tool.poetry.scripts]
+stitchee_harmony = 'concatenator.harmony.cli:main'
 stitchee = 'concatenator.run_stitchee:main'
 
 [build-system]
