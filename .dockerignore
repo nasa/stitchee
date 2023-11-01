@@ -1,5 +1,6 @@
 TEMPO_*.nc
-tests/*data*/
+tests/
+pytest.ini
 .git
 .gitignore
 .travis.yaml
