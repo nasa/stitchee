@@ -30,7 +30,6 @@ ARG DIST_PATH
 USER root
 RUN mkdir -p /worker && chown dockeruser /worker
 COPY pyproject.toml /worker
-# COPY ../pyproject.toml /worker
 
 WORKDIR /worker
 # ENV PYTHONPATH=${PYTHONPATH}:${PWD}
