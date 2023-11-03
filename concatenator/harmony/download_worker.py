@@ -12,7 +12,9 @@ from harmony.logging import build_logger
 from harmony.util import download
 
 
-def multi_core_download(urls, destination_dir, access_token, cfg, process_count=None):
+def multi_core_download(
+    urls: list, destination_dir: str, access_token: str, cfg: dict, process_count: int | None = None
+) -> list[Path]:
     """
     A method which automagically scales downloads to the number of CPU
     cores. For further explaination, see documentation on "multi-track
@@ -28,7 +30,7 @@ def multi_core_download(urls, destination_dir, access_token, cfg, process_count=
         access token as provided in Harmony input
     cfg : dict
         Harmony configuration information
-    process_count : int
+    process_count : int, optional
         Number of worker processes to run (expected >= 1)
 
     Returns
@@ -39,6 +41,8 @@ def multi_core_download(urls, destination_dir, access_token, cfg, process_count=
 
     if process_count is None:
         process_count = cpu_count()
+    if process_count is None:
+        raise RuntimeError("cannot determine number of cpus")
 
     with Manager() as manager:
         url_queue = manager.Queue(len(urls))
@@ -70,7 +74,9 @@ def multi_core_download(urls, destination_dir, access_token, cfg, process_count=
     return [Path(path) for path in path_list]
 
 
-def _download_worker(url_queue, path_list, destination_dir, access_token, cfg):
+def _download_worker(
+    url_queue: queue.Queue, path_list: list, destination_dir: str, access_token: str, cfg: dict
+) -> None:
     """
     A method to be executed in a separate process which processes the url_queue
     and places paths to completed downloads into the path_list. Downloads are
