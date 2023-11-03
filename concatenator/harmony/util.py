@@ -96,3 +96,15 @@ def _get_item_date_range(item: Item) -> tuple[datetime, datetime]:
         end_datetime = item.datetime
 
     return start_datetime, end_datetime
+
+
+def sizeof_fmt(num: float, suffix="B") -> str:
+    """Get a human-readable version of file size
+
+    From: https://stackoverflow.com/a/1094933
+    """
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+        if abs(num) < 1024.0:
+            return f"{num:3.1f}{unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f}Yi{suffix}"
