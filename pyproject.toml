@@ -13,22 +13,23 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-netcdf4 = "^1.6.4"
-xarray = "^2023.9.0"
-dask = "^2023.9.3"
-harmony-service-lib = "^1.0.23"
+netcdf4 = "^1.6.5"
+xarray = "^2023.10.1"
+dask = "^2023.10.1"
+harmony-service-lib = "^1.0.24"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.3.1"
-mypy = "^1.4.1"
-black = "^23.9.1"
-ruff = "^0.0.292"
+pytest = "^7.4.3"
+mypy = "^1.6.1"
+black = "^23.10.1"
+ruff = "^0.1.4"
 coverage = "^7.3.2"
 
 [tool.poetry.group.extras.dependencies]
 nco = "^1.1.0"
 
 [tool.poetry.scripts]
+stitchee_harmony = 'concatenator.harmony.cli:main'
 stitchee = 'concatenator.run_stitchee:main'
 
 [build-system]

@@ -25,35 +25,45 @@ poetry run pytest tests/
 
 ```shell
 $ poetry run stitchee --help
-usage: stitchee [-h] -o output_path [--concat_dim concat_dim] [--make_dir_copy] [--keep_tmp_files] [-O] [-v]
+usage: stitchee [-h] -o OUTPUT_PATH [--no_input_file_copies] [--keep_tmp_files] [--concat_method {xarray-concat,xarray-combine}] [--concat_dim CONCAT_DIM]
+                [--xarray_arg_compat XARRAY_ARG_COMPAT] [--xarray_arg_combine_attrs XARRAY_ARG_COMBINE_ATTRS] [--xarray_arg_join XARRAY_ARG_JOIN] [-O]
+                [-v]
                 path/directory or path list [path/directory or path list ...]
 
 Run the along-existing-dimension concatenator.
 
 options:
   -h, --help            show this help message and exit
-  --concat_dim concat_dim
-                        Dimension to concatenate along, if possible.
-  --make_dir_copy       Make a duplicate of the input directory to avoid modification of input files. This is useful for testing, but
-                        uses more disk space.
-  --keep_tmp_files      Prevents removal, after successful execution, of (1) the flattened concatenated file and (2) the input
-                        directory copy if created by '--make_dir_copy'.
+  --no_input_file_copies
+                        By default, input files are copied into a temporary directory to avoid modification of input files. This is useful for testing,
+                        but uses more disk space. By specifying this argument, no copying is performed.
+  --keep_tmp_files      Prevents removal, after successful execution, of (1) the flattened concatenated file and (2) the input directory copy if created
+                        by '--make_dir_copy'.
+  --concat_method {xarray-concat,xarray-combine}
+                        Whether to use the xarray concat method or the combine-by-coords method.
+  --concat_dim CONCAT_DIM
+                        Dimension to concatenate along, if possible. This is required if using the 'xarray-concat' method
+  --xarray_arg_compat XARRAY_ARG_COMPAT
+                        'compat' argument passed to xarray.concat() or xarray.combine_by_coords().
+  --xarray_arg_combine_attrs XARRAY_ARG_COMBINE_ATTRS
+                        'combine_attrs' argument passed to xarray.concat() or xarray.combine_by_coords().
+  --xarray_arg_join XARRAY_ARG_JOIN
+                        'join' argument passed to xarray.concat() or xarray.combine_by_coords().
   -O, --overwrite       Overwrite output file if it already exists.
   -v, --verbose         Enable verbose output to stdout; useful for debugging
 
 Required:
   path/directory or path list
-                        Files to be concatenated, specified via a (1) single directory containing the files to be concatenated, (2)
-                        single text file containing linebreak-separated paths of the files to be concatenated, or (3) multiple
-                        filepaths of the files to be concatenated.
-  -o output_path, --output_path output_path
+                        Files to be concatenated, specified via a (1) single directory containing the files to be concatenated, (2) single text file
+                        containing linebreak-separated paths of the files to be concatenated, or (3) multiple filepaths of the files to be concatenated.
+  -o OUTPUT_PATH, --output_path OUTPUT_PATH
                         The output filename for the merged output.
 ```
 
 For example:
 
 ```shell
-poetry run stitchee /path/to/netcdf/directory/ /path/to/output.nc
+poetry run stitchee /path/to/netcdf/directory/ -o /path/to/output.nc
 ```
 
 ## Roadmap
