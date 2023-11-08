@@ -37,18 +37,17 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None]:
     req_grp.add_argument(
         "-o",
         "--output_path",
-        metavar="output_path",
         required=True,
         help="The output filename for the merged output.",
     )
-
-    # Optional arguments
-    parser.add_argument(
+    req_grp.add_argument(
         "--concat_dim",
-        metavar="concat_dim",
         nargs=1,
+        required=True,
         help="Dimension to concatenate along, if possible.",
     )
+
+    # Optional arguments
     parser.add_argument(
         "--no_input_file_copies",
         action="store_true",
