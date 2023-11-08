@@ -23,6 +23,7 @@ def stitchee(
     output_file: str,
     write_tmp_flat_concatenated: bool = False,
     keep_tmp_files: bool = True,
+    concat_method: str = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
     logger: Logger = default_logger,
@@ -97,13 +98,23 @@ def stitchee(
         if concat_kwargs is None:
             concat_kwargs = {}
 
-        combined_ds = xr.concat(
-            xrdataset_list,
-            dim=GROUP_DELIM + concat_dim,
-            data_vars="minimal",
-            coords="minimal",
-            **concat_kwargs,
-        )
+        if concat_method == "xarray-concat":
+            combined_ds = xr.concat(
+                xrdataset_list,
+                dim=GROUP_DELIM + concat_dim,
+                data_vars="minimal",
+                coords="minimal",
+                **concat_kwargs,
+            )
+        elif concat_method == "xarray-combine":
+            combined_ds = xr.combine_by_coords(
+                xrdataset_list,
+                data_vars="minimal",
+                coords="minimal",
+                **concat_kwargs,
+            )
+        else:
+            raise ValueError("Unexpected concatenation method, <%s>." % concat_method)
 
         benchmark_log["concatenating"] = time.time() - start_time
 
