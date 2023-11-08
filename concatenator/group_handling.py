@@ -174,7 +174,6 @@ def regroup_flattened_dataset(
     output_file : str
         Name of the output file to write the resulting NetCDF file to.
     """
-
     with nc.Dataset(output_file, mode="w", format="NETCDF4") as base_dataset:
         # Copy global attributes
         base_dataset.setncatts(dataset.attrs)
