@@ -50,10 +50,10 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None]:
         help="Dimension to concatenate along, if possible.",
     )
     parser.add_argument(
-        "--make_dir_copy",
+        "--copy_input_files_to_temp_dir",
         action="store_true",
-        help="Make a duplicate of the input directory to avoid modification of input files. "
-        "This is useful for testing, but uses more disk space.",
+        help="Make a duplicate of the input files in a temporary directory to avoid modification "
+        "of input files. This is useful for testing, but uses more disk space.",
     )
     parser.add_argument(
         "--keep_tmp_files",
