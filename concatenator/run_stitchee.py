@@ -68,16 +68,16 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None, str, 
         "This is required if using the 'xarray-concat' method",
     )
     parser.add_argument(
-        "--concat_arg_compat",
-        help="'compat' argument passed to xarray.concat.",
+        "--xarray_arg_compat",
+        help="'compat' argument passed to xarray.concat() or xarray.combine_by_coords().",
     )
     parser.add_argument(
-        "--concat_arg_combine_attrs",
-        help="'combine_attrs' argument passed to xarray.concat.",
+        "--xarray_arg_combine_attrs",
+        help="'combine_attrs' argument passed to xarray.concat() or xarray.combine_by_coords().",
     )
     parser.add_argument(
-        "--concat_arg_join",
-        help="'join' argument passed to xarray.concat.",
+        "--xarray_arg_join",
+        help="'join' argument passed to xarray.concat() or xarray.combine_by_coords().",
     )
     parser.add_argument(
         "-O", "--overwrite", action="store_true", help="Overwrite output file if it already exists."
@@ -113,12 +113,12 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None, str, 
 
     # Gather the concatenation arguments that will be passed to xarray.
     concat_kwargs = {}
-    if parsed.concat_arg_compat:
-        concat_kwargs["compat"] = parsed.concat_arg_compat
-    if parsed.concat_arg_combine_attrs:
-        concat_kwargs["combine_attrs"] = parsed.concat_arg_combine_attrs
-    if parsed.concat_arg_join:
-        concat_kwargs["join"] = parsed.concat_arg_join
+    if parsed.xarray_arg_compat:
+        concat_kwargs["compat"] = parsed.xarray_arg_compat
+    if parsed.xarray_arg_combine_attrs:
+        concat_kwargs["combine_attrs"] = parsed.xarray_arg_combine_attrs
+    if parsed.xarray_arg_join:
+        concat_kwargs["join"] = parsed.xarray_arg_join
 
     # If requested, make a temporary directory with new copies of the original input files
     temporary_dir_to_remove = None
