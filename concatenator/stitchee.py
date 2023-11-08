@@ -3,6 +3,7 @@ import logging
 import os
 import time
 from logging import Logger
+from warnings import warn
 
 import netCDF4 as nc
 import xarray as xr
@@ -52,6 +53,11 @@ def stitchee(
     if num_input_files < 1:
         logger.info("No non-empty netCDF files found. Exiting.")
         return ""
+
+    if concat_dim and (concat_method == "xarray-combine"):
+        warn(
+            "'concat_dim' was specified, but will not be used because xarray-combine method was selected."
+        )
 
     logger.info("Flattening all input files...")
     xrdataset_list = []
