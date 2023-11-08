@@ -50,10 +50,11 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None]:
         help="Dimension to concatenate along, if possible.",
     )
     parser.add_argument(
-        "--make_dir_copy",
+        "--no_input_file_copies",
         action="store_true",
-        help="Make a duplicate of the input directory to avoid modification of input files. "
-        "This is useful for testing, but uses more disk space.",
+        help="By default, input files are copied into a temporary directory to avoid modification "
+        "of input files. This is useful for testing, but uses more disk space.  "
+        "By specifying this argument, no copying is performed.",
     )
     parser.add_argument(
         "--keep_tmp_files",
@@ -107,7 +108,7 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None]:
 
     # If requested, make a temporary directory with copies of the original input files
     temporary_dir_to_remove = None
-    if parsed.make_dir_copy:
+    if not parsed.no_input_file_copies:
         new_data_dir = Path(
             add_label_to_path(str(output_path.parent / "temp_copy"), label=str(uuid.uuid4()))
         ).resolve()
