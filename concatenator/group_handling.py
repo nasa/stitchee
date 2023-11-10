@@ -6,6 +6,7 @@ Functions for converting multidimensional data structures
 """
 import re
 
+import h5py
 import netCDF4 as nc
 import numpy as np
 import xarray as xr
@@ -78,7 +79,7 @@ def walk(
 
 
 def flatten_grouped_dataset(
-    nc_dataset: nc.Dataset, file_to_subset: str, ensure_all_dims_are_coords: bool = False
+    nc_dataset: nc.Dataset | h5py.File, ensure_all_dims_are_coords: bool = False
 ) -> tuple[nc.Dataset, list[str], list[str]]:
     """
     Transform a netCDF4 Dataset that has groups to an xarray compatible
@@ -104,9 +105,7 @@ def flatten_grouped_dataset(
         flattened.
     """
     # Close the existing read-only dataset and reopen in append mode
-    nc_dataset.close()
-    nc_dataset = nc.Dataset(file_to_subset, "r+")
-
+    # nc_dataset.close()
     dimensions = {}
 
     # for var_name in list(nc_dataset.variables.keys()):
