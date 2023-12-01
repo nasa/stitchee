@@ -29,33 +29,32 @@ def regroup_coordinate_attribute(attribute_string: str) -> str:
     """
     # Use the separator that's in the attribute string only if all separators in the string are the same.
     # Otherwise, we will use our own default separator.
-    whitespaces = re.findall(r'\s+', attribute_string)
+    whitespaces = re.findall(r"\s+", attribute_string)
     if len(set(whitespaces)) <= 1:
         new_sep = whitespaces[0]
     else:
         new_sep = COORD_DELIM
 
     return new_sep.join(
-        '/'.join(c.split(GROUP_DELIM))[1:]
-        for c
-        in attribute_string.split()  # split on any whitespace
+        "/".join(c.split(GROUP_DELIM))[1:]
+        for c in attribute_string.split()  # split on any whitespace
     )
 
 
-def flatten_coordinate_attribute_paths(dataset: netCDF4.Dataset,
-                                       var: netCDF4.Variable,
-                                       variable_name: str) -> None:
+def flatten_coordinate_attribute_paths(
+    dataset: netCDF4.Dataset, var: netCDF4.Variable, variable_name: str
+) -> None:
     """Flatten the paths of variables referenced in the coordinates attribute."""
-    if 'coordinates' in var.ncattrs():
-        coord_att = var.getncattr('coordinates')
+    if "coordinates" in var.ncattrs():
+        coord_att = var.getncattr("coordinates")
 
         new_coord_att = _flatten_coordinate_attribute(coord_att)
 
-        dataset.variables[variable_name].setncattr('coordinates', new_coord_att)
+        dataset.variables[variable_name].setncattr("coordinates", new_coord_att)
 
 
 def _flatten_coordinate_attribute(attribute_string: str) -> str:
-    """Converts attributes that specify group membership via "/" to use new group delimiter, even for the root level.
+    """Converts attributes with "/" delimiters to use new group delimiter, even for the root level.
 
     Examples
     --------
@@ -73,15 +72,14 @@ def _flatten_coordinate_attribute(attribute_string: str) -> str:
     """
     # Use the separator that's in the attribute string only if all separators in the string are the same.
     # Otherwise, we will use our own default separator.
-    whitespaces = re.findall(r'\s+', attribute_string)
-    if len(set(whitespaces)) <= 1:
+    whitespaces = re.findall(r"\s+", attribute_string)
+    if len(set(whitespaces)) == 1:
         new_sep = whitespaces[0]
     else:
         new_sep = COORD_DELIM
 
     # A new string is constructed.
     return new_sep.join(
-        f'{GROUP_DELIM}{c.replace("/", GROUP_DELIM)}'
-        for c
-        in attribute_string.split()  # split on any whitespace
+        f"{GROUP_DELIM}{item}" if not item.startswith(GROUP_DELIM) else item
+        for item in attribute_string.replace("/", GROUP_DELIM).split()
     )
