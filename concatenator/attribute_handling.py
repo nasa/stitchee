@@ -79,7 +79,11 @@ def _flatten_coordinate_attribute(attribute_string: str) -> str:
         new_sep = COORD_DELIM
 
     # A new string is constructed.
-    return new_sep.join(
-        f"{GROUP_DELIM}{item}" if not item.startswith(GROUP_DELIM) else item
-        for item in attribute_string.replace("/", GROUP_DELIM).split()
-    )
+    return new_sep.join(flatten_variable_path_str(item) for item in attribute_string.split())
+
+
+def flatten_variable_path_str(path_str: str) -> str:
+    """Converts a path with "/" delimiters to use new group delimiter, even for the root level."""
+    new_path = path_str.replace("/", GROUP_DELIM)
+
+    return f"{GROUP_DELIM}{new_path}" if not new_path.startswith(GROUP_DELIM) else new_path
