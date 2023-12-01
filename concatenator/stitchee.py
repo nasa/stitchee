@@ -130,22 +130,24 @@ def stitchee(
         #                                 coords='minimal',
         #                                 compat='override')
 
+        # Establish default concatenation keyword arguments if not supplied as input.
         if concat_kwargs is None:
             concat_kwargs = {}
+        if "data_vars" not in concat_kwargs:
+            concat_kwargs["data_vars"] = "minimal"
+        if "coords" not in concat_kwargs:
+            concat_kwargs["coords"] = "minimal"
 
+        # Perform concatenation operation.
         if concat_method == "xarray-concat":
             combined_ds = xr.concat(
                 xrdataset_list,
                 dim=GROUP_DELIM + concat_dim,
-                data_vars="minimal",
-                coords="minimal",
                 **concat_kwargs,
             )
         elif concat_method == "xarray-combine":
             combined_ds = xr.combine_by_coords(
                 xrdataset_list,
-                data_vars="minimal",
-                coords="minimal",
                 **concat_kwargs,
             )
         else:
