@@ -38,13 +38,14 @@ class TestConcat(TestCase):
         concat_method: str = "xarray-concat",
         record_dim_name: str = "mirror_step",
         concat_kwargs: dict | None = None,
+        variables_to_include: list[str] | None = None,
     ):
         output_path = str(self.__output_path.joinpath(output_name))  # type: ignore
         data_path = self.__test_data_path.joinpath(data_dir)  # type: ignore
 
         input_files = []
         for filepath in data_path.iterdir():
-            if Path(filepath).suffix.lower() in (".nc", ".h5", ".hdf"):
+            if Path(filepath).suffix.lower() in (".nc", ".nc4", ".h5", ".hdf"):
                 copied_input_new_path = self.__output_path / Path(filepath).name  # type: ignore
                 shutil.copyfile(filepath, copied_input_new_path)
                 input_files.append(str(copied_input_new_path))
@@ -60,6 +61,7 @@ class TestConcat(TestCase):
             concat_method=concat_method,
             concat_dim=record_dim_name,
             concat_kwargs=concat_kwargs,
+            variables_to_include=variables_to_include,
         )
 
         # Verify that the length of the record dimension in the concatenated file equals
