@@ -9,6 +9,7 @@ import netCDF4 as nc
 import xarray as xr
 
 from concatenator import GROUP_DELIM
+from concatenator.attribute_handling import flatten_variable_path_str
 from concatenator.dimension_cleanup import remove_duplicate_dims
 from concatenator.file_ops import add_label_to_path
 from concatenator.group_handling import (
@@ -27,6 +28,7 @@ def stitchee(
     concat_method: str = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
+    variables_to_include: list[str] | None = None,
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -35,8 +37,16 @@ def stitchee(
     ----------
     files_to_concat : list[str]
     output_file : str
-    keep_tmp_files : bool
+    write_tmp_flat_concatenated : bool, optional
+    keep_tmp_files : bool, optional
+    concat_method : str, optional
+        Either 'xarray-concat' or 'xarray-combine'
     concat_dim : str, optional
+    concat_kwargs : dict, optional
+        Keyword arguments to pass through to the xarray concatenation method
+    variables_to_include : list[str], optional
+        Names of variables to include. All other variables are excluded from the result
+
     logger : logging.Logger
 
     Returns
@@ -59,6 +69,14 @@ def stitchee(
             "'concat_dim' was specified, but will not be used because xarray-combine method was selected."
         )
 
+    # Convert variable names inputted to flattened versions
+    if variables_to_include is not None:
+        variables_to_include_flattened = [
+            flatten_variable_path_str(v) for v in variables_to_include
+        ]
+    else:
+        variables_to_include_flattened = None
+
     logger.info("Flattening all input files...")
     xrdataset_list = []
 
@@ -67,9 +85,20 @@ def stitchee(
             # The group structure is flattened.
             start_time = time.time()
             logger.info("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
-            flat_dataset, coord_vars, _ = flatten_grouped_dataset(
+            flat_dataset, coord_vars, string_vars = flatten_grouped_dataset(
                 nc.Dataset(filepath, "r"), filepath, ensure_all_dims_are_coords=True
             )
+
+            if variables_to_include_flattened is not None:
+                variables_to_delete = [
+                    var_name
+                    for var_name, _ in flat_dataset.variables.items()
+                    if (var_name not in variables_to_include_flattened)
+                    and (var_name not in coord_vars)
+                ]
+
+                for var_name in variables_to_delete:
+                    del flat_dataset.variables[var_name]
 
             logger.info("Removing duplicate dimensions")
             flat_dataset = remove_duplicate_dims(flat_dataset)
