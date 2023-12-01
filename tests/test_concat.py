@@ -12,6 +12,7 @@ import netCDF4 as nc
 import pytest
 
 from concatenator import concat_with_nco
+from concatenator.attribute_handling import flatten_variable_path_str
 from concatenator.stitchee import stitchee
 
 
@@ -61,14 +62,24 @@ class TestConcat(TestCase):
             concat_kwargs=concat_kwargs,
         )
 
-        merged_dataset = nc.Dataset(output_path)
-
         # Verify that the length of the record dimension in the concatenated file equals
         #   the sum of the lengths across the input files
         length_sum = 0
         for file in input_files:
-            length_sum += len(nc.Dataset(file).variables[record_dim_name])
-        assert length_sum == len(merged_dataset.variables[record_dim_name])
+            with nc.Dataset(file) as ds:
+                length_sum += ds.dimensions[flatten_variable_path_str(record_dim_name)].size
+
+        with nc.Dataset(output_path) as merged_dataset:
+            if record_dim_name in merged_dataset.variables:
+                # Primary dimension is a root level variable
+                assert length_sum == len(merged_dataset.variables[record_dim_name])
+            elif record_dim_name in merged_dataset.dimensions:
+                # Primary dimension is a root level dimension, but not a variable
+                assert length_sum == merged_dataset.dimensions[record_dim_name].size
+            else:
+                raise AttributeError(
+                    "Unexpected condition, where primary record dimension is not at the root level."
+                )
 
     def run_verification_with_nco(self, data_dir, output_name, record_dim_name="mirror_step"):
         output_path = str(self.__output_path.joinpath(output_name))
