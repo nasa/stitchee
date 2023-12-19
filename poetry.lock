@@ -488,13 +488,13 @@ tqdm = ["tqdm"]
 
 [[package]]
 name = "harmony-service-lib"
-version = "1.0.24"
+version = "1.0.25"
 description = "A library for Python-based Harmony services to parse incoming messages, fetch data, stage data, and call back to Harmony"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "harmony-service-lib-1.0.24.tar.gz", hash = "sha256:5b12456c14b530aaa9b878714bb9754f7403e2f536e98c8649f4379465c8f1e9"},
-    {file = "harmony_service_lib-1.0.24-py3-none-any.whl", hash = "sha256:af7ea2ea83e5f1a629940682ffee13249615298c0bade2f2c328bb56c28bb926"},
+    {file = "harmony-service-lib-1.0.25.tar.gz", hash = "sha256:498009458624406a76b486c7394beb0fed8ef1a6c6e97d78789d143055c16888"},
+    {file = "harmony_service_lib-1.0.25-py3-none-any.whl", hash = "sha256:d2a71c56717a8acd9be759d5b1b04b0068e68e666bc7c1a94636cae477ddf8b3"},
 ]
 
 [package.dependencies]
@@ -1216,4 +1216,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a0f390d4b4a1c81ee9d46aa17f9488cdab6101fab674ce7f24e28bcdf79fee89"
+content-hash = "f708dbc5753074736c29b6a34c72cfab94da172b87183a63c6d2ed8750f231d5"
