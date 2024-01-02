@@ -19,7 +19,7 @@ dask = "^2023.12.1"
 harmony-service-lib = "^1.0.25"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.3"
+pytest = "^7.4.4"
 mypy = "^1.8.0"
 black = "^23.12.1"
 ruff = "^0.1.9"
