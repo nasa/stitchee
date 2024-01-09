@@ -11,7 +11,6 @@ from unittest import TestCase
 import netCDF4 as nc
 import pytest
 
-from concatenator import concat_with_nco
 from concatenator.stitchee import stitchee
 
 
@@ -70,30 +69,6 @@ class TestConcat(TestCase):
             length_sum += len(nc.Dataset(file).variables[record_dim_name])
         assert length_sum == len(merged_dataset.variables[record_dim_name])
 
-    def run_verification_with_nco(self, data_dir, output_name, record_dim_name="mirror_step"):
-        output_path = str(self.__output_path.joinpath(output_name))
-        data_path = self.__test_data_path.joinpath(data_dir)
-
-        input_files = []
-        for filepath in data_path.iterdir():
-            if Path(filepath).suffix == ".nc":
-                copied_input_new_path = self.__output_path / Path(filepath).name
-                shutil.copyfile(filepath, copied_input_new_path)
-                input_files.append(str(copied_input_new_path))
-
-        concat_with_nco.concat_netcdf_files(
-            input_files, output_path, dim_for_record_dim=record_dim_name, decompress_datasets=True
-        )
-
-        merged_dataset = nc.Dataset(output_path)
-
-        # Verify that the length of the record dimension in the concatenated file equals
-        #   the sum of the lengths across the input files
-        length_sum = 0
-        for file in input_files:
-            length_sum += len(nc.Dataset(file).variables[record_dim_name])
-        assert length_sum == len(merged_dataset.variables[record_dim_name])
-
     def test_tempo_no2_concat_with_stitchee(self):
         self.run_verification_with_stitchee(
             "tempo/no2", "tempo_no2_bee_concatenated.nc", concat_method="xarray-concat"
@@ -139,9 +114,3 @@ class TestConcat(TestCase):
     #     self.run_verification_with_stitchee('ceres_flash-subsetter-output',
     #                                          'ceres_flash_concat_with_stitchee.nc',
     #                                          record_dim_name='time')
-
-    # def test_tempo_no2_concat_with_nco(self):
-    #     self.run_verification_with_nco('no2', 'tempo_no2_concat_with_nco.nc')
-    #
-    # def test_tempo_hcho_concat_with_nco(self):
-    #     self.run_verification_with_nco('hcho', 'tempo_hcho_concat_with_nco.nc')
