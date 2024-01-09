@@ -85,7 +85,10 @@ class StitcheeAdapter(BaseHarmonyAdapter):
 
             # -- Perform merging --
             collection = self._get_item_source(items[0]).collection
-            filename = f"{collection}_merged.nc4"
+
+            number_of_granules = len(netcdf_urls)
+            first_url_name = Path(netcdf_urls[0]).stem
+            filename = f"{collection}_batch_of_{number_of_granules}_starting_from_{first_url_name}_stitched.nc4"
             self.logger.info(f"Merged filename will be === {filename}.")
 
             with TemporaryDirectory() as temp_dir:
@@ -104,7 +107,7 @@ class StitcheeAdapter(BaseHarmonyAdapter):
 
                 # # --- Run STITCHEE ---
                 stitchee(
-                    input_files,
+                    [str(f) for f in input_files],
                     output_path,
                     write_tmp_flat_concatenated=False,
                     keep_tmp_files=False,
