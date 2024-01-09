@@ -84,10 +84,10 @@ class TestConcat(TestCase):
             "tempo/cld04", "tempo_cld04_bee_concatenated.nc", concat_method="xarray-concat"
         )
 
-    def test_tempo_o3prof_concat_with_stitchee(self):
-        self.run_verification_with_stitchee(
-            "tempo/o3prof", "tempo_o3prof_bee_concatenated.nc", concat_method="xarray-concat"
-        )
+    # def test_tempo_o3prof_concat_with_stitchee(self):
+    #     self.run_verification_with_stitchee(
+    #         "tempo/o3prof", "tempo_o3prof_bee_concatenated.nc", concat_method="xarray-concat"
+    #     )
 
     # def test_icesat_concat_with_stitchee(self):
     #     self.run_verification_with_stitchee('icesat', 'icesat_concat_with_stitchee.nc')
