@@ -26,7 +26,6 @@ ruff = "^0.1.11"
 coverage = "^7.4.0"
 
 [tool.poetry.group.extras.dependencies]
-nco = "^1.1.0"
 
 [tool.poetry.scripts]
 stitchee_harmony = 'concatenator.harmony.cli:main'

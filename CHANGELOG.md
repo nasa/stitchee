@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [PR #15](https://github.com/danielfromearth/stitchee/pull/15): Use ruff+black chain for pre-commit lint & format
   - [Issue #45](https://github.com/danielfromearth/stitchee/issues/45): Rename CLI argument to clarify temporary copying behavior
   - [Issue #44](https://github.com/danielfromearth/stitchee/issues/44): Concatenation dimension CLI argument is required but isn't listed as such in the help message
+  - [Issue #81](https://github.com/danielfromearth/stitchee/issues/81): Remove `nco` related code
 ### Deprecated
 ### Removed
 ### Fixed
