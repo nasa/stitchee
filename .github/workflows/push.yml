@@ -102,14 +102,17 @@ jobs:
         echo "venue=ops" >> $GITHUB_ENV
 
     - name: Log in to the Container registry
-      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+      # TODO: change this and subsequent docker steps back to NOT (as follows), after testing in the feature branch --- if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
       uses: docker/login-action@v2
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Extract metadata (tags, labels) for Docker
-      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+#      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
       id: meta
       uses: docker/metadata-action@v5
       with:
@@ -119,13 +122,15 @@ jobs:
           type=raw,value=${{ env.venue }}
 
     - name: Wait for package
-      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+#      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
       run: |
         pip install tenacity
         ${GITHUB_WORKSPACE}/.github/workflows/wait-for-pypi.py ${{env.pyproject_name}}[harmony]==${{ env.software_version }}
 
     - name: Build and push Docker image
-      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+#      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
       id: docker-push
       uses: docker/build-push-action@v3
       with:
