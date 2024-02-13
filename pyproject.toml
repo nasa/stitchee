@@ -21,7 +21,7 @@ harmony-service-lib = "^1.0.25"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 mypy = "^1.8.0"
-black = "^24.1.1"
+black = "^24.2.0"
 ruff = "^0.2.1"
 coverage = "^7.4.1"
 
