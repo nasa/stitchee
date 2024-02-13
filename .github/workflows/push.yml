@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  POETRY_VERSION: "1.3.1"
+  POETRY_VERSION: "1.3.2"
   PYTHON_VERSION: "3.10"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -84,11 +84,11 @@ jobs:
         CURRENT_VERSION: ${{ steps.get-version.outputs.current_version }}
         # True if the version already has a 'rc' pre-release identifier
         BUMP_RC: ${{ contains(steps.get-version.outputs.current_version, 'rc') }}
-        # True if the version already has a 'alpha' pre-release identifier
+        # True if the version already has an 'alpha' pre-release identifier
         BUMP_A: ${{ contains(steps.get-version.outputs.current_version, 'a') }}
         # True if the version already has a 'beta' pre-release identifier
         BUMP_B: ${{ contains(steps.get-version.outputs.current_version, 'b') }}
-      # Remove rc* from end of version string
+      # Remove rc* from the end of version string
       # The ${string%%substring} syntax below deletes the longest match of $substring from back of $string.
       run: |
         if [ "$BUMP_RC" = true ]; then
