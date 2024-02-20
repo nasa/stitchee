@@ -1163,13 +1163,13 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "xarray"
-version = "2024.1.1"
+version = "2024.2.0"
 description = "N-D labeled arrays and datasets in Python"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "xarray-2024.1.1-py3-none-any.whl", hash = "sha256:0bec81303b088c8df4f075e1579c00cfd7e5069688e4434007f0b8d7df17fc1c"},
-    {file = "xarray-2024.1.1.tar.gz", hash = "sha256:a1ba2d87a74892e213c9c83f4a462dbcdf68212320a4e31b34bd789ba7a64e35"},
+    {file = "xarray-2024.2.0-py3-none-any.whl", hash = "sha256:a31a9b37e39bd5aeb098070a75d6dd4d59019eb339d735b86108b9e0cb391f94"},
+    {file = "xarray-2024.2.0.tar.gz", hash = "sha256:a105f02791082c888ebe2622090beaff2e7b68571488d62fe6afdab35b4b717f"},
 ]
 
 [package.dependencies]
@@ -1179,7 +1179,8 @@ pandas = ">=1.5"
 
 [package.extras]
 accel = ["bottleneck", "flox", "numbagg", "opt-einsum", "scipy"]
-complete = ["xarray[accel,io,parallel,viz]"]
+complete = ["xarray[accel,dev,io,parallel,viz]"]
+dev = ["hypothesis", "pre-commit", "pytest", "pytest-cov", "pytest-env", "pytest-timeout", "pytest-xdist", "ruff", "xarray[complete]"]
 io = ["cftime", "fsspec", "h5netcdf", "netCDF4", "pooch", "pydap", "scipy", "zarr"]
 parallel = ["dask[complete]"]
 viz = ["matplotlib", "nc-time-axis", "seaborn"]
@@ -1202,4 +1203,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f3dcb6c6ff9cba25d5c6efcaf0a1e292e7851aecdaad9c82be75c4e2e7eb0c91"
+content-hash = "af77fdb28de5826a013bf8be2139975247df4d76a58dc2e65a21742f70fde3af"
