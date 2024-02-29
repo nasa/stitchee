@@ -23,7 +23,7 @@ pytest = "^8.0.2"
 mypy = "^1.8.0"
 black = "^24.2.0"
 ruff = "^0.2.2"
-coverage = "^7.4.1"
+coverage = "^7.4.3"
 
 [tool.poetry.group.extras.dependencies]
 
