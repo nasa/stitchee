@@ -1,4 +1,7 @@
 """Concatenation service that appends data along an existing dimension, using netCDF4 and xarray."""
+
+from __future__ import annotations
+
 import logging
 import os
 import time
@@ -27,6 +30,7 @@ def stitchee(
     concat_method: str = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
+    history_to_append: dict | None = None,
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -35,8 +39,12 @@ def stitchee(
     ----------
     files_to_concat : list[str]
     output_file : str
+    write_tmp_flat_concatenated
     keep_tmp_files : bool
+    concat_method
     concat_dim : str, optional
+    concat_kwargs
+    history_to_append
     logger : logging.Logger
 
     Returns
@@ -132,10 +140,12 @@ def stitchee(
         else:
             tmp_flat_concatenated_path = None
 
+        # new_global_attributes = create_new_attributes(combined_ds, request_parameters=dict())
+
         # The group hierarchy of the concatenated file is reconstructed (using XARRAY).
         start_time = time.time()
         logger.info("Reconstructing groups within concatenated file...")
-        regroup_flattened_dataset(combined_ds, output_file)
+        regroup_flattened_dataset(combined_ds, output_file)  # , new_global_attributes)
         benchmark_log["reconstructing_groups"] = time.time() - start_time
 
         logger.info("--- Benchmark results ---")
