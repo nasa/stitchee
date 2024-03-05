@@ -4,6 +4,7 @@ group_handling.py
 Functions for converting multidimensional data structures
  between a group hierarchy and a flat structure
 """
+
 import re
 
 import netCDF4 as nc
@@ -103,7 +104,7 @@ def flatten_grouped_dataset(
         netCDF4 Dataset that does not contain groups and that has been
         flattened.
     """
-    # Close the existing read-only dataset and reopen in append mode
+    # Close the existing read-only dataset and reopen in 'append' mode
     nc_dataset.close()
     nc_dataset = nc.Dataset(file_to_subset, "r+")
 
@@ -159,7 +160,7 @@ def flatten_grouped_dataset(
 
 
 def regroup_flattened_dataset(
-    dataset: xr.Dataset, output_file: str
+    dataset: xr.Dataset, output_file: str, history_to_append: str | None
 ) -> None:  # pylint: disable=too-many-branches
     """
     Given a list of xarray datasets, combine those datasets into a
@@ -176,7 +177,10 @@ def regroup_flattened_dataset(
     """
     with nc.Dataset(output_file, mode="w", format="NETCDF4") as base_dataset:
         # Copy global attributes
-        base_dataset.setncatts(dataset.attrs)
+        output_attributes = dataset.attrs
+        if history_to_append is not None:
+            output_attributes["history_json"] = history_to_append
+        base_dataset.setncatts(output_attributes)
 
         # Create Groups
         group_lst = []
@@ -283,9 +287,11 @@ def _calculate_chunks(dim_sizes: list, default_low_dim_chunksize=4000) -> tuple:
     number_of_dims = len(dim_sizes)
     if number_of_dims <= 3:
         chunk_sizes = tuple(
-            default_low_dim_chunksize
-            if ((s > default_low_dim_chunksize) and (number_of_dims > 1))
-            else s
+            (
+                default_low_dim_chunksize
+                if ((s > default_low_dim_chunksize) and (number_of_dims > 1))
+                else s
+            )
             for s in dim_sizes
         )
     else:

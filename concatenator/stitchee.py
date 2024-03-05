@@ -30,7 +30,7 @@ def stitchee(
     concat_method: str = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
-    history_to_append: dict | None = None,
+    history_to_append: str | None = None,
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -145,7 +145,7 @@ def stitchee(
         # The group hierarchy of the concatenated file is reconstructed (using XARRAY).
         start_time = time.time()
         logger.info("Reconstructing groups within concatenated file...")
-        regroup_flattened_dataset(combined_ds, output_file)  # , new_global_attributes)
+        regroup_flattened_dataset(combined_ds, output_file, history_to_append)
         benchmark_log["reconstructing_groups"] = time.time() - start_time
 
         logger.info("--- Benchmark results ---")

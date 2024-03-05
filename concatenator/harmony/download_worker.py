@@ -35,8 +35,7 @@ def multi_core_download(
 
     Returns
     -------
-    list
-        list of downloaded files as pathlib.Path objects
+    list of downloaded files as pathlib.Path objects
     """
 
     if process_count is None:
