@@ -1,6 +1,10 @@
-<div style="text-align: center;">
-![stitchee, a python package for concatenating netCDF data along an existing dimension](https://github.com/danielfromearth/stitchee/assets/114174502/58052dfa-b6e1-49e5-96e5-4cb1e8d14c32 "stitchee logo")
-</div>
+<p align="center">
+  <img alt="stitchee, a python package for concatenating netCDF data along an existing dimension"
+  src="https://github.com/danielfromearth/stitchee/assets/114174502/58052dfa-b6e1-49e5-96e5-4cb1e8d14c32" width="250"
+  />
+</p>
+
+[//]: # (Using deprecated `align="center"` for the logo image above, because of https://stackoverflow.com/a/62383408)
 
 <a href="https://www.repostatus.org/#active" target="_blank">
     <img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed">
