@@ -1,4 +1,8 @@
-[<img src="https://github.com/danielfromearth/stitchee/assets/114174502/58052dfa-b6e1-49e5-96e5-4cb1e8d14c32" width="250"/>](stitchee_9_hex)
+<p style="text-align:center">
+  <img alt="stitchee, a python package for concatenating netCDF data along an existing dimension"
+  src="https://github.com/danielfromearth/stitchee/assets/114174502/58052dfa-b6e1-49e5-96e5-4cb1e8d14c32" width="250"
+  />
+</p>
 
 # Overview
 _____
