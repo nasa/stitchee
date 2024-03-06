@@ -15,15 +15,15 @@ packages = [
 python = "^3.10"
 netcdf4 = "^1.6.5"
 xarray = "^2024.2.0"
-dask = "^2024.2.0"
+dask = "^2024.2.1"
 harmony-service-lib = "^1.0.25"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"
 mypy = "^1.8.0"
 black = "^24.2.0"
-ruff = "^0.2.2"
-coverage = "^7.4.1"
+ruff = "^0.3.0"
+coverage = "^7.4.3"
 
 [tool.poetry.group.extras.dependencies]
 
