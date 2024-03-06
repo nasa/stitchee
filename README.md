@@ -4,6 +4,16 @@
   />
 </p>
 
+<a href="https://www.repostatus.org/#active" target="_blank">
+    <img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed">
+</a>
+<a href="https://github.com/python/black" target="_blank">
+    <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style">
+</a>
+<a href="http://mypy-lang.org/" target="_blank">
+    <img src="http://www.mypy-lang.org/static/mypy_badge.svg" alt="Mypy checked">
+</a>
+
 # Overview
 _____
 
