@@ -1,20 +1,22 @@
 <p align="center">
-  <img alt="stitchee, a python package for concatenating netCDF data along an existing dimension"
-  src="https://github.com/danielfromearth/stitchee/assets/114174502/58052dfa-b6e1-49e5-96e5-4cb1e8d14c32" width="250"
-  />
+    <img alt="stitchee, a python package for concatenating netCDF data along an existing dimension"
+    src="https://github.com/danielfromearth/stitchee/assets/114174502/58052dfa-b6e1-49e5-96e5-4cb1e8d14c32" width="250"
+    />
 </p>
 
-[//]: # (Using deprecated `align="center"` for the logo image above, because of https://stackoverflow.com/a/62383408)
+<p align="center">
+    <a href="https://www.repostatus.org/#active" target="_blank">
+        <img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed">
+    </a>
+    <a href="https://github.com/python/black" target="_blank">
+        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style">
+    </a>
+    <a href="http://mypy-lang.org/" target="_blank">
+        <img src="http://www.mypy-lang.org/static/mypy_badge.svg" alt="Mypy checked">
+    </a>
+</p>
 
-<a href="https://www.repostatus.org/#active" target="_blank">
-    <img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed">
-</a>
-<a href="https://github.com/python/black" target="_blank">
-    <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style">
-</a>
-<a href="http://mypy-lang.org/" target="_blank">
-    <img src="http://www.mypy-lang.org/static/mypy_badge.svg" alt="Mypy checked">
-</a>
+[//]: # (Using deprecated `align="center"` for the logo image and badges above, because of https://stackoverflow.com/a/62383408)
 
 # Overview
 _____
