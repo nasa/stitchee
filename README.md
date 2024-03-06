@@ -79,8 +79,3 @@ For example:
 ```shell
 poetry run stitchee /path/to/netcdf/directory/ -o /path/to/output.nc
 ```
-
-## Roadmap
-Next major milestone(s):
-- Conduct extensive tests
-- Incorporate this service into Harmony as a Docker image.
