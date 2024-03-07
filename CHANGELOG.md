@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [Issue #49](https://github.com/danielfromearth/stitchee/issues/49): More CLI arguments for finer control of concatenation method
   - [PR #99](https://github.com/danielfromearth/stitchee/pull/99): Add Docker build steps to GitHub Actions workflow
   - [PR #115](https://github.com/danielfromearth/stitchee/pull/115): Add readme badges
+  - [PR #116](https://github.com/danielfromearth/stitchee/pull/116): Add tutorial Jupyter notebook
 ### Changed
   - [PR #12](https://github.com/danielfromearth/stitchee/pull/12): Changed name to "stitchee"
   - [PR #15](https://github.com/danielfromearth/stitchee/pull/15): Use ruff+black chain for pre-commit lint & format
