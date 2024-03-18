@@ -2,7 +2,6 @@
 
 # pylint: disable=C0116
 
-import shutil
 from pathlib import Path
 
 import netCDF4 as nc
@@ -11,6 +10,7 @@ import pytest
 from concatenator.stitchee import stitchee
 
 from . import data_for_tests_dir
+from .conftest import prep_input_files
 
 
 @pytest.mark.usefixtures("pass_options")
@@ -27,19 +27,13 @@ class TestConcat:
         concat_kwargs: dict | None = None,
     ):
         output_path = str(output_dir.joinpath(output_name))  # type: ignore
-
-        input_files = []
-        for filepath in input_dir.iterdir():
-            if Path(filepath).suffix.lower() in (".nc", ".h5", ".hdf"):
-                copied_input_new_path = output_dir / Path(filepath).name  # type: ignore
-                shutil.copyfile(filepath, copied_input_new_path)
-                input_files.append(str(copied_input_new_path))
+        prepared_input_files = prep_input_files(input_dir, output_dir)
 
         if concat_kwargs is None:
             concat_kwargs = {}
 
         output_path = stitchee(
-            files_to_concat=input_files,
+            files_to_concat=prepared_input_files,
             output_file=output_path,
             write_tmp_flat_concatenated=True,
             keep_tmp_files=True,
@@ -53,9 +47,11 @@ class TestConcat:
         # Verify that the length of the record dimension in the concatenated file equals
         #   the sum of the lengths across the input files
         length_sum = 0
-        for file in input_files:
+        for file in prepared_input_files:
             length_sum += len(nc.Dataset(file).variables[record_dim_name])
         assert length_sum == len(merged_dataset.variables[record_dim_name])
+
+        return merged_dataset
 
     def test_simple_sample(
         self,
