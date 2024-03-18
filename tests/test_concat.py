@@ -10,6 +10,8 @@ import pytest
 
 from concatenator.stitchee import stitchee
 
+from . import data_for_tests_dir
+
 
 @pytest.mark.usefixtures("pass_options")
 class TestConcat:
@@ -70,25 +72,25 @@ class TestConcat:
             concat_method="xarray-concat",
         )
 
-    def test_tempo_no2_concat_with_stitchee(self, data_dirs, temp_output_dir):
+    def test_tempo_no2_concat_with_stitchee(self, temp_output_dir):
         self.run_verification_with_stitchee(
-            input_dir=data_dirs.test_data_path / "tempo/no2",
+            input_dir=data_for_tests_dir / "tempo/no2",
             output_dir=temp_output_dir,
             output_name="tempo_no2_stitcheed.nc",
             concat_method="xarray-concat",
         )
 
-    def test_tempo_hcho_concat_with_stitchee(self, data_dirs, temp_output_dir):
+    def test_tempo_hcho_concat_with_stitchee(self, temp_output_dir):
         self.run_verification_with_stitchee(
-            input_dir=data_dirs.test_data_path / "tempo/hcho",
+            input_dir=data_for_tests_dir / "tempo/hcho",
             output_dir=temp_output_dir,
             output_name="tempo_hcho_stitcheed.nc",
             concat_method="xarray-concat",
         )
 
-    def test_tempo_cld04_concat_with_stitchee(self, data_dirs, temp_output_dir):
+    def test_tempo_cld04_concat_with_stitchee(self, temp_output_dir):
         self.run_verification_with_stitchee(
-            input_dir=data_dirs.test_data_path / "tempo/cld04",
+            input_dir=data_for_tests_dir / "tempo/cld04",
             output_dir=temp_output_dir,
             output_name="tempo_cld04_stitcheed.nc",
             concat_method="xarray-concat",
@@ -102,9 +104,9 @@ class TestConcat:
     # def test_icesat_concat_with_stitchee(self):
     #     self.run_verification_with_stitchee('icesat', 'icesat_concat_with_stitchee.nc')
     #
-    def test_ceres_concat_with_stitchee(self, data_dirs, temp_output_dir):
+    def test_ceres_concat_with_stitchee(self, temp_output_dir):
         self.run_verification_with_stitchee(
-            input_dir=data_dirs.test_data_path / "ceres-subsetter-output",
+            input_dir=data_for_tests_dir / "ceres-subsetter-output",
             output_dir=temp_output_dir,
             output_name="ceres_bee_concatenated.nc",
             concat_method="xarray-combine",
@@ -112,9 +114,9 @@ class TestConcat:
             concat_kwargs={"compat": "override", "combine_attrs": "override"},
         )
 
-    def test_ceres_flash_concat_with_stitchee(self, data_dirs, temp_output_dir):
+    def test_ceres_flash_concat_with_stitchee(self, temp_output_dir):
         self.run_verification_with_stitchee(
-            input_dir=data_dirs.test_data_path / "ceres_flash-subsetter-output",
+            input_dir=data_for_tests_dir / "ceres_flash-subsetter-output",
             output_dir=temp_output_dir,
             output_name="ceres_flash_bee_concatenated.nc",
             concat_method="xarray-combine",

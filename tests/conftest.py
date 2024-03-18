@@ -1,10 +1,7 @@
 """Initial configuration for tests."""
 
-import shutil
 import typing
-from collections.abc import Generator
 from pathlib import Path
-from tempfile import mkdtemp
 
 import netCDF4 as nc
 import pytest
@@ -35,32 +32,14 @@ def pass_options(request):
     request.cls.KEEP_TMP = request.config.getoption("--keep-tmp")
 
 
-@pytest.fixture(scope="session", autouse=True)
-def data_dirs() -> DataDirs:
-    __test_path = Path(__file__).parent.resolve()
-    __test_data_path = __test_path.joinpath("data")
-
-    return DataDirs(test_path=__test_path, test_data_path=__test_data_path)
-
-
-@pytest.fixture(scope="session", autouse=True)
-def temp_toy_data_dir(data_dirs) -> Generator[Path, None, None]:
-    # Setup
-    __toy_data_path = Path(mkdtemp(prefix="toy-", dir=data_dirs.test_data_path))
-    yield __toy_data_path
-
-    # Tear down
-    shutil.rmtree(__toy_data_path)
+@pytest.fixture(scope="session")
+def temp_toy_data_dir(tmpdir_factory) -> Path:
+    return Path(tmpdir_factory.mktemp("toy-"))
 
 
 @pytest.fixture(scope="function", autouse=True)
-def temp_output_dir(data_dirs) -> Generator[Path, None, None]:
-    # Setup
-    __output_path = Path(mkdtemp(prefix="tmp-", dir=data_dirs.test_data_path))
-    yield __output_path
-
-    # Tear down
-    shutil.rmtree(__output_path)
+def temp_output_dir(tmpdir_factory) -> Path:
+    return Path(tmpdir_factory.mktemp("tmp-"))
 
 
 def add_to_ds_3dims_3vars_4coords_1group_with_step_values(open_ds: nc.Dataset, step_values: list):
