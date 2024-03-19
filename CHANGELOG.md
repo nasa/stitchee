@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [Issue #10](https://github.com/danielfromearth/stitchee/issues/10): Add code necessary to communicate with Harmony
   - [Issue #49](https://github.com/danielfromearth/stitchee/issues/49): More CLI arguments for finer control of concatenation method
   - [Pull #99](https://github.com/danielfromearth/stitchee/pull/99): Add Docker build steps to GitHub Actions workflow
+  - [Pull #113](https://github.com/danielfromearth/stitchee/pull/113): Add history attributes
   - [Pull #115](https://github.com/danielfromearth/stitchee/pull/115): Add readme badges
   - [Pull #116](https://github.com/danielfromearth/stitchee/pull/116): Add tutorial Jupyter notebook
   - [Pull #128](https://github.com/danielfromearth/stitchee/pull/116): Create toy netCDFs in testing suite

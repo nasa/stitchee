@@ -1,5 +1,6 @@
 """Initial configuration for tests."""
 
+import shutil
 import typing
 from pathlib import Path
 
@@ -26,13 +27,24 @@ def pytest_addoption(parser):
     )
 
 
+def prep_input_files(input_dir: Path, output_dir: Path) -> list[str]:
+    """Prepare input by copying from the original test data directory."""
+    input_files = []
+    for filepath in input_dir.iterdir():
+        if Path(filepath).suffix.lower() in (".nc", ".h5", ".hdf"):
+            copied_input_new_path = output_dir / Path(filepath).name  # type: ignore
+            shutil.copyfile(filepath, copied_input_new_path)
+            input_files.append(str(copied_input_new_path))
+    return input_files
+
+
 @pytest.fixture(scope="class")
 def pass_options(request):
     """Adds optional argument to a test class."""
     request.cls.KEEP_TMP = request.config.getoption("--keep-tmp")
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def temp_toy_data_dir(tmpdir_factory) -> Path:
     return Path(tmpdir_factory.mktemp("toy-"))
 
@@ -80,7 +92,7 @@ def add_to_ds_3dims_3vars_4coords_1group_with_step_values(open_ds: nc.Dataset, s
     return open_ds
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def ds_3dims_3vars_4coords_1group_part1(temp_toy_data_dir) -> Path:
     filepath = temp_toy_data_dir / "test_3dims_3vars_4coords_1group_part1.nc"
 
@@ -91,7 +103,7 @@ def ds_3dims_3vars_4coords_1group_part1(temp_toy_data_dir) -> Path:
     return filepath
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def ds_3dims_3vars_4coords_1group_part2(temp_toy_data_dir):
     filepath = temp_toy_data_dir / "test_3dims_3vars_4coords_1group_part2.nc"
 

@@ -156,7 +156,7 @@ def flatten_grouped_dataset(
 
 
 def regroup_flattened_dataset(
-    dataset: xr.Dataset, output_file: str
+    dataset: xr.Dataset, output_file: str, history_to_append: str | None
 ) -> None:  # pylint: disable=too-many-branches
     """
     Given a list of xarray datasets, combine those datasets into a
@@ -173,7 +173,10 @@ def regroup_flattened_dataset(
     """
     with nc.Dataset(output_file, mode="w", format="NETCDF4") as base_dataset:
         # Copy global attributes
-        base_dataset.setncatts(dataset.attrs)
+        output_attributes = dataset.attrs
+        if history_to_append is not None:
+            output_attributes["history_json"] = history_to_append
+        base_dataset.setncatts(output_attributes)
 
         # Create Groups
         group_lst = []

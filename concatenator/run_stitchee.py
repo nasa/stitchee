@@ -1,4 +1,6 @@
 """A simple CLI wrapper around the main concatenation process."""
+
+import json
 import logging
 import os
 import shutil
@@ -7,6 +9,9 @@ import uuid
 from argparse import ArgumentParser
 from pathlib import Path
 
+import netCDF4 as nc
+
+from concatenator.attribute_handling import construct_history, retrieve_history
 from concatenator.file_ops import add_label_to_path
 from concatenator.stitchee import stitchee
 
@@ -225,6 +230,15 @@ def run_stitchee(args: list) -> None:
     ) = parse_args(args)
     num_inputs = len(input_files)
 
+    history_json: list[dict] = []
+    for file_count, file in enumerate(input_files):
+        with nc.Dataset(file, "r") as dataset:
+            history_json.extend(retrieve_history(dataset))
+
+    history_json.append(construct_history(input_files, input_files))
+
+    new_history_json = json.dumps(history_json, default=str)
+
     logging.info("Executing stitchee concatenation on %d files...", num_inputs)
     stitchee(
         input_files,
@@ -234,6 +248,7 @@ def run_stitchee(args: list) -> None:
         concat_method=concat_method,
         concat_dim=concat_dim,
         concat_kwargs=concat_kwargs,
+        history_to_append=new_history_json,
     )
     logging.info("STITCHEE complete. Result in %s", output_path)
 
