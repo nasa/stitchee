@@ -59,13 +59,25 @@ class TestConcat:
         temp_output_dir,
         ds_3dims_3vars_4coords_1group_part1,
         ds_3dims_3vars_4coords_1group_part2,
+        ds_3dims_3vars_4coords_1group_part3,
     ):
-        self.run_verification_with_stitchee(
+        record_dim_name = "step"
+
+        merged_data = self.run_verification_with_stitchee(
             input_dir=temp_toy_data_dir,
             output_dir=temp_output_dir,
             output_name="simple_sample_concatenated.nc",
-            record_dim_name="step",
+            record_dim_name=record_dim_name,
             concat_method="xarray-concat",
+        )
+
+        # Check that the concatenated dimension elements in the result are sorted.
+        assert all(
+            a == b
+            for a, b in zip(
+                merged_data.variables[record_dim_name][:],
+                sorted(merged_data.variables[record_dim_name][:]),
+            )
         )
 
     def test_tempo_no2_concat_with_stitchee(self, temp_output_dir):
