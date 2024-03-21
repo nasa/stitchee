@@ -85,6 +85,7 @@ def stitchee(
 
             logger.info("Flattening all input files...")
             xrdataset_list = []
+            concat_dim_order = []
             for i, filepath in enumerate(input_files):
                 # The group structure is flattened.
                 start_time = time.time()
@@ -106,6 +107,8 @@ def stitchee(
                     decode_coords=False,
                     drop_variables=coord_vars,
                 )
+                first_value = xrds[GROUP_DELIM + concat_dim].values.flatten()[0]
+                concat_dim_order.append(first_value)
 
                 benchmark_log["flattening"] = time.time() - start_time
 
@@ -115,6 +118,9 @@ def stitchee(
                 # intermediate_flat_filepaths.append(flat_file_path)
                 # xrdataset_list.append(xr.open_dataset(flat_file_path))
                 xrdataset_list.append(xrds)
+
+            # Reorder the xarray datasets according to the concat dim values.
+            xrdataset_list = [x for _, x in sorted(zip(concat_dim_order, xrdataset_list))]
 
             # Flattened files are concatenated together (Using XARRAY).
             start_time = time.time()
