@@ -9,6 +9,12 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  POETRY_VERSION: "1.3.2"
+  PYTHON_VERSION: "3.10"
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   run_tests:
     uses: ./.github/workflows/run_tests.yml
@@ -24,12 +30,12 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Install Poetry
-      uses: abatilo/actions-poetry@v2.4.0
+      uses: abatilo/actions-poetry@v3.0.0
       with:
-        poetry-version: 1.3.2
+        poetry-version: ${{ env.POETRY_VERSION }}
 
     - name: Get version
       id: get-version
@@ -78,11 +84,11 @@ jobs:
         CURRENT_VERSION: ${{ steps.get-version.outputs.current_version }}
         # True if the version already has a 'rc' pre-release identifier
         BUMP_RC: ${{ contains(steps.get-version.outputs.current_version, 'rc') }}
-        # True if the version already has a 'alpha' pre-release identifier
+        # True if the version already has an 'alpha' pre-release identifier
         BUMP_A: ${{ contains(steps.get-version.outputs.current_version, 'a') }}
         # True if the version already has a 'beta' pre-release identifier
         BUMP_B: ${{ contains(steps.get-version.outputs.current_version, 'b') }}
-      # Remove rc* from end of version string
+      # Remove rc* from the end of version string
       # The ${string%%substring} syntax below deletes the longest match of $substring from back of $string.
       run: |
         if [ "$BUMP_RC" = true ]; then
@@ -94,6 +100,48 @@ jobs:
         fi
         echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
         echo "venue=ops" >> $GITHUB_ENV
+
+    - name: Log in to the Container registry
+      # TODO: change this and subsequent docker steps back to NOT (as follows), after testing in the feature branch --- if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata (tags, labels) for Docker
+#      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=raw,pattern={{version}},value=${{ env.software_version }}
+          type=raw,value=${{ env.venue }}
+
+#    - name: Wait for package
+##      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+#      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
+#      run: |
+#        pip install tenacity
+#        ${GITHUB_WORKSPACE}/.github/workflows/wait-for-pypi.py ${{env.pyproject_name}}[harmony]==${{ env.software_version }}
+
+    - name: Build and push Docker image
+#      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
+      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
+      id: docker-push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: Dockerfile
+        build-args: |
+          SOURCE=${{env.pyproject_name}}[harmony]==${{ env.software_version }}
+        push: true
+        pull: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
 
 #    - name: Commit Version Bump
 #      # If building develop, a release branch, or main then we commit the version bump back to the repo

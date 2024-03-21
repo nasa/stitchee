@@ -1,15 +1,18 @@
+import json
 from pathlib import Path
 from shutil import copyfile
 from tempfile import TemporaryDirectory
 from urllib.parse import urlsplit
 from uuid import uuid4
 
+import netCDF4 as nc
 import pystac
 from harmony.adapter import BaseHarmonyAdapter
 from harmony.util import bbox_to_geometry, stage
 from pystac import Item
 from pystac.item import Asset
 
+from concatenator.attribute_handling import construct_history, retrieve_history
 from concatenator.harmony.download_worker import multi_core_download
 from concatenator.harmony.util import (
     _get_netcdf_urls,
@@ -98,9 +101,17 @@ class StitcheeAdapter(BaseHarmonyAdapter):
                 )
                 self.logger.info("Finished granule downloads.")
 
+                history_json: list[dict] = []
                 for file_count, file in enumerate(input_files):
                     file_size = sizeof_fmt(file.stat().st_size)
                     self.logger.info(f"File {file_count} is size <{file_size}>. Path={file}")
+
+                    with nc.Dataset(file, "r") as dataset:
+                        history_json.extend(retrieve_history(dataset))
+
+                history_json.append(construct_history(input_files, netcdf_urls))
+
+                new_history_json = json.dumps(history_json, default=str)
 
                 self.logger.info("Running Stitchee..")
                 output_path = str(Path(temp_dir).joinpath(filename).resolve())
@@ -112,6 +123,7 @@ class StitcheeAdapter(BaseHarmonyAdapter):
                     write_tmp_flat_concatenated=False,
                     keep_tmp_files=False,
                     concat_dim="mirror_step",  # This is currently set only for TEMPO
+                    history_to_append=new_history_json,
                     logger=self.logger,
                 )
                 self.logger.info("Stitchee completed.")
