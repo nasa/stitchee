@@ -88,6 +88,14 @@ class TestConcat:
             concat_method="xarray-concat",
         )
 
+    def test_tempo_no2_subsetter_output_concat_with_stitchee(self, temp_output_dir):
+        self.run_verification_with_stitchee(
+            input_dir=data_for_tests_dir / "tempo/no2_subsetted",
+            output_dir=temp_output_dir,
+            output_name="tempo_no2_stitcheed.nc",
+            concat_method="xarray-concat",
+        )
+
     def test_tempo_hcho_concat_with_stitchee(self, temp_output_dir):
         self.run_verification_with_stitchee(
             input_dir=data_for_tests_dir / "tempo/hcho",
