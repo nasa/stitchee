@@ -120,7 +120,10 @@ def stitchee(
                 xrdataset_list.append(xrds)
 
             # Reorder the xarray datasets according to the concat dim values.
-            xrdataset_list = [x for _, x in sorted(zip(concat_dim_order, xrdataset_list))]
+            xrdataset_list = [
+                dataset
+                for _, dataset in sorted(zip(concat_dim_order, xrdataset_list), key=lambda x: x[0])
+            ]
 
             # Flattened files are concatenated together (Using XARRAY).
             start_time = time.time()

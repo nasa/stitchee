@@ -26,4 +26,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 ### Removed
 ### Fixed
-- [PR #4](https://github.com/danielfromearth/stitchee/pull/4): Error with TEMPO ozone profile data because of duplicated dimension names
+- [Pull #4](https://github.com/danielfromearth/stitchee/pull/4): Error with TEMPO ozone profile data because of duplicated dimension names
+- [Pull #133](https://github.com/danielfromearth/stitchee/pull/133): Fix conflicting dimensions on record dimension sorting
