@@ -40,7 +40,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          poetry run coverage run -m pytest tests/test_group_handling.py >& test_results.txt
+          poetry run coverage run -m pytest tests/unit/test_group_handling.py >& test_results.txt
         # TODO: expand tests to include full concatenation runs, i.e., don't just run test_group_handling.py
 
       - name: Generate coverage report
