@@ -83,3 +83,6 @@ For example:
 ```shell
 poetry run stitchee /path/to/netcdf/directory/ -o /path/to/output.nc
 ```
+
+---
+This package is NASA Software Release Authorization (SRA) # LAR-20433-1
