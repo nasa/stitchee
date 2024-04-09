@@ -4,8 +4,7 @@ import xarray as xr
 
 from concatenator.attribute_handling import construct_history
 from concatenator.stitchee import stitchee
-
-from .conftest import prep_input_files
+from tests.conftest import prep_input_files
 
 
 def test_simple_sample_with_history(

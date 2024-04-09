@@ -9,9 +9,8 @@ import pytest
 
 from concatenator.group_handling import GROUP_DELIM
 from concatenator.stitchee import stitchee
-
-from . import data_for_tests_dir
-from .conftest import prep_input_files
+from tests import data_for_tests_dir
+from tests.conftest import prep_input_files
 
 
 @pytest.mark.usefixtures("pass_options")
