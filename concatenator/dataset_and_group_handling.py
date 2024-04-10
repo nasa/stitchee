@@ -5,6 +5,8 @@ Functions for converting multidimensional data structures
  between a group hierarchy and a flat structure
 """
 
+from __future__ import annotations
+
 import re
 
 import netCDF4 as nc
@@ -313,3 +315,39 @@ def _get_dimension_size(dataset: nc.Dataset, dim_name: str) -> int:
     if dim_size is None:
         print(f"Dimension {dim_name} not found when searching for sizes!")
     return dim_size
+
+
+def validate_workable_files(files_to_concat, logger) -> tuple[list[str], int]:
+    """Remove files from list that are not open-able as netCDF or that are empty."""
+    workable_files = []
+    for file in files_to_concat:
+        try:
+            with nc.Dataset(file, "r") as dataset:
+                is_empty = _is_file_empty(dataset)
+                if is_empty is False:
+                    workable_files.append(file)
+        except OSError:
+            logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
+
+    number_of_workable_files = len(workable_files)
+
+    return workable_files, number_of_workable_files
+
+
+def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
+    """Check if netCDF dataset is empty or not.
+
+    Tests if all variable sizes in a dataset are size 0.
+    As soon as a variable array size not equal to 0 is detected,
+    the granule is considered non-empty.
+
+    Returns
+    -------
+    False if the dataset is considered non-empty; True otherwise (dataset is indeed empty).
+    """
+    for var in parent_group.variables.values():
+        if var.size != 0:
+            return False
+    for child_group in parent_group.groups.values():
+        return _is_file_empty(child_group)
+    return True
