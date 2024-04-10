@@ -337,9 +337,9 @@ def validate_workable_files(files_to_concat, logger) -> tuple[list[str], int]:
 def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
     """Check if netCDF dataset is empty or not.
 
-    Tests if all variable sizes in a dataset are size 0.
-    As soon as a variable array size not equal to 0 is detected,
-    the granule is considered non-empty.
+    Tests if all variable arrays are empty.
+    As soon as a variable is detected with both (i) an array size not equal to zero and
+    (ii) not all null/fill values, then the granule is considered non-empty.
 
     Returns
     -------
