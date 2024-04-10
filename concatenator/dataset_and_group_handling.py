@@ -345,9 +345,27 @@ def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
     -------
     False if the dataset is considered non-empty; True otherwise (dataset is indeed empty).
     """
-    for var in parent_group.variables.values():
+    for var_name, var in parent_group.variables.items():
         if var.size != 0:
-            return False
+            if "_FillValue" in var.ncattrs():
+                fill_or_null = getattr(var, "_FillValue")
+            else:
+                fill_or_null = np.nan
+
+            # This checks three ways that the variable's array might be considered empty.
+            # If none of the ways are true,
+            #   a non-empty variable has been found and False is returned.
+            # If one of the ways is true, we consider the variable empty,
+            #   and continue checking other variables.
+            empty_way_1 = False
+            if np.ma.isMaskedArray(var[:]):
+                empty_way_1 = var[:].mask.all()
+            empty_way_2 = np.all(var[:].data == fill_or_null)
+            empty_way_3 = np.all(np.isnan(var[:].data))
+
+            if not (empty_way_1 or empty_way_2 or empty_way_3):
+                return False  # Found a non-empty variable.
+
     for child_group in parent_group.groups.values():
         return _is_file_empty(child_group)
     return True
