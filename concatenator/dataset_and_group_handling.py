@@ -1,5 +1,5 @@
 """
-group_handling.py
+dataset_and_group_handling.py
 
 Functions for converting multidimensional data structures
  between a group hierarchy and a flat structure

@@ -13,12 +13,12 @@ import netCDF4 as nc
 import xarray as xr
 
 from concatenator import GROUP_DELIM
-from concatenator.dimension_cleanup import remove_duplicate_dims
-from concatenator.file_ops import add_label_to_path
-from concatenator.group_handling import (
+from concatenator.dataset_and_group_handling import (
     flatten_grouped_dataset,
     regroup_flattened_dataset,
 )
+from concatenator.dimension_cleanup import remove_duplicate_dims
+from concatenator.file_ops import add_label_to_path
 
 default_logger = logging.getLogger(__name__)
 
