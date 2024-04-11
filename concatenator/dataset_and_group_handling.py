@@ -1,9 +1,11 @@
 """
-group_handling.py
+dataset_and_group_handling.py
 
 Functions for converting multidimensional data structures
  between a group hierarchy and a flat structure
 """
+
+from __future__ import annotations
 
 import re
 
@@ -313,3 +315,57 @@ def _get_dimension_size(dataset: nc.Dataset, dim_name: str) -> int:
     if dim_size is None:
         print(f"Dimension {dim_name} not found when searching for sizes!")
     return dim_size
+
+
+def validate_workable_files(files_to_concat, logger) -> tuple[list[str], int]:
+    """Remove files from list that are not open-able as netCDF or that are empty."""
+    workable_files = []
+    for file in files_to_concat:
+        try:
+            with nc.Dataset(file, "r") as dataset:
+                is_empty = _is_file_empty(dataset)
+                if is_empty is False:
+                    workable_files.append(file)
+        except OSError:
+            logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
+
+    number_of_workable_files = len(workable_files)
+
+    return workable_files, number_of_workable_files
+
+
+def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
+    """Check if netCDF dataset is empty or not.
+
+    Tests if all variable arrays are empty.
+    As soon as a variable is detected with both (i) an array size not equal to zero and
+    (ii) not all null/fill values, then the granule is considered non-empty.
+
+    Returns
+    -------
+    False if the dataset is considered non-empty; True otherwise (dataset is indeed empty).
+    """
+    for var_name, var in parent_group.variables.items():
+        if var.size != 0:
+            if "_FillValue" in var.ncattrs():
+                fill_or_null = getattr(var, "_FillValue")
+            else:
+                fill_or_null = np.nan
+
+            # This checks three ways that the variable's array might be considered empty.
+            # If none of the ways are true,
+            #   a non-empty variable has been found and False is returned.
+            # If one of the ways is true, we consider the variable empty,
+            #   and continue checking other variables.
+            empty_way_1 = False
+            if np.ma.isMaskedArray(var[:]):
+                empty_way_1 = var[:].mask.all()
+            empty_way_2 = np.all(var[:].data == fill_or_null)
+            empty_way_3 = np.all(np.isnan(var[:].data))
+
+            if not (empty_way_1 or empty_way_2 or empty_way_3):
+                return False  # Found a non-empty variable.
+
+    for child_group in parent_group.groups.values():
+        return _is_file_empty(child_group)
+    return True

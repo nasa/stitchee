@@ -13,12 +13,13 @@ import netCDF4 as nc
 import xarray as xr
 
 from concatenator import GROUP_DELIM
-from concatenator.dimension_cleanup import remove_duplicate_dims
-from concatenator.file_ops import add_label_to_path
-from concatenator.group_handling import (
+from concatenator.dataset_and_group_handling import (
     flatten_grouped_dataset,
     regroup_flattened_dataset,
+    validate_workable_files,
 )
+from concatenator.dimension_cleanup import remove_duplicate_dims
+from concatenator.file_ops import add_label_to_path
 
 default_logger = logging.getLogger(__name__)
 
@@ -65,7 +66,7 @@ def stitchee(
     benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
 
     # Proceed to concatenate only files that are workable (can be opened and are not empty).
-    input_files, num_input_files = _validate_workable_files(files_to_concat, logger)
+    input_files, num_input_files = validate_workable_files(files_to_concat, logger)
 
     # Exit cleanly if no workable netCDF files found.
     if num_input_files < 1:
@@ -196,32 +197,3 @@ def stitchee(
         raise err
 
     return output_file
-
-
-def _validate_workable_files(files_to_concat, logger) -> tuple[list[str], int]:
-    """Remove files from list that are not open-able as netCDF or that are empty."""
-    workable_files = []
-    for file in files_to_concat:
-        try:
-            with nc.Dataset(file, "r") as dataset:
-                is_empty = _is_file_empty(dataset)
-                if is_empty is False:
-                    workable_files.append(file)
-        except OSError:
-            logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
-
-    number_of_workable_files = len(workable_files)
-
-    return workable_files, number_of_workable_files
-
-
-def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
-    """
-    Function to test if a all variable size in a dataset is 0
-    """
-    for var in parent_group.variables.values():
-        if var.size != 0:
-            return False
-    for child_group in parent_group.groups.values():
-        return _is_file_empty(child_group)
-    return True

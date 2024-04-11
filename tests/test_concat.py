@@ -7,7 +7,7 @@ from pathlib import Path
 import netCDF4 as nc
 import pytest
 
-from concatenator.group_handling import GROUP_DELIM
+from concatenator.dataset_and_group_handling import GROUP_DELIM
 from concatenator.stitchee import stitchee
 
 from . import data_for_tests_dir
