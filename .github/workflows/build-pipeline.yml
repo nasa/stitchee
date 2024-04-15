@@ -123,15 +123,14 @@ jobs:
 
       # Builds and pushes a Docker image
       - name: Log in to the Container registry
-        if: ${{ !startsWith(github.ref, 'refs/heads/feature/') }}
+        if: ${{ !startsWith(github.ref, 'refs/heads/main/') }}
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Extract metadata (tags, labels) for Docker
-        if: ${{ !startsWith(github.ref, 'refs/heads/feature/') }}
+        if: ${{ !startsWith(github.ref, 'refs/heads/main/') }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -139,16 +138,8 @@ jobs:
           tags: |
             type=raw,pattern={{version}},value=${{ env.software_version }}
             type=raw,value=${{ env.venue }}
-
-  #    - name: Wait for package
-  ##      if: ${{ !startsWith(github.ref, 'refs/heads/feature') }}
-  #      if: ${{ startsWith(github.ref, 'refs/heads/feature/') }}
-  #      run: |
-  #        pip install tenacity
-  #        ${GITHUB_WORKSPACE}/.github/workflows/wait-for-pypi.py ${{env.pyproject_name}}[harmony]==${{ env.software_version }}
-
       - name: Build and push Docker image
-        if: ${{ !startsWith(github.ref, 'refs/heads/feature/') }}
+        if: ${{ !startsWith(github.ref, 'refs/heads/main/') }}
         id: docker-push
         uses: docker/build-push-action@v5
         with:
