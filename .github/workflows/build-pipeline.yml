@@ -87,6 +87,27 @@ jobs:
           echo "software_version=$(poetry version | awk '{print $2}')" >> $GITHUB_ENV
           echo "venue=ops" >> $GITHUB_ENV
 
+      - name: Run Snyk as a blocking step
+        uses: snyk/actions/python-3.10@master
+        env:
+            SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: >
+              --org=${{ secrets.SNYK_ORG_ID }}
+              --project-name=${{ github.repository }}
+              --severity-threshold=high
+              --fail-on=all
+      - name: Run Snyk on Python
+        uses: snyk/actions/python-3.10@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: >
+            --org=${{ secrets.SNYK_ORG_ID }}
+            --project-name=${{ github.repository }}
+
       - name: Commit Version Bump
         # If building the `develop`, a `release` branch, or `main`,
         # then we commit the version bump back to the repo.
