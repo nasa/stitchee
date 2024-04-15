@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [Pull #129](https://github.com/danielfromearth/stitchee/pull/129): Sort according to extend dimension
   - [Pull #152](https://github.com/danielfromearth/stitchee/pull/152): Consider empty a netCDF with only singleton null-values
   - [Pull #157](https://github.com/danielfromearth/stitchee/pull/157): Update CI pipeline
+  - [Pull #158](https://github.com/danielfromearth/stitchee/pull/158): Add pypi publishing steps to CI pipeline
 ### Deprecated
 ### Removed
 ### Fixed
