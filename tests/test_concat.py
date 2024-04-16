@@ -7,6 +7,7 @@ from pathlib import Path
 import netCDF4 as nc
 import pytest
 
+from concatenator.dataset_and_group_handling import GROUP_DELIM
 from concatenator.stitchee import stitchee
 
 from . import data_for_tests_dir
@@ -46,10 +47,21 @@ class TestConcat:
 
         # Verify that the length of the record dimension in the concatenated file equals
         #   the sum of the lengths across the input files
-        length_sum = 0
+        original_files_length_sum = 0
         for file in prepared_input_files:
-            length_sum += len(nc.Dataset(file).variables[record_dim_name])
-        assert length_sum == len(merged_dataset.variables[record_dim_name])
+            # length_sum += len(nc.Dataset(file).variables[record_dim_name])
+            with nc.Dataset(file) as ncds:
+                try:
+                    original_files_length_sum += ncds.dimensions[record_dim_name].size
+                except KeyError:
+                    original_files_length_sum += ncds.dimensions[GROUP_DELIM + record_dim_name].size
+
+        try:
+            merged_file_length = merged_dataset.dimensions[record_dim_name].size
+        except KeyError:
+            merged_file_length = merged_dataset.dimensions[GROUP_DELIM + record_dim_name].size
+
+        assert original_files_length_sum == merged_file_length
 
         return merged_dataset
 
@@ -83,6 +95,14 @@ class TestConcat:
     def test_tempo_no2_concat_with_stitchee(self, temp_output_dir):
         self.run_verification_with_stitchee(
             input_dir=data_for_tests_dir / "tempo/no2",
+            output_dir=temp_output_dir,
+            output_name="tempo_no2_stitcheed.nc",
+            concat_method="xarray-concat",
+        )
+
+    def test_tempo_no2_subsetter_output_concat_with_stitchee(self, temp_output_dir):
+        self.run_verification_with_stitchee(
+            input_dir=data_for_tests_dir / "tempo/no2_subsetted",
             output_dir=temp_output_dir,
             output_name="tempo_no2_stitcheed.nc",
             concat_method="xarray-concat",

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stitchee"
-version = "0.1.0"
+version = "1.0.0rc3"
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
 authors = ["Daniel Kaufman <daniel.kaufman@nasa.gov>"]
 readme = "README.md"
@@ -14,18 +14,17 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 netcdf4 = "^1.6.5"
-xarray = "^2024.2.0"
-dask = "^2024.2.1"
+xarray = "^2024.3.0"
+dask = "^2024.4.1"
 harmony-service-lib = "^1.0.25"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
 mypy = "^1.9.0"
 black = "^24.2.0"
-ruff = "^0.3.2"
+ruff = "^0.3.7"
 coverage = "^7.4.4"
-
-[tool.poetry.group.extras.dependencies]
+pytest-cov = "^5.0.0"
 
 [tool.poetry.scripts]
 stitchee_harmony = 'concatenator.harmony.cli:main'

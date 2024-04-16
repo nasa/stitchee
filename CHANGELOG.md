@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0]
 
 ### Added
   - [Pull #1](https://github.com/danielfromearth/stitchee/pull/1): An initial GitHub Actions workflow
@@ -23,7 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [Issue #44](https://github.com/danielfromearth/stitchee/issues/44): Concatenation dimension CLI argument is required but isn't listed as such in the help message
   - [Issue #81](https://github.com/danielfromearth/stitchee/issues/81): Remove `nco` related code
   - [Pull #129](https://github.com/danielfromearth/stitchee/pull/129): Sort according to extend dimension
+  - [Pull #152](https://github.com/danielfromearth/stitchee/pull/152): Consider empty a netCDF with only singleton null-values
+  - [Pull #157](https://github.com/danielfromearth/stitchee/pull/157): Update CI pipeline
+  - [Pull #158](https://github.com/danielfromearth/stitchee/pull/158): Add pypi publishing steps to CI pipeline
 ### Deprecated
 ### Removed
 ### Fixed
-- [PR #4](https://github.com/danielfromearth/stitchee/pull/4): Error with TEMPO ozone profile data because of duplicated dimension names
+- [Pull #4](https://github.com/danielfromearth/stitchee/pull/4): Error with TEMPO ozone profile data because of duplicated dimension names
+- [Pull #133](https://github.com/danielfromearth/stitchee/pull/133): Fix conflicting dimensions on record dimension sorting
