@@ -7,6 +7,9 @@ name: A reusable workflow to build and run the unit test suite
 
 on:
   workflow_call:
+    secrets:
+      codecov_token:
+        required: true
   workflow_dispatch:
 
 env:
@@ -46,5 +49,4 @@ jobs:
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: nasa/stitchee
           verbose: true
