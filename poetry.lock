@@ -48,17 +48,17 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.34.84"
+version = "1.34.86"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.84-py3-none-any.whl", hash = "sha256:7a02f44af32095946587d748ebeb39c3fa15b9d7275307ff612a6760ead47e04"},
-    {file = "boto3-1.34.84.tar.gz", hash = "sha256:91e6343474173e9b82f603076856e1d5b7b68f44247bdd556250857a3f16b37b"},
+    {file = "boto3-1.34.86-py3-none-any.whl", hash = "sha256:be594c449a0079bd1898ba1b7d90e0e5ac6b5803b2ada03993da01179073808d"},
+    {file = "boto3-1.34.86.tar.gz", hash = "sha256:992ba74459fef2bf1572050408db73d33c43e7531d81bda85a027f39156926a1"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.84,<1.35.0"
+botocore = ">=1.34.86,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -67,13 +67,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.84"
+version = "1.34.86"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.84-py3-none-any.whl", hash = "sha256:da1ae0a912e69e10daee2a34dafd6c6c106450d20b8623665feceb2d96c173eb"},
-    {file = "botocore-1.34.84.tar.gz", hash = "sha256:a2b309bf5594f0eb6f63f355ade79ba575ce8bf672e52e91da1a7933caa245e6"},
+    {file = "botocore-1.34.86-py3-none-any.whl", hash = "sha256:57c1e3b2e1db745d22c45cbd761bbc0c143d2cfc2b532e3245cf5d874aa30b6d"},
+    {file = "botocore-1.34.86.tar.gz", hash = "sha256:2fd62b63d8788e15629bfc95be1bd2d99c0da6c1d45ef1f40c0a0101e412f6b5"},
 ]
 
 [package.dependencies]
@@ -82,7 +82,7 @@ python-dateutil = ">=2.1,<3.0.0"
 urllib3 = {version = ">=1.25.4,<2.2.0 || >2.2.0,<3", markers = "python_version >= \"3.10\""}
 
 [package.extras]
-crt = ["awscrt (==0.19.19)"]
+crt = ["awscrt (==0.20.9)"]
 
 [[package]]
 name = "certifi"
@@ -491,13 +491,13 @@ tqdm = ["tqdm"]
 
 [[package]]
 name = "harmony-service-lib"
-version = "1.0.25"
+version = "1.0.26"
 description = "A library for Python-based Harmony services to parse incoming messages, fetch data, stage data, and call back to Harmony"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "harmony-service-lib-1.0.25.tar.gz", hash = "sha256:498009458624406a76b486c7394beb0fed8ef1a6c6e97d78789d143055c16888"},
-    {file = "harmony_service_lib-1.0.25-py3-none-any.whl", hash = "sha256:d2a71c56717a8acd9be759d5b1b04b0068e68e666bc7c1a94636cae477ddf8b3"},
+    {file = "harmony_service_lib-1.0.26-py3-none-any.whl", hash = "sha256:fce65b5334f055c1d28036ca74df72c974d8229e69e108238ad599f3c3e7a8f4"},
+    {file = "harmony_service_lib-1.0.26.tar.gz", hash = "sha256:a6a7342633859dbaba59ab595121ac06cced94d9b2d5aba44abc7ddbdd8d8ab0"},
 ]
 
 [package.dependencies]
@@ -1226,4 +1226,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c0b9fe8dcbfe38cd63322b4b44d85b9690482d26ac856eee9f36e3b8cf40f2e8"
+content-hash = "719ef221928740098a782a3965c90ea794b76d1ebb6b35af59254a243489b01f"
