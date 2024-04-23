@@ -20,6 +20,8 @@ jobs:
   # The first job in the workflow confirms that the software's own tests pass.
   run_tests:
     uses: ./.github/workflows/run_tests.yml
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
 
   # Second job in the workflow verifies the software
   build:

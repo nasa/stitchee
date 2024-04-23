@@ -7,6 +7,9 @@ name: A reusable workflow to build and run the unit test suite
 
 on:
   workflow_call:
+    secrets:
+      codecov_token:
+        required: true
   workflow_dispatch:
 
 env:
@@ -39,12 +42,11 @@ jobs:
           poetry run ruff concatenator
 
       - name: Run tests and collect coverage
-        run: poetry run pytest --cov=concatenator tests/unit/test_dataset_and_group_handling.py
+        run: poetry run pytest --cov=concatenator tests/unit/test_dataset_and_group_handling.py --cov-report=xml
         # TODO: expand tests to include full concatenation runs, i.e., not only test_dataset_and_group_handling.py
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: nasa/stitchee
           verbose: true
