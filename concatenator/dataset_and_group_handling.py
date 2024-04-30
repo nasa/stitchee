@@ -233,8 +233,8 @@ def regroup_flattened_dataset(
                 else:
                     vartype = str(var.dtype)
 
-                compression = "zlib"
-                if vartype.startswith("<U") and len(var.shape)==1 and var.shape[0]<10:
+                compression: str | None = "zlib"
+                if vartype.startswith("<U") and len(var.shape) == 1 and var.shape[0] < 10:
                     compression = None
 
                 var_group.createVariable(
