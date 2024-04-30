@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
   - [Issue #170](https://github.com/nasa/stitchee/issues/170): Add PyPI badges to readme
 ### Changed
+  - [Issue #168](https://github.com/nasa/stitchee/issues/168): remove compression for string array of small size
 ### Deprecated
 ### Removed
 ### Fixed
@@ -17,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0]
 
 ### Added
-  - [Pull #164](https://github.com/nasa/stitchee/pull/164): Add code coverage
+  - [Pull #164](https://github.com/nasa/stitchee/pull/164): Add code coverage to CI pipeline
 ### Changed
 ### Deprecated
 ### Removed
