@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 ### Removed
 ### Fixed
+  - [Pull #177](https://github.com/nasa/stitchee/pull/177): Resolve linting error
 
 ## [1.1.0]
 
