@@ -39,7 +39,7 @@ jobs:
 
       - name: Run linting
         run: |
-          poetry run ruff concatenator
+          poetry run ruff check concatenator
 
       - name: Run tests and collect coverage
         run: poetry run pytest --cov=concatenator tests/unit/test_dataset_and_group_handling.py --cov-report=xml
