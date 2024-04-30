@@ -14,6 +14,12 @@
     <a href="http://mypy-lang.org/" target="_blank">
         <img src="http://www.mypy-lang.org/static/mypy_badge.svg" alt="Mypy checked">
     </a>
+    <a href="https://pypi.org/project/stitchee/" target="_blank">
+        <img src="https://img.shields.io/pypi/pyversions/stitchee.svg" alt="Python Versions">
+    </a>
+<a href="https://pypi.org/project/stitchee" target="_blank">
+    <img src="https://img.shields.io/pypi/v/stitchee?color=%2334D058label=pypi%20package" alt="Package version">
+</a>
     <a href="https://codecov.io/gh/nasa/stitchee">
      <img src="https://codecov.io/gh/nasa/stitchee/graph/badge.svg?token=WDj92iN7c4" alt="Code coverage">
     </a>

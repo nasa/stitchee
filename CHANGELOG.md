@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+  - [Issue #170](https://github.com/nasa/stitchee/issues/170): Add PyPI badges to readme
 ### Changed
 ### Deprecated
 ### Removed
