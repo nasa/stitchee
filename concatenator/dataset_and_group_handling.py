@@ -334,6 +334,10 @@ def validate_workable_files(files_to_concat, logger) -> tuple[list[str], int]:
         except OSError:
             logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
 
+    # addressing the issue 153: propagate first empty file if all input files are empty
+    if len(workable_files) == 0:
+        workable_files.append(files_to_concat[0])
+
     number_of_workable_files = len(workable_files)
 
     return workable_files, number_of_workable_files
