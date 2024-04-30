@@ -232,12 +232,17 @@ def regroup_flattened_dataset(
                     vartype = "S1"
                 else:
                     vartype = str(var.dtype)
+
+                compression = "zlib"
+                if vartype.startswith("<U") and len(var.shape)==1 and var.shape[0]<10:
+                    compression = None
+
                 var_group.createVariable(
                     new_var_name,
                     vartype,
                     dimensions=new_var_dims,
                     chunksizes=chunk_sizes,
-                    compression="zlib",
+                    compression=compression,
                     complevel=7,
                     shuffle=shuffle,
                     fill_value=fill_value,
