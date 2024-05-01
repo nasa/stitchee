@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
   - [Issue #170](https://github.com/nasa/stitchee/issues/170): Add PyPI badges to readme
 ### Changed
+  - [Issue #153](https://github.com/nasa/stitchee/issues/153): propagate first empty granule if all input files are empty
   - [Issue #168](https://github.com/nasa/stitchee/issues/168): remove compression for string array of small size
 ### Deprecated
 ### Removed
