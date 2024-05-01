@@ -155,7 +155,7 @@ def stitchee(
                     **concat_kwargs,
                 )
             else:
-                raise ValueError("Unexpected concatenation method, <%s>." % concat_method)
+                raise ValueError(f"Unexpected concatenation method, <{concat_method}>.")
 
             benchmark_log["concatenating"] = time.time() - start_time
 

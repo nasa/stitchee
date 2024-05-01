@@ -8,9 +8,23 @@ from concatenator.attribute_handling import (
     _flatten_coordinate_attribute,
     regroup_coordinate_attribute,
 )
-from concatenator.dataset_and_group_handling import _is_file_empty
+from concatenator.dataset_and_group_handling import (
+    _is_file_empty,
+    validate_workable_files
+)
 
 from .. import data_for_tests_dir
+
+
+def test_dataset_with_single_empty_input_file():
+    """Ensure that a dataset with a single empty input file is propagating empty granule to the output"""
+    files_to_concat = [
+        data_for_tests_dir
+        / "unit-test-data"
+        / "TEMPO_NO2_L2_V03_20240328T154353Z_S008G01.nc4"
+    ]
+    workable_files, number_of_workable_files = validate_workable_files(files_to_concat, None)
+    assert number_of_workable_files == 1
 
 
 def test_dataset_with_singleton_null_values_is_identified_as_empty():

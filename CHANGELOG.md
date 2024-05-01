@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+  - [Issue #170](https://github.com/nasa/stitchee/issues/170): Add PyPI badges to readme
+### Changed
+  - [Issue #153](https://github.com/nasa/stitchee/issues/153): propagate first empty granule if all input files are empty
+  - [Issue #168](https://github.com/nasa/stitchee/issues/168): remove compression for string array of small size
+### Deprecated
+### Removed
+### Fixed
+  - [Pull #177](https://github.com/nasa/stitchee/pull/177): Resolve linting error
+
 ## [1.1.0]
 
 ### Added
