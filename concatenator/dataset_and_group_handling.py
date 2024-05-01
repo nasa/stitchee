@@ -322,10 +322,10 @@ def _get_dimension_size(dataset: nc.Dataset, dim_name: str) -> int:
     return dim_size
 
 
-def validate_workable_files(files_to_concat, logger) -> tuple[list[str], int]:
+def validate_workable_files(files, logger) -> tuple[list[str], int]:
     """Remove files from list that are not open-able as netCDF or that are empty."""
     workable_files = []
-    for file in files_to_concat:
+    for file in files:
         try:
             with nc.Dataset(file, "r") as dataset:
                 is_empty = _is_file_empty(dataset)
@@ -335,8 +335,8 @@ def validate_workable_files(files_to_concat, logger) -> tuple[list[str], int]:
             logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
 
     # addressing the issue 153: propagate first empty file if all input files are empty
-    if (len(workable_files)) == 0 and (len(files_to_concat) > 0):
-        workable_files.append(files_to_concat[0])
+    if (len(workable_files)) == 0 and (len(files) > 0):
+        workable_files.append(files[0])
 
     number_of_workable_files = len(workable_files)
 
