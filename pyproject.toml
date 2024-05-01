@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stitchee"
-version = "1.2.0rc3"
+version = "1.2.1rc3"
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
 authors = ["Daniel Kaufman <daniel.kaufman@nasa.gov>"]
 readme = "README.md"
