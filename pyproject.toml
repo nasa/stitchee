@@ -29,8 +29,13 @@ pytest = "^8.1.1"
 mypy = "^1.9.0"
 black = "^24.4.0"
 ruff = ">=0.3.7,<0.5.0"
-coverage = "^7.4.4"
 pytest-cov = "^5.0.0"
+mkdocs = "^1.6.0"
+markdown-callouts = "^0.4.0"
+markdown-include = "^0.8.1"
+mkdocstrings = "^0.25.1"
+mkdocs-jupyter = "^0.24.7"
+mkdocs-material = "^9.5.22"
 
 [build-system]
 requires = ["poetry-core"]

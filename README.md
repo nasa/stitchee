@@ -8,6 +8,9 @@
     <a href="https://www.repostatus.org/#active" target="_blank">
         <img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed">
     </a>
+    <a href='https://stitchee.readthedocs.io/en/latest/?badge=latest'>
+        <img src='https://readthedocs.org/projects/stitchee/badge/?version=latest' alt='Documentation Status' />
+    </a>
     <a href="https://github.com/python/black" target="_blank">
         <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style">
     </a>
@@ -17,9 +20,9 @@
     <a href="https://pypi.org/project/stitchee/" target="_blank">
         <img src="https://img.shields.io/pypi/pyversions/stitchee.svg" alt="Python Versions">
     </a>
-<a href="https://pypi.org/project/stitchee" target="_blank">
-    <img src="https://img.shields.io/pypi/v/stitchee?color=%2334D058label=pypi%20package" alt="Package version">
-</a>
+    <a href="https://pypi.org/project/stitchee" target="_blank">
+        <img src="https://img.shields.io/pypi/v/stitchee?color=%2334D058label=pypi%20package" alt="Package version">
+    </a>
     <a href="https://codecov.io/gh/nasa/stitchee">
      <img src="https://codecov.io/gh/nasa/stitchee/graph/badge.svg?token=WDj92iN7c4" alt="Code coverage">
     </a>
