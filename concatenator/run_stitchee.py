@@ -3,20 +3,17 @@
 import json
 import logging
 import os
-import shutil
 import sys
-import uuid
 from argparse import ArgumentParser
 from pathlib import Path
 
 import netCDF4 as nc
 
 from concatenator.attribute_handling import construct_history, retrieve_history
-from concatenator.file_ops import add_label_to_path
 from concatenator.stitchee import stitchee
 
 
-def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None, str, dict]:
+def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool]:
     """
     Parse args for this script.
 
@@ -48,9 +45,10 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None, str, 
 
     # Optional arguments
     parser.add_argument(
-        "--no_input_file_copies",
+        "--copy_input_files",
         action="store_true",
-        help="By default, input files are copied into a temporary directory to avoid modification "
+        help="By default, input files are not copied. "
+        "This option copies the input files into a temporary directory to avoid modification "
         "of input files. This is useful for testing, but uses more disk space.  "
         "By specifying this argument, no copying is performed.",
     )
@@ -125,45 +123,18 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str | None, str, 
     if parsed.xarray_arg_join:
         concat_kwargs["join"] = parsed.xarray_arg_join
 
-    # If requested, make a temporary directory with new copies of the original input files
-    temporary_dir_to_remove = None
-    if not parsed.no_input_file_copies:
-        input_files, temporary_dir_to_remove = _make_temp_dir_with_input_file_copies(
-            input_files, output_path
-        )
-
     return (
         input_files,
         str(output_path),
         parsed.concat_dim,
         bool(parsed.keep_tmp_files),
-        temporary_dir_to_remove,
         parsed.concat_method,
         concat_kwargs,
+        parsed.copy_input_files,
     )
 
 
-def _make_temp_dir_with_input_file_copies(input_files, output_path):
-    new_data_dir = Path(
-        add_label_to_path(str(output_path.parent / "temp_copy"), label=str(uuid.uuid4()))
-    ).resolve()
-    os.makedirs(new_data_dir, exist_ok=True)
-    print("Created temporary directory: %s", str(new_data_dir))
-
-    new_input_files = []
-    for file in input_files:
-        new_path = new_data_dir / Path(file).name
-        shutil.copyfile(file, new_path)
-        new_input_files.append(str(new_path))
-
-    input_files = new_input_files
-    print("Copied files to temporary directory: %s", new_data_dir)
-    temporary_dir_to_remove = str(new_data_dir)
-
-    return input_files, temporary_dir_to_remove
-
-
-def _validate_output_path(parsed):
+def _validate_output_path(parsed) -> Path:
     # The output file path is validated.
     output_path = Path(parsed.output_path).resolve()
     if output_path.is_file():  # the file already exists
@@ -224,9 +195,9 @@ def run_stitchee(args: list) -> None:
         output_path,
         concat_dim,
         keep_tmp_files,
-        temporary_dir_to_remove,
         concat_method,
         concat_kwargs,
+        copy_input_files,
     ) = parse_args(args)
     num_inputs = len(input_files)
 
@@ -249,11 +220,9 @@ def run_stitchee(args: list) -> None:
         concat_dim=concat_dim,
         concat_kwargs=concat_kwargs,
         history_to_append=new_history_json,
+        copy_input_files=copy_input_files,
     )
     logging.info("STITCHEE complete. Result in %s", output_path)
-
-    if not keep_tmp_files and temporary_dir_to_remove:
-        shutil.rmtree(temporary_dir_to_remove)
 
 
 def main() -> None:

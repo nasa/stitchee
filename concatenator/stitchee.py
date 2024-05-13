@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import time
 from contextlib import ExitStack
 from logging import Logger
+from pathlib import Path
 from warnings import warn
 
 import netCDF4 as nc
@@ -19,7 +21,10 @@ from concatenator.dataset_and_group_handling import (
     validate_workable_files,
 )
 from concatenator.dimension_cleanup import remove_duplicate_dims
-from concatenator.file_ops import add_label_to_path
+from concatenator.file_ops import (
+    add_label_to_path,
+    make_temp_dir_with_input_file_copies,
+)
 
 default_logger = logging.getLogger(__name__)
 
@@ -38,10 +43,11 @@ def stitchee(
     output_file: str,
     write_tmp_flat_concatenated: bool = False,
     keep_tmp_files: bool = True,
-    concat_method: str = "xarray-concat",
+    concat_method: str | None = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
     history_to_append: str | None = None,
+    copy_input_files: bool = False,
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -77,6 +83,13 @@ def stitchee(
         warn(
             "'concat_dim' was specified, but will not be used because xarray-combine method was "
             "selected."
+        )
+
+    # If requested, make a temporary directory with new copies of the original input files
+    temporary_dir_to_remove = None
+    if copy_input_files:
+        input_files, temporary_dir_to_remove = make_temp_dir_with_input_file_copies(
+            input_files, Path(output_file)
         )
 
     try:
@@ -190,6 +203,8 @@ def stitchee(
                     os.remove(file)
                 if tmp_flat_concatenated_path:
                     os.remove(tmp_flat_concatenated_path)
+                if not keep_tmp_files and temporary_dir_to_remove:
+                    shutil.rmtree(temporary_dir_to_remove)
 
     except Exception as err:
         logger.info("Stitchee encountered an error!")
