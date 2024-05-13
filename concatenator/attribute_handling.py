@@ -18,7 +18,7 @@ from concatenator import COORD_DELIM, GROUP_DELIM
 # Values needed for history_json attribute
 HISTORY_JSON_SCHEMA = "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-v0.1.0.json"
 PROGRAM = "stitchee"
-PROGRAM_REF = "https://cmr.earthdata.nasa.gov:443/search/concepts/S1262025641-LARC_CLOUD"
+PROGRAM_REF = "https://cmr.earthdata.nasa.gov:443/search/concepts/S2940253910-LARC_CLOUD"
 VERSION = importlib_metadata.distribution("stitchee").version
 
 
