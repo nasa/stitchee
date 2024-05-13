@@ -3,12 +3,12 @@ updates:
   - package-ecosystem: pip
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     # Raise pull requests for version updates
     # to pip against the `develop` branch
     target-branch: "develop"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     target-branch: "develop"
