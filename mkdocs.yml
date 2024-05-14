@@ -23,7 +23,7 @@ nav:
   - OVERVIEW:
       - "Readme": "index.md"
   - EXAMPLES:
-      - "Usage of STITCHEE via Harmony": "docs/tutorial_examples.ipynb"
+      - "Usage of STITCHEE via Harmony": "tutorial_examples.ipynb"
 
 extra_css:
   - css/styles.css
