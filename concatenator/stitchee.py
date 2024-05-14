@@ -66,6 +66,8 @@ def stitchee(
         json string to append to the history attribute of the concatenated file (default: None).
     copy_input_files
         whether to copy input files or not (default: False).
+    overwrite_output_file
+        whether to overwrite output file (default: False).
     logger
 
     Returns
