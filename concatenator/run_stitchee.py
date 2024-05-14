@@ -2,14 +2,13 @@
 
 import json
 import logging
-import os
 import sys
 from argparse import ArgumentParser
-from pathlib import Path
 
 import netCDF4 as nc
 
 from concatenator.attribute_handling import construct_history, retrieve_history
+from concatenator.file_ops import validate_input_path, validate_output_path
 from concatenator.stitchee import stitchee
 
 
@@ -98,8 +97,8 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool]:
         logging.basicConfig(level=logging.DEBUG)
 
     # Validate the input and output paths
-    output_path = _validate_output_path(parsed)
-    input_files = _validate_input_path(parsed)
+    output_path = validate_output_path(parsed.output_path, parsed.overwrite)
+    input_files = validate_input_path(parsed.input)
 
     print(f"CONCAT METHOD === {parsed.concat_method}")
     print(f"CONCAT DIM === {parsed.concat_dim}")
@@ -132,58 +131,6 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool]:
         concat_kwargs,
         parsed.copy_input_files,
     )
-
-
-def _validate_output_path(parsed) -> Path:
-    # The output file path is validated.
-    output_path = Path(parsed.output_path).resolve()
-    if output_path.is_file():  # the file already exists
-        if parsed.overwrite:
-            os.remove(output_path)
-        else:
-            raise FileExistsError(
-                f"File already exists at <{output_path}>. Run again with option '-O' to overwrite."
-            )
-    if output_path.is_dir():  # the specified path is an existing directory
-        raise TypeError("Output path cannot be a directory. Please specify a new filepath.")
-    return output_path
-
-
-def _validate_input_path(parsed):
-    # The input directory or file is validated.
-    print(f"parsed_input === {parsed.input}")
-    if len(parsed.input) > 1:
-        input_files = parsed.input
-    elif len(parsed.input) == 1:
-        directory_or_path = Path(parsed.input[0]).resolve()
-        if directory_or_path.is_dir():
-            input_files = _get_list_of_filepaths_from_dir(directory_or_path)
-        elif directory_or_path.is_file():
-            input_files = _get_list_of_filepaths_from_file(directory_or_path)
-        else:
-            raise TypeError(
-                "If one path is provided for 'data_dir_or_file_or_filepaths', "
-                "then it must be an existing directory or file."
-            )
-    else:
-        raise TypeError("input argument must be one path/directory or a list of paths.")
-    return input_files
-
-
-def _get_list_of_filepaths_from_file(file_with_paths: Path):
-    # Each path listed in the specified file is resolved using pathlib for validation.
-    paths_list = []
-    with open(file_with_paths, encoding="utf-8") as file:
-        while line := file.readline():
-            paths_list.append(str(Path(line.rstrip()).resolve()))
-
-    return paths_list
-
-
-def _get_list_of_filepaths_from_dir(data_dir: Path):
-    # Get a list of files (ignoring hidden files) in directory.
-    input_files = [str(f) for f in data_dir.iterdir() if not f.name.startswith(".")]
-    return input_files
 
 
 def run_stitchee(args: list) -> None:

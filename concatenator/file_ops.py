@@ -36,3 +36,55 @@ def make_temp_dir_with_input_file_copies(
     temporary_dir_to_remove = str(new_data_dir)
 
     return input_files, temporary_dir_to_remove
+
+
+def validate_output_path(filepath: str, overwrite: bool = False) -> Path:
+    """Checks whether an output path is a valid file and whether it already exists."""
+    path = Path(filepath).resolve()
+    if path.is_file():  # the file already exists
+        if overwrite:
+            os.remove(path)
+        else:
+            raise FileExistsError(
+                f"File already exists at <{path}>. Run again with option '-O' to overwrite."
+            )
+    if path.is_dir():  # the specified path is an existing directory
+        raise TypeError("Output path cannot be a directory. Please specify a new filepath.")
+    return path
+
+
+def validate_input_path(path_or_paths: list[str]) -> list[str]:
+    """Checks whether input is a valid directory, list of files, or a text file containing paths."""
+    print(f"parsed_input === {path_or_paths}")
+    if len(path_or_paths) > 1:
+        input_files = path_or_paths
+    elif len(path_or_paths) == 1:
+        directory_or_path = Path(path_or_paths[0]).resolve()
+        if directory_or_path.is_dir():
+            input_files = _get_list_of_filepaths_from_dir(directory_or_path)
+        elif directory_or_path.is_file():
+            input_files = _get_list_of_filepaths_from_file(directory_or_path)
+        else:
+            raise TypeError(
+                "If one path is provided for 'data_dir_or_file_or_filepaths', "
+                "then it must be an existing directory or file."
+            )
+    else:
+        raise TypeError("input argument must be one path/directory or a list of paths.")
+    return input_files
+
+
+def _get_list_of_filepaths_from_file(file_with_paths: Path) -> list[str]:
+    """Each path listed in the specified file is resolved using pathlib for validation."""
+    paths_list = []
+    with open(file_with_paths, encoding="utf-8") as file:
+        while line := file.readline():
+            paths_list.append(str(Path(line.rstrip()).resolve()))
+
+    return paths_list
+
+
+def _get_list_of_filepaths_from_dir(data_dir: Path) -> list[str]:
+    """Get a list of files (ignoring hidden files) in directory."""
+    input_files = [str(f) for f in data_dir.iterdir() if not f.name.startswith(".")]
+    return input_files
