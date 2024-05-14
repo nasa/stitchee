@@ -4,7 +4,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     secrets:
-      codecov_token:
+      DEK_EDL_USER:
+        required: true
+      DEK_EDL_PASSWORD:
         required: true
   push:
     branches:
