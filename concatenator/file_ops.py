@@ -46,7 +46,8 @@ def validate_output_path(filepath: str, overwrite: bool = False) -> str:
             os.remove(path)
         else:
             raise FileExistsError(
-                f"File already exists at <{path}>. Run again with option '-O' to overwrite."
+                f"File already exists at <{path}>. "
+                f"Run again with `overwrite` option to overwrite existing file."
             )
     if path.is_dir():  # the specified path is an existing directory
         raise TypeError("Output path cannot be a directory. Please specify a new filepath.")
