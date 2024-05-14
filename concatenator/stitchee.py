@@ -24,6 +24,8 @@ from concatenator.dimension_cleanup import remove_duplicate_dims
 from concatenator.file_ops import (
     add_label_to_path,
     make_temp_dir_with_input_file_copies,
+    validate_input_path,
+    validate_output_path,
 )
 
 default_logger = logging.getLogger(__name__)
@@ -39,6 +41,7 @@ def stitchee(
     concat_kwargs: dict | None = None,
     history_to_append: str | None = None,
     copy_input_files: bool = False,
+    overwrite_output_file: bool = False,
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -70,6 +73,8 @@ def stitchee(
     str
         path of concatenated file
     """
+    validate_input_path(files_to_concat)
+
     intermediate_flat_filepaths: list[str] = []
     benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
 
@@ -86,6 +91,8 @@ def stitchee(
             "'concat_dim' was specified, but will not be used because xarray-combine method was "
             "selected."
         )
+
+    output_file = validate_output_path(output_file, overwrite=overwrite_output_file)
 
     # If requested, make a temporary directory with new copies of the original input files
     temporary_dir_to_remove = None

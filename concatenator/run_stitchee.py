@@ -124,7 +124,7 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool]:
 
     return (
         input_files,
-        str(output_path),
+        output_path,
         parsed.concat_dim,
         bool(parsed.keep_tmp_files),
         parsed.concat_method,

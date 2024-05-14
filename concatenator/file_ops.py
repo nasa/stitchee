@@ -38,7 +38,7 @@ def make_temp_dir_with_input_file_copies(
     return input_files, temporary_dir_to_remove
 
 
-def validate_output_path(filepath: str, overwrite: bool = False) -> Path:
+def validate_output_path(filepath: str, overwrite: bool = False) -> str:
     """Checks whether an output path is a valid file and whether it already exists."""
     path = Path(filepath).resolve()
     if path.is_file():  # the file already exists
@@ -50,7 +50,7 @@ def validate_output_path(filepath: str, overwrite: bool = False) -> Path:
             )
     if path.is_dir():  # the specified path is an existing directory
         raise TypeError("Output path cannot be a directory. Please specify a new filepath.")
-    return path
+    return str(path)
 
 
 def validate_input_path(path_or_paths: list[str]) -> list[str]:
