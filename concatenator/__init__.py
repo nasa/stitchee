@@ -14,7 +14,6 @@ class Options:
 
 __version__ = version("stitchee")
 
-global _options
 _options = Options()
 
 
@@ -23,8 +22,14 @@ def __getattr__(name):  # type: ignore
 
     Other unhandled attributes raise as `AttributeError` as expected.
     """
+    global _options
+
     if name == "__options__":
         return _options
+    if name == "group_delim":
+        return _options.group_delim
+    if name == "coord_delim":
+        return _options.coord_delim
     else:
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
