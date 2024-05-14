@@ -7,7 +7,7 @@ from pathlib import Path
 import netCDF4 as nc
 import pytest
 
-from concatenator.group_handling import GROUP_DELIM
+import concatenator
 from concatenator.stitchee import stitchee
 from tests import data_for_tests_dir
 from tests.conftest import prep_input_files
@@ -53,12 +53,16 @@ class TestConcat:
                 try:
                     original_files_length_sum += ncds.dimensions[record_dim_name].size
                 except KeyError:
-                    original_files_length_sum += ncds.dimensions[GROUP_DELIM + record_dim_name].size
+                    original_files_length_sum += ncds.dimensions[
+                        concatenator.group_delim + record_dim_name
+                    ].size
 
         try:
             merged_file_length = merged_dataset.dimensions[record_dim_name].size
         except KeyError:
-            merged_file_length = merged_dataset.dimensions[GROUP_DELIM + record_dim_name].size
+            merged_file_length = merged_dataset.dimensions[
+                concatenator.group_delim + record_dim_name
+            ].size
 
         assert original_files_length_sum == merged_file_length
 

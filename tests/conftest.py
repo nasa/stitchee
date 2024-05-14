@@ -5,6 +5,7 @@ import typing
 from pathlib import Path
 
 import netCDF4 as nc
+import numpy as np
 import pytest
 
 
@@ -52,6 +53,38 @@ def temp_toy_data_dir(tmpdir_factory) -> Path:
 @pytest.fixture(scope="function", autouse=True)
 def temp_output_dir(tmpdir_factory) -> Path:
     return Path(tmpdir_factory.mktemp("tmp-"))
+
+
+@pytest.fixture(scope="function")
+def toy_empty_dataset(temp_toy_data_dir):
+    """Creates groups, dimensions, variables; and uses chosen step values in an open dataset"""
+
+    filepath = temp_toy_data_dir / "test_empty_dataset.nc"
+
+    f = nc.Dataset(filename=filepath, mode="w")
+
+    grp1 = f.createGroup("Group1")
+
+    # Root-level Dimensions/Variables
+    f.createDimension("step", 1)
+    f.createDimension("track", 1)
+    f.createVariable("step", "f4", ("step",), fill_value=False)
+    f.createVariable("track", "f4", ("track",), fill_value=False)
+    f.createVariable("var0", "f4", ("step", "track"))
+
+    #
+    f["step"][:] = [np.nan]
+    f["track"][:] = [np.nan]
+    f["var0"][:] = [np.nan]
+
+    # Group 1 Dimensions/Variables
+    grp1.createVariable("var1", "f8", ("step", "track"))
+    #
+    grp1["var1"][:] = [np.nan]
+
+    f.close()
+
+    return filepath
 
 
 def add_to_ds_3dims_3vars_4coords_1group_with_step_values(open_ds: nc.Dataset, step_values: list):

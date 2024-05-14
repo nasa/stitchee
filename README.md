@@ -8,11 +8,23 @@
     <a href="https://www.repostatus.org/#active" target="_blank">
         <img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed">
     </a>
+    <a href='https://stitchee.readthedocs.io/en/latest/?badge=latest'>
+        <img src='https://readthedocs.org/projects/stitchee/badge/?version=latest' alt='Documentation Status' />
+    </a>
     <a href="https://github.com/python/black" target="_blank">
         <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style">
     </a>
     <a href="http://mypy-lang.org/" target="_blank">
         <img src="http://www.mypy-lang.org/static/mypy_badge.svg" alt="Mypy checked">
+    </a>
+    <a href="https://pypi.org/project/stitchee/" target="_blank">
+        <img src="https://img.shields.io/pypi/pyversions/stitchee.svg" alt="Python Versions">
+    </a>
+    <a href="https://pypi.org/project/stitchee" target="_blank">
+        <img src="https://img.shields.io/pypi/v/stitchee?color=%2334D058label=pypi%20package" alt="Package version">
+    </a>
+    <a href="https://codecov.io/gh/nasa/stitchee">
+     <img src="https://codecov.io/gh/nasa/stitchee/graph/badge.svg?token=WDj92iN7c4" alt="Code coverage">
     </a>
 </p>
 
@@ -67,6 +79,8 @@ options:
                         'combine_attrs' argument passed to xarray.concat() or xarray.combine_by_coords().
   --xarray_arg_join XARRAY_ARG_JOIN
                         'join' argument passed to xarray.concat() or xarray.combine_by_coords().
+  --group_delim GROUP_DELIM
+                        Character or string to use as group delimiter
   -O, --overwrite       Overwrite output file if it already exists.
   -v, --verbose         Enable verbose output to stdout; useful for debugging
 
@@ -83,3 +97,6 @@ For example:
 ```shell
 poetry run stitchee /path/to/netcdf/directory/ -o /path/to/output.nc
 ```
+
+---
+This package is NASA Software Release Authorization (SRA) # LAR-20433-1
