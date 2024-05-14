@@ -102,24 +102,30 @@ def stitchee(
                 flat_dataset = remove_duplicate_dims(flat_dataset)
 
                 logger.info("Opening flattened file with xarray.")
-                xrds = xr.open_dataset(
-                    xr.backends.NetCDF4DataStore(flat_dataset),
-                    decode_times=False,
-                    decode_coords=False,
-                    drop_variables=coord_vars,
-                )
-                first_value = xrds[GROUP_DELIM + concat_dim].values.flatten()[0]
-                concat_dim_order.append(first_value)
+                try:
+                    with xr.open_dataset(
+                        xr.backends.NetCDF4DataStore(flat_dataset),
+                        decode_times=False,
+                        decode_coords=False,
+                        drop_variables=coord_vars,
+                    ) as xrds:
+                        first_value = xrds[GROUP_DELIM + concat_dim].values.flatten()[0]
+                        concat_dim_order.append(first_value)
 
-                benchmark_log["flattening"] = time.time() - start_time
+                        benchmark_log["flattening"] = time.time() - start_time
 
-                # The flattened file is written to disk.
-                # flat_file_path = add_label_to_path(filepath, label="_flat_intermediate")
-                # xrds.to_netcdf(flat_file_path, encoding={v_name: {'dtype': 'str'} for v_name in string_vars})
-                # intermediate_flat_filepaths.append(flat_file_path)
-                # xrdataset_list.append(xr.open_dataset(flat_file_path))
-                xrdataset_list.append(xrds)
-
+                        # The flattened file is written to disk.
+                        # flat_file_path = add_label_to_path(filepath, label="_flat_intermediate")
+                        # xrds.to_netcdf(flat_file_path, encoding={v_name: {'dtype': 'str'} for v_name in string_vars})
+                        # intermediate_flat_filepaths.append(flat_file_path)
+                        # xrdataset_list.append(xr.open_dataset(flat_file_path))
+                        xrdataset_list.append(xrds)
+                except Exception as err:
+                    logger.info("Stitchee encountered an error: Too many flat files open.")
+                    logger.error(err)
+                    raise err
+                finally:
+                    xrds.close()
             # Reorder the xarray datasets according to the concat dim values.
             xrdataset_list = [
                 dataset
