@@ -10,6 +10,10 @@ on:
     branches:
       - main
       - develop
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - feature/**
 
 # When this workflow is queued, automatically cancel any previous running
 # or pending jobs from the same branch
