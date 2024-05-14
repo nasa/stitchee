@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import time
 from contextlib import ExitStack
 from logging import Logger
+from pathlib import Path
 from warnings import warn
 
 import netCDF4 as nc
@@ -19,18 +21,14 @@ from concatenator.dataset_and_group_handling import (
     validate_workable_files,
 )
 from concatenator.dimension_cleanup import remove_duplicate_dims
-from concatenator.file_ops import add_label_to_path
+from concatenator.file_ops import (
+    add_label_to_path,
+    make_temp_dir_with_input_file_copies,
+    validate_input_path,
+    validate_output_path,
+)
 
 default_logger = logging.getLogger(__name__)
-
-# class netcdfExitStack(ExitStack):
-#     """A context manager that handles netCDF.Dataset.close exceptions."""
-#     def __exit__(self, *args, logger=default_logger, **kwargs):
-#         try:
-#             super().__exit__(*args, **kwargs)
-#         except RuntimeError as err:
-#             if str(err) == "NetCDF: Not a valid ID":
-#                 logger.warning("Tried closing an already closed netCDF.")
 
 
 def stitchee(
@@ -38,30 +36,47 @@ def stitchee(
     output_file: str,
     write_tmp_flat_concatenated: bool = False,
     keep_tmp_files: bool = True,
-    concat_method: str = "xarray-concat",
+    concat_method: str | None = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
     history_to_append: str | None = None,
+    copy_input_files: bool = False,
+    overwrite_output_file: bool = False,
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
 
     Parameters
     ----------
-    files_to_concat : list[str]
-    output_file : str
+    files_to_concat
+        netCDF files to concatenate
+    output_file
+        file path for output file
     write_tmp_flat_concatenated
-    keep_tmp_files : bool
+        whether to save intermediate flattened files or not (default: False).
+    keep_tmp_files
+        whether to keep all temporary files created (default: True).
     concat_method
-    concat_dim : str, optional
+        either "xarray-concat" (default) or "xarray-combine".
+    concat_dim
+        dimension along which to concatenate (default: ""). Not needed is concat_method is "xarray-combine".
     concat_kwargs
+        keyword arguments to pass to xarray.concat or xarray.combine_by_coords (default: None).
     history_to_append
-    logger : logging.Logger
+        json string to append to the history attribute of the concatenated file (default: None).
+    copy_input_files
+        whether to copy input files or not (default: False).
+    overwrite_output_file
+        whether to overwrite output file (default: False).
+    logger
 
     Returns
     -------
     str
+        path of concatenated file
     """
+    validate_input_path(files_to_concat)
+
     intermediate_flat_filepaths: list[str] = []
     benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
 
@@ -77,6 +92,15 @@ def stitchee(
         warn(
             "'concat_dim' was specified, but will not be used because xarray-combine method was "
             "selected."
+        )
+
+    output_file = validate_output_path(output_file, overwrite=overwrite_output_file)
+
+    # If requested, make a temporary directory with new copies of the original input files
+    temporary_dir_to_remove = None
+    if copy_input_files:
+        input_files, temporary_dir_to_remove = make_temp_dir_with_input_file_copies(
+            input_files, Path(output_file)
         )
 
     try:
@@ -190,6 +214,8 @@ def stitchee(
                     os.remove(file)
                 if tmp_flat_concatenated_path:
                     os.remove(tmp_flat_concatenated_path)
+                if not keep_tmp_files and temporary_dir_to_remove:
+                    shutil.rmtree(temporary_dir_to_remove)
 
     except Exception as err:
         logger.info("Stitchee encountered an error!")

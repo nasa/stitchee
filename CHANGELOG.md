@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [unreleased]
 
 ### Added
+- [Issue #133](https://github.com/nasa/stitchee/issues/133): Add readthedocs documentation build
+- [Issue #185](https://github.com/nasa/stitchee/issues/185): Added arguments for temporary file copies and overwriting output file in main stitchee function
 ### Changed
-  - [Issue #133](https://github.com/nasa/stitchee/issues/133): Add readthedocs documentation build
 ### Deprecated
 ### Removed
 ### Fixed
