@@ -28,15 +28,6 @@ from concatenator.file_ops import (
 
 default_logger = logging.getLogger(__name__)
 
-# class netcdfExitStack(ExitStack):
-#     """A context manager that handles netCDF.Dataset.close exceptions."""
-#     def __exit__(self, *args, logger=default_logger, **kwargs):
-#         try:
-#             super().__exit__(*args, **kwargs)
-#         except RuntimeError as err:
-#             if str(err) == "NetCDF: Not a valid ID":
-#                 logger.warning("Tried closing an already closed netCDF.")
-
 
 def stitchee(
     files_to_concat: list[str],
