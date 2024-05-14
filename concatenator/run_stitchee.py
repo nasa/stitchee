@@ -12,7 +12,7 @@ from concatenator.file_ops import validate_input_path, validate_output_path
 from concatenator.stitchee import stitchee
 
 
-def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool]:
+def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool, str]:
     """
     Parse args for this script.
 
@@ -85,6 +85,11 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool]:
         "-O", "--overwrite", action="store_true", help="Overwrite output file if it already exists."
     )
     parser.add_argument(
+        "--group_delim",
+        help="Character or string to use as group delimiter.",
+        default="__",
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         help="Enable verbose output to stdout; useful for debugging",
@@ -130,6 +135,7 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool]:
         parsed.concat_method,
         concat_kwargs,
         parsed.copy_input_files,
+        parsed.group_delim,
     )
 
 
@@ -145,6 +151,7 @@ def run_stitchee(args: list) -> None:
         concat_method,
         concat_kwargs,
         copy_input_files,
+        group_delimiter,
     ) = parse_args(args)
     num_inputs = len(input_files)
 
@@ -168,6 +175,7 @@ def run_stitchee(args: list) -> None:
         concat_kwargs=concat_kwargs,
         history_to_append=new_history_json,
         copy_input_files=copy_input_files,
+        group_delimiter=group_delimiter,
     )
     logging.info("STITCHEE complete. Result in %s", output_path)
 
