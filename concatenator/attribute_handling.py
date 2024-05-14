@@ -13,7 +13,7 @@ import importlib_metadata
 import netCDF4
 import xarray as xr
 
-from concatenator import COORD_DELIM, GROUP_DELIM
+import concatenator
 
 # Values needed for history_json attribute
 HISTORY_JSON_SCHEMA = "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-v0.1.0.json"
@@ -44,10 +44,10 @@ def regroup_coordinate_attribute(attribute_string: str) -> str:
     if len(set(whitespaces)) <= 1:
         new_sep = whitespaces[0]
     else:
-        new_sep = COORD_DELIM
+        new_sep = concatenator.coord_delim
 
     return new_sep.join(
-        "/".join(c.split(GROUP_DELIM))[1:]
+        "/".join(c.split(concatenator.group_delim))[1:]
         for c in attribute_string.split()  # split on any whitespace
     )
 
@@ -87,11 +87,11 @@ def _flatten_coordinate_attribute(attribute_string: str) -> str:
     if len(set(whitespaces)) <= 1:
         new_sep = whitespaces[0]
     else:
-        new_sep = COORD_DELIM
+        new_sep = concatenator.coord_delim
 
     # A new string is constructed.
     return new_sep.join(
-        f'{GROUP_DELIM}{c.replace("/", GROUP_DELIM)}'
+        f'{concatenator.group_delim}{c.replace("/", concatenator.group_delim)}'
         for c in attribute_string.split()  # split on any whitespace
     )
 

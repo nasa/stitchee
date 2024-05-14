@@ -14,7 +14,7 @@ from warnings import warn
 import netCDF4 as nc
 import xarray as xr
 
-from concatenator import GROUP_DELIM
+import concatenator
 from concatenator.dataset_and_group_handling import (
     flatten_grouped_dataset,
     regroup_flattened_dataset,
@@ -42,6 +42,7 @@ def stitchee(
     history_to_append: str | None = None,
     copy_input_files: bool = False,
     overwrite_output_file: bool = False,
+    group_delimiter: str = "__",
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -68,6 +69,8 @@ def stitchee(
         whether to copy input files or not (default: False).
     overwrite_output_file
         whether to overwrite output file (default: False).
+    group_delimiter
+        character used to separate groups (default: "__").
     logger
 
     Returns
@@ -76,6 +79,7 @@ def stitchee(
         path of concatenated file
     """
     validate_input_path(files_to_concat)
+    concatenator.group_delim = group_delimiter
 
     intermediate_flat_filepaths: list[str] = []
     benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
@@ -132,7 +136,7 @@ def stitchee(
                     decode_coords=False,
                     drop_variables=coord_vars,
                 )
-                first_value = xrds[GROUP_DELIM + concat_dim].values.flatten()[0]
+                first_value = xrds[concatenator.group_delim + concat_dim].values.flatten()[0]
                 concat_dim_order.append(first_value)
 
                 benchmark_log["flattening"] = time.time() - start_time
@@ -166,7 +170,7 @@ def stitchee(
             if concat_method == "xarray-concat":
                 combined_ds = xr.concat(
                     xrdataset_list,
-                    dim=GROUP_DELIM + concat_dim,
+                    dim=concatenator.group_delim + concat_dim,
                     data_vars="minimal",
                     coords="minimal",
                     **concat_kwargs,
