@@ -54,19 +54,30 @@ def stitchee(
 
     Parameters
     ----------
-    files_to_concat : list[str]
-    output_file : str
+    files_to_concat
+        netCDF files to concatenate
+    output_file
+        file path for output file
     write_tmp_flat_concatenated
-    keep_tmp_files : bool
+        whether to save intermediate flattened files or not (default: False).
+    keep_tmp_files
+        whether to keep all temporary files created (default: True).
     concat_method
-    concat_dim : str, optional
+        either "xarray-concat" (default) or "xarray-combine".
+    concat_dim
+        dimension along which to concatenate (default: ""). Not needed is concat_method is "xarray-combine".
     concat_kwargs
+        keyword arguments to pass to xarray.concat or xarray.combine_by_coords (default: None).
     history_to_append
-    logger : logging.Logger
+        json string to append to the history attribute of the concatenated file (default: None).
+    copy_input_files
+        whether to copy input files or not (default: False).
+    logger
 
     Returns
     -------
     str
+        path of concatenated file
     """
     intermediate_flat_filepaths: list[str] = []
     benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
