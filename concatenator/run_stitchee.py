@@ -82,12 +82,12 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool, 
         help="'join' argument passed to xarray.concat() or xarray.combine_by_coords().",
     )
     parser.add_argument(
-        "-O", "--overwrite", action="store_true", help="Overwrite output file if it already exists."
-    )
-    parser.add_argument(
         "--group_delim",
         help="Character or string to use as group delimiter.",
         default="__",
+    )
+    parser.add_argument(
+        "-O", "--overwrite", action="store_true", help="Overwrite output file if it already exists."
     )
     parser.add_argument(
         "-v",

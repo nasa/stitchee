@@ -79,6 +79,8 @@ options:
                         'combine_attrs' argument passed to xarray.concat() or xarray.combine_by_coords().
   --xarray_arg_join XARRAY_ARG_JOIN
                         'join' argument passed to xarray.concat() or xarray.combine_by_coords().
+  --group_delim GROUP_DELIM
+                        Character or string to use as group delimiter
   -O, --overwrite       Overwrite output file if it already exists.
   -v, --verbose         Enable verbose output to stdout; useful for debugging
 
