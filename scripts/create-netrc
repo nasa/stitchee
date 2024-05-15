@@ -3,5 +3,5 @@
 if [ -f ~/.netrc ]; then
     echo "Skipping generating ~/.netrc file because it already exists."
 else
-    echo -e "\nmachine uat.urs.earthdata.nasa.gov login $EDL_USER password $EDL_PASSWORD\n" >> ~/.netrc
+    echo -e "\nmachine urs.earthdata.nasa.gov login $EDL_USER password $EDL_PASSWORD\n" >> ~/.netrc
 fi
