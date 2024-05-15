@@ -39,7 +39,7 @@ COPY --chown=dockeruser $DIST_PATH $DIST_PATH
 
 #install poetry as root
 RUN poetry config virtualenvs.create false
-RUN poetry install --only main
+RUN poetry install --with harmony --without integration
 
 USER dockeruser
 COPY --chown=dockeruser ./docker-entrypoint.sh docker-entrypoint.sh
