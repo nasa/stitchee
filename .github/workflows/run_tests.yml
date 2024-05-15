@@ -42,8 +42,7 @@ jobs:
           poetry run ruff check concatenator
 
       - name: Run tests and collect coverage
-        run: poetry run pytest --cov=concatenator tests/unit --cov-report=xml
-        # TODO: expand tests to include full concatenation runs, i.e., not only test_dataset_and_group_handling.py
+        run: poetry run pytest --cov=concatenator tests/unit --cov-report=xml -F unit
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4

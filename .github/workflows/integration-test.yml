@@ -52,7 +52,7 @@ jobs:
           EDL_PASSWORD: ${{ secrets.DEK_EDL_PASSWORD }}
         run: |
           scripts/create-netrc
-          poetry run pytest --cov=concatenator --cov-report=term-missing --log-cli-level=INFO tests/integration
+          poetry run pytest --cov=concatenator --cov-report=term-missing --log-cli-level=INFO tests/integration -F integration
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
