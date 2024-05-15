@@ -1,9 +1,10 @@
+# A reusable workflow to build and run the unit test suite
+#
 # This workflow will install Python dependencies, run tests,
 # and report test results and code coverage as artifacts. It will
 # be called by the workflow that run tests against new PRs and as
 # a first step in the workflow that publishes new Docker images.
-
-name: A reusable workflow to build and run the unit test suite
+name: Unit Tests
 
 on:
   workflow_call:
@@ -17,7 +18,7 @@ env:
   PYTHON_VERSION: "3.10"
 
 jobs:
-  build_and_test:
+  unit-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -42,11 +43,11 @@ jobs:
           poetry run ruff check concatenator
 
       - name: Run tests and collect coverage
-        run: poetry run pytest --cov=concatenator tests/unit/test_dataset_and_group_handling.py --cov-report=xml
-        # TODO: expand tests to include full concatenation runs, i.e., not only test_dataset_and_group_handling.py
+        run: poetry run pytest --cov=concatenator --cov-report=xml tests/unit
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
+          flags: unittests

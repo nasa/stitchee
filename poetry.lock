@@ -149,17 +149,17 @@ css = ["tinycss2 (>=1.1.0,<1.3)"]
 
 [[package]]
 name = "boto3"
-version = "1.34.86"
+version = "1.34.105"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.86-py3-none-any.whl", hash = "sha256:be594c449a0079bd1898ba1b7d90e0e5ac6b5803b2ada03993da01179073808d"},
-    {file = "boto3-1.34.86.tar.gz", hash = "sha256:992ba74459fef2bf1572050408db73d33c43e7531d81bda85a027f39156926a1"},
+    {file = "boto3-1.34.105-py3-none-any.whl", hash = "sha256:b633e8fbf7145bdb995ce68a27d096bb89fd393185b0e773418d81cd78db5a03"},
+    {file = "boto3-1.34.105.tar.gz", hash = "sha256:f2c11635be0de7b7c06eb606ece1add125e02d6ed521592294a0a21af09af135"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.86,<1.35.0"
+botocore = ">=1.34.105,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -168,13 +168,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.86"
+version = "1.34.105"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.86-py3-none-any.whl", hash = "sha256:57c1e3b2e1db745d22c45cbd761bbc0c143d2cfc2b532e3245cf5d874aa30b6d"},
-    {file = "botocore-1.34.86.tar.gz", hash = "sha256:2fd62b63d8788e15629bfc95be1bd2d99c0da6c1d45ef1f40c0a0101e412f6b5"},
+    {file = "botocore-1.34.105-py3-none-any.whl", hash = "sha256:a459d060b541beecb50681e6e8a39313cca981e146a59ba7c5229d62f631a016"},
+    {file = "botocore-1.34.105.tar.gz", hash = "sha256:727d5d3e800ac8b705fca6e19b6fefa1e728a81d62a712df9bd32ed0117c740b"},
 ]
 
 [package.dependencies]
@@ -516,6 +516,19 @@ tomli = {version = "*", optional = true, markers = "python_full_version <= \"3.1
 toml = ["tomli"]
 
 [[package]]
+name = "curlify"
+version = "2.2.1"
+description = "Library to convert python requests object to curl command."
+optional = false
+python-versions = "*"
+files = [
+    {file = "curlify-2.2.1.tar.gz", hash = "sha256:0d3f02e7235faf952de8ef45ef469845196d30632d5838bcd5aee217726ddd6d"},
+]
+
+[package.dependencies]
+requests = "*"
+
+[[package]]
 name = "dask"
 version = "2024.4.2"
 description = "Parallel PyData with Task Scheduling"
@@ -704,6 +717,28 @@ python-dateutil = ">=2.8.1"
 
 [package.extras]
 dev = ["flake8", "markdown", "twine", "wheel"]
+
+[[package]]
+name = "harmony-py"
+version = "0.4.14"
+description = "The NASA Harmony Python library"
+optional = false
+python-versions = "<4,>=3.6"
+files = [
+    {file = "harmony_py-0.4.14-py3-none-any.whl", hash = "sha256:fe0dc176b0c5c9762916cd4a0db1b53aeb83a08a23a42f32ddd87705ede88ee9"},
+    {file = "harmony_py-0.4.14.tar.gz", hash = "sha256:d33d8579af01e5597e938e0ae768d2d411da6ca09176f22b03c95f5b462394af"},
+]
+
+[package.dependencies]
+curlify = ">=2.2.1,<2.3.0"
+progressbar2 = ">=4.2.0,<4.3.0"
+python-dateutil = ">=2.8.2,<2.9.0"
+python-dotenv = ">=0.20.0,<0.21.0"
+requests = ">=2.28,<3.0"
+sphinxcontrib-napoleon = ">=0.7,<1.0"
+
+[package.extras]
+dev = ["PyYAML (>=6.0.1,<6.1.0)", "autopep8 (>=1.4,<2.0)", "camel-case-switcher (>=2.0,<3.0)", "coverage (>=5.4,<6.0)", "flake8 (>=3.8,<4.0)", "hypothesis (>=6.2,<7.0)", "importlib-metadata (<5.0)", "mypy (>=0.812,<1.0)", "nose (>=1.3,<2.0)", "pytest (>=6.2,<7.0)", "pytest-cov (>=2.11,<3.0)", "pytest-mock (>=3.5,<4.0)", "pytest-watch (>=4.2,<5.0)", "responses (>=0.12,<1.0)", "setuptools (>=54.2)", "sphinx (>=7.1.2,<7.2.0)", "wheel (>=0.36)"]
 
 [[package]]
 name = "harmony-service-lib"
@@ -1792,6 +1827,38 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "pockets"
+version = "0.9.1"
+description = "A collection of helpful Python tools!"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pockets-0.9.1-py2.py3-none-any.whl", hash = "sha256:68597934193c08a08eb2bf6a1d85593f627c22f9b065cc727a4f03f669d96d86"},
+    {file = "pockets-0.9.1.tar.gz", hash = "sha256:9320f1a3c6f7a9133fe3b571f283bcf3353cd70249025ae8d618e40e9f7e92b3"},
+]
+
+[package.dependencies]
+six = ">=1.5.2"
+
+[[package]]
+name = "progressbar2"
+version = "4.2.0"
+description = "A Python Progressbar library to provide visual (yet text based) progress to long running operations."
+optional = false
+python-versions = ">=3.7.0"
+files = [
+    {file = "progressbar2-4.2.0-py2.py3-none-any.whl", hash = "sha256:1a8e201211f99a85df55f720b3b6da7fb5c8cdef56792c4547205be2de5ea606"},
+    {file = "progressbar2-4.2.0.tar.gz", hash = "sha256:1393922fcb64598944ad457569fbeb4b3ac189ef50b5adb9cef3284e87e394ce"},
+]
+
+[package.dependencies]
+python-utils = ">=3.0.0"
+
+[package.extras]
+docs = ["sphinx (>=1.8.5)"]
+tests = ["flake8 (>=3.7.7)", "freezegun (>=0.3.11)", "pytest (>=4.6.9)", "pytest-cov (>=2.6.1)", "pytest-mypy", "sphinx (>=1.8.5)"]
+
+[[package]]
 name = "prompt-toolkit"
 version = "3.0.43"
 description = "Library for building powerful interactive command lines in Python"
@@ -1986,17 +2053,31 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "virtualenv"]
 
 [[package]]
 name = "python-dateutil"
-version = "2.9.0.post0"
+version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 files = [
-    {file = "python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3"},
-    {file = "python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"},
+    {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
+    {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
 ]
 
 [package.dependencies]
 six = ">=1.5"
+
+[[package]]
+name = "python-dotenv"
+version = "0.20.0"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "python-dotenv-0.20.0.tar.gz", hash = "sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f"},
+    {file = "python_dotenv-0.20.0-py3-none-any.whl", hash = "sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-json-logger"
@@ -2008,6 +2089,25 @@ files = [
     {file = "python-json-logger-2.0.7.tar.gz", hash = "sha256:23e7ec02d34237c5aa1e29a070193a4ea87583bb4e7f8fd06d3de8264c4b2e1c"},
     {file = "python_json_logger-2.0.7-py3-none-any.whl", hash = "sha256:f380b826a991ebbe3de4d897aeec42760035ac760345e57b812938dc8b35e2bd"},
 ]
+
+[[package]]
+name = "python-utils"
+version = "3.8.2"
+description = "Python Utils is a module with some convenient utilities not included with the standard Python install"
+optional = false
+python-versions = ">3.8.0"
+files = [
+    {file = "python-utils-3.8.2.tar.gz", hash = "sha256:c5d161e4ca58ce3f8c540f035e018850b261a41e7cb98f6ccf8e1deb7174a1f1"},
+    {file = "python_utils-3.8.2-py2.py3-none-any.whl", hash = "sha256:ad0ccdbd6f856d015cace07f74828b9840b5c4072d9e868a7f6a14fd195555a8"},
+]
+
+[package.dependencies]
+typing-extensions = ">3.10.0.2"
+
+[package.extras]
+docs = ["mock", "python-utils", "sphinx"]
+loguru = ["loguru"]
+tests = ["flake8", "loguru", "pytest", "pytest-asyncio", "pytest-cov", "pytest-mypy", "sphinx", "types-setuptools"]
 
 [[package]]
 name = "pytz"
@@ -2515,6 +2615,21 @@ files = [
 ]
 
 [[package]]
+name = "sphinxcontrib-napoleon"
+version = "0.7"
+description = "Sphinx \"napoleon\" extension."
+optional = false
+python-versions = "*"
+files = [
+    {file = "sphinxcontrib-napoleon-0.7.tar.gz", hash = "sha256:407382beed396e9f2d7f3043fad6afda95719204a1e1a231ac865f40abcbfcf8"},
+    {file = "sphinxcontrib_napoleon-0.7-py2.py3-none-any.whl", hash = "sha256:711e41a3974bdf110a484aec4c1a556799eb0b3f3b897521a018ad7e2db13fef"},
+]
+
+[package.dependencies]
+pockets = ">=0.3"
+six = ">=1.5.2"
+
+[[package]]
 name = "stack-data"
 version = "0.6.3"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -2751,4 +2866,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a0a5f81039919ef7d0cda8c3c686e9f0a2d4a9d119ad15d430b5b5fdf8f66bd5"
+content-hash = "5cc1bc065f5eff1f9524d34a1231e8656024dced0edb34ef864387e343323d03"
