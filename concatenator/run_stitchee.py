@@ -1,5 +1,6 @@
 """A simple CLI wrapper around the main concatenation process."""
 
+import argparse
 import json
 import logging
 import sys
@@ -12,13 +13,12 @@ from concatenator.file_ops import validate_input_path, validate_output_path
 from concatenator.stitchee import stitchee
 
 
-def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool, str]:
-    """
-    Parse args for this script.
+def parse_args(args: list) -> argparse.Namespace:
+    """Parse args for this script.
 
     Returns
     -------
-    tuple
+    argparse.Namespace
     """
     parser = ArgumentParser(
         prog="stitchee", description="Run the along-existing-dimension concatenator."
@@ -98,6 +98,13 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool, 
 
     parsed = parser.parse_args(args)
 
+    return parsed
+
+
+def validate_parsed_args(
+    parsed: argparse.Namespace,
+) -> tuple[list[str], str, str, bool, str, dict, bool, str]:
+    """Perform preliminary validation of the parsed arguments and return them as a tuple."""
     if parsed.verbose:
         logging.basicConfig(level=logging.DEBUG)
 
@@ -107,6 +114,7 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool, 
 
     print(f"CONCAT METHOD === {parsed.concat_method}")
     print(f"CONCAT DIM === {parsed.concat_dim}")
+
     if parsed.concat_method == "xarray-concat":
         if not parsed.concat_dim:
             raise ValueError(
@@ -140,9 +148,7 @@ def parse_args(args: list) -> tuple[list[str], str, str, bool, str, dict, bool, 
 
 
 def run_stitchee(args: list) -> None:
-    """
-    Parse arguments and run subsetter on the specified input file
-    """
+    """Parse arguments and run subsetter on the specified input file."""
     (
         input_files,
         output_path,
@@ -152,7 +158,7 @@ def run_stitchee(args: list) -> None:
         concat_kwargs,
         copy_input_files,
         group_delimiter,
-    ) = parse_args(args)
+    ) = validate_parsed_args(parse_args(args))
     num_inputs = len(input_files)
 
     history_json: list[dict] = []
