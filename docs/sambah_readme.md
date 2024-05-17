@@ -11,7 +11,9 @@ executes several services:
 
 ## Known Limitations
 
--
+- Panoply is unable to plot results when coordinate arrays contain null values on the edges.
+- Polygons and other Shapefile formats are not supported for subsetting. Support for this is in development.
+- A request for a single granule proceeds through the entire chain, thus modifying the filename and adding a history attribute.
 
 ## Missions supported
 
