@@ -22,6 +22,8 @@ theme:
 nav:
   - OVERVIEW:
       - "Readme": "index.md"
+  - SAMBAH Service Chain:
+      - "Description and known limitations": "sambah_readme.md"
   - EXAMPLES:
       - "Usage of STITCHEE via Harmony": "tutorial_examples.ipynb"
 
