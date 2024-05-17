@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Issue #185](https://github.com/nasa/stitchee/issues/185): Added arguments for temporary file copies and overwriting output file in main stitchee function
 - [Issue #181](https://github.com/nasa/stitchee/issues/181): Add a group delimiter argument
 - [Issue #134](https://github.com/nasa/stitchee/issues/134): Add an integration test that runs stitchee on files first subsetted by the operational Harmony subsetter
+- [Issue #194](https://github.com/nasa/stitchee/issues/194): Add page about the SAMBAH service chain to the Readthedocs documentation
 ### Changed
 ### Deprecated
 ### Removed
