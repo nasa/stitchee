@@ -14,6 +14,7 @@ executes several services:
 - Panoply is unable to plot results when coordinate arrays contain null values on the edges.
 - Polygons and other Shapefile formats are not supported for subsetting. Support for this is in development.
 - A request for a single granule proceeds through the entire chain. Thus, the following modifications are made even though the data are not concatenated: (i) the filename is changed to the granule's collection ID + "_merged" and (ii) a history attribute is added.
+- Occasionally stitchee instance fails due to Harmony memory limit. Solution for this is in development.
 
 ## Missions supported
 
