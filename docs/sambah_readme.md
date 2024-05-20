@@ -15,6 +15,7 @@ executes several services:
 - Polygons and other Shapefile formats are not supported for subsetting. Support for this is in development.
 - A request for a single granule proceeds through the entire chain. Thus, the following modifications are made even though the data are not concatenated: (i) the filename is changed to the granule's collection ID + "_merged" and (ii) a history attribute is added.
 - Occasionally stitchee instance fails due to Harmony memory limit. Solution for this is in development.
+- Known EarthData Search Client web interface bug allows user to select/deselect non-optional variables, such as coordinates, in variable subsetting menu. Non-optional variables are still included in the output file regardless of the user choice in the menu.
 
 ## Missions supported
 
