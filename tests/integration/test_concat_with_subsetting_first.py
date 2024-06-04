@@ -17,6 +17,7 @@ def test_concat_with_subsetting_first(temp_output_dir):
             "stop": dt.datetime(2024, 5, 13, 20, 0, 0),
         },
         spatial=BBox(-130, 30, -115, 35),
+        concatenate=False,
     )
     if not request.is_valid():
         raise RuntimeError
