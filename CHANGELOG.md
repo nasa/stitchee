@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 ### Removed
 ### Fixed
+- [Issue #204](https://github.com/nasa/stitchee/issues/204): Fix integration test failure
 
 ## [1.2.1]
 

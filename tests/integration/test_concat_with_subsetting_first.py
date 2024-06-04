@@ -17,6 +17,7 @@ def test_concat_with_subsetting_first(temp_output_dir):
             "stop": dt.datetime(2024, 5, 13, 20, 0, 0),
         },
         spatial=BBox(-130, 30, -115, 35),
+        concatenate=False,
     )
     if not request.is_valid():
         raise RuntimeError
@@ -29,6 +30,7 @@ def test_concat_with_subsetting_first(temp_output_dir):
     # Download the result files.
     futures = harmony_client.download_all(job_id, directory=str(temp_output_dir))
     file_names = [f.result() for f in futures]
+    print(f"File names: {file_names}")
 
     # Try concatenating the resulting files
     output_path = stitchee(
