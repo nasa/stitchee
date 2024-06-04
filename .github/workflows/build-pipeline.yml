@@ -5,7 +5,7 @@ name: Build
 on:
   # Triggers the workflow on push events
   push:
-    branches: [ develop, release/**, main, feature/**, issue/**, issues/** ]
+    branches: [ develop, release/**, main, feature/**, issue/**, issues/** , docs/**]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -51,7 +51,8 @@ jobs:
         if: |
           ${{ startsWith(github.ref, 'refs/heads/issue') }}      ||
           ${{ startsWith(github.ref, 'refs/heads/dependabot/') }} ||
-          ${{ startsWith(github.ref, 'refs/heads/feature/') }}
+          ${{ startsWith(github.ref, 'refs/heads/feature/') }} ||
+          ${{ startsWith(github.ref, 'refs/heads/docs/') }}
         run: |
           new_ver="${{ steps.get-version.outputs.current_version }}+$(git rev-parse --short ${GITHUB_SHA})"
           poetry version $new_ver
