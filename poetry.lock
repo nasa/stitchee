@@ -742,13 +742,13 @@ dev = ["PyYAML (>=6.0.1,<6.1.0)", "autopep8 (>=1.4,<2.0)", "camel-case-switcher 
 
 [[package]]
 name = "harmony-service-lib"
-version = "1.0.26"
+version = "1.0.27"
 description = "A library for Python-based Harmony services to parse incoming messages, fetch data, stage data, and call back to Harmony"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "harmony_service_lib-1.0.26-py3-none-any.whl", hash = "sha256:fce65b5334f055c1d28036ca74df72c974d8229e69e108238ad599f3c3e7a8f4"},
-    {file = "harmony_service_lib-1.0.26.tar.gz", hash = "sha256:a6a7342633859dbaba59ab595121ac06cced94d9b2d5aba44abc7ddbdd8d8ab0"},
+    {file = "harmony_service_lib-1.0.27-py3-none-any.whl", hash = "sha256:edf3aaa4b6f18addbfc4b54c20746d16ffe365a55ebaab0f4df47296b5900af3"},
+    {file = "harmony_service_lib-1.0.27.tar.gz", hash = "sha256:7992bbed205e02ad15dcc35526e7a827e6c3054a65d5eb5b59ddfec160950ca1"},
 ]
 
 [package.dependencies]
