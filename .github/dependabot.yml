@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    groups:
+      pip-dependencies:
+        patterns:
+          - "*"
     # Raise pull requests for version updates
     # to pip against the `develop` branch
     target-branch: "develop"
@@ -11,4 +15,8 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    groups:
+      gha-dependencies:
+        patterns:
+          - "*"
     target-branch: "develop"
