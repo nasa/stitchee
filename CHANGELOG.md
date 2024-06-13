@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Issue #134](https://github.com/nasa/stitchee/issues/134): Add an integration test that runs stitchee on files first subsetted by the operational Harmony subsetter
 - [Issue #194](https://github.com/nasa/stitchee/issues/194): Add page about the SAMBAH service chain to the Readthedocs documentation
 ### Changed
+- [Issue #206](https://github.com/nasa/stitchee/issues/206): Group dependabot updates into one PR
 ### Deprecated
 ### Removed
 ### Fixed
