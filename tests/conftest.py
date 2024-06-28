@@ -32,7 +32,7 @@ def prep_input_files(input_dir: Path, output_dir: Path) -> list[str]:
     """Prepare input by copying from the original test data directory."""
     input_files = []
     for filepath in input_dir.iterdir():
-        if Path(filepath).suffix.lower() in (".nc", ".h5", ".hdf"):
+        if Path(filepath).suffix.lower() in (".nc", ".nc4", ".h5", ".hdf"):
             copied_input_new_path = output_dir / Path(filepath).name  # type: ignore
             shutil.copyfile(filepath, copied_input_new_path)
             input_files.append(str(copied_input_new_path))
