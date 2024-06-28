@@ -18,10 +18,11 @@ stitchee_harmony = 'concatenator.harmony.cli:main'
 stitchee = 'concatenator.run_stitchee:main'
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 netcdf4 = ">=1.6.5"
 xarray = ">=2024.3.0"
 dask = ">=2024.4.1"
+pystac = ">=0.5.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.1.1"
@@ -60,7 +61,7 @@ exclude = [
   "doc",
   "_typed_ops.pyi",
 ]
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 # E402: module level import not at top of file
