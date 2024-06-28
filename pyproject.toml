@@ -19,28 +19,28 @@ stitchee = 'concatenator.run_stitchee:main'
 
 [tool.poetry.dependencies]
 python = "^3.10"
-netcdf4 = "^1.6.5"
-xarray = "^2024.3.0"
-dask = "^2024.4.1"
+netcdf4 = ">=1.6.5"
+xarray = ">=2024.3.0"
+dask = ">=2024.4.1"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.1.1"
-mypy = "^1.9.0"
-black = "^24.4.0"
+pytest = ">=8.1.1"
+mypy = ">=1.9.0"
+black = ">=24.4.0"
 ruff = ">=0.3.7,<0.5.0"
-pytest-cov = "^5.0.0"
-mkdocs = "^1.6.0"
-markdown-callouts = "^0.4.0"
-markdown-include = "^0.8.1"
-mkdocstrings = "^0.25.1"
-mkdocs-jupyter = "^0.24.7"
-mkdocs-material = "^9.5.22"
+pytest-cov = ">=5.0.0"
+mkdocs = ">=1.6.0"
+markdown-callouts = ">=0.4.0"
+markdown-include = ">=0.8.1"
+mkdocstrings = ">=0.25.1"
+mkdocs-jupyter = ">=0.24.7"
+mkdocs-material = ">=9.5.22"
 
 [tool.poetry.group.harmony.dependencies]
-harmony-service-lib = "^1.0.26"
+harmony-service-lib = ">=1.0.26"
 
 [tool.poetry.group.integration.dependencies]
-harmony-py = "^0.4.14"
+harmony-py = ">=0.4.14"
 
 [build-system]
 requires = ["poetry-core"]
