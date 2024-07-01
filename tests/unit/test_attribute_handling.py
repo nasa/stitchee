@@ -60,8 +60,8 @@ def test_concatenator_options_getting_and_setting():
     assert concatenator.coord_delim == default_coord_delim
     concatenator.coord_delim = "---"
     assert concatenator.coord_delim == "---"
-    concatenator.group_delim = default_coord_delim
-    assert concatenator.group_delim == default_coord_delim
+    concatenator.coord_delim = default_coord_delim
+    assert concatenator.coord_delim == default_coord_delim
 
     concatenator.nonexistent_attribute = "---"
     assert concatenator.nonexistent_attribute == "---"
