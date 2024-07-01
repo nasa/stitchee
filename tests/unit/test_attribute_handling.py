@@ -1,3 +1,6 @@
+import pytest
+
+import concatenator
 from concatenator.attribute_handling import (
     _flatten_coordinate_attribute,
     regroup_coordinate_attribute,
@@ -38,3 +41,10 @@ def test_coordinate_attribute_regrouping():
         )
         == "time longitude latitude ozone_profile_pressure ozone_profile_altitude"
     )
+
+
+def test_concatenator_options_access():
+    assert concatenator.group_delim == "__"
+    assert concatenator.__options__.group_delim == "__"
+    with pytest.raises(AttributeError):
+        _ = concatenator.unknown_attribute
