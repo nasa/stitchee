@@ -1,4 +1,5 @@
 """A Harmony CLI wrapper around the concatenate-batcher"""
+
 from argparse import ArgumentParser
 
 import harmony
@@ -29,5 +30,5 @@ def main(config: harmony.util.Config = None) -> None:
         parser.error("Only --harmony CLIs are supported")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
