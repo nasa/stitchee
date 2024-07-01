@@ -24,8 +24,6 @@ def __getattr__(name):  # type: ignore
     """
     global _options
 
-    if name == "__options__":
-        return _options
     if name == "group_delim":
         return _options.group_delim
     if name == "coord_delim":
