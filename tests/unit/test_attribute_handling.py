@@ -43,8 +43,24 @@ def test_coordinate_attribute_regrouping():
     )
 
 
-def test_concatenator_options_access():
+def test_concatenator_options_getting():
     assert concatenator.group_delim == "__"
+    assert concatenator.coord_delim == "  "
     assert concatenator.__options__.group_delim == "__"
     with pytest.raises(AttributeError):
-        _ = concatenator.unknown_attribute
+        _ = concatenator.nonexistent_attribute
+
+
+def test_concatenator_options_setting():
+    """Test setting attributes for the concatenator module.
+
+    Note that currently, new attributes can be defined dynamically.
+    """
+    concatenator.group_delim = "%"
+    assert concatenator.group_delim == "%"
+
+    concatenator.coord_delim = "---"
+    assert concatenator.coord_delim == "---"
+
+    concatenator.nonexistent_attribute = "---"
+    assert concatenator.nonexistent_attribute == "---"

@@ -32,16 +32,3 @@ def __getattr__(name):  # type: ignore
         return _options.coord_delim
     else:
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-
-def __setattr__(name, value):  # type: ignore
-    """Module-level setattr to handle setting of `concatenator.options`.
-
-    Other unhandled attributes raise as `AttributeError` as expected.
-    """
-    if name == "group_delim":
-        _options.group_delim = value
-    elif name == "coord_delim":
-        _options.coord_delim = value
-    else:
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
