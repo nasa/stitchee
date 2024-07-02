@@ -30,5 +30,5 @@ def main(config: harmony.util.Config = None) -> None:
         parser.error("Only --harmony CLIs are supported")
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     main()
