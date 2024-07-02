@@ -81,7 +81,7 @@ select = [
 ]
 
 [tool.coverage.run]
-concurrency = "multiprocessing"
+concurrency = ["multiprocessing"]
 
 [tool.coverage.report]
 # Regexes for lines to exclude from consideration
