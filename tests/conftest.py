@@ -19,6 +19,10 @@ class TempDirs(typing.NamedTuple):
     toy_data_path: Path
 
 
+def path_str(dir_path: Path, filename: str) -> str:
+    return str(dir_path.joinpath(filename))
+
+
 def pytest_addoption(parser):
     """Sets up optional argument to keep temporary testing directory."""
     parser.addoption(

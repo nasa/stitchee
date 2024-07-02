@@ -7,9 +7,7 @@ import pytest
 import concatenator
 from concatenator.run_stitchee import parse_args
 
-
-def path_str(dir_path: Path, filename: str) -> str:
-    return str(dir_path.joinpath(filename))
+from ..conftest import path_str
 
 
 def test_parser():
