@@ -54,7 +54,7 @@ def regroup_coordinate_attribute(attribute_string: str) -> str:
 def flatten_coordinate_attribute_paths(
     dataset: netCDF4.Dataset, var: netCDF4.Variable, variable_name: str
 ) -> None:
-    """Flatten the paths of variables referenced in the coordinates attribute."""
+    """Flatten the paths of variables referenced in the 'coordinates' attribute."""
     if "coordinates" in var.ncattrs():
         coord_att = var.getncattr("coordinates")
 
