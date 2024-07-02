@@ -1,4 +1,10 @@
 ---
+ci:
+  autoupdate_schedule: "monthly" # Like dependabot
+  autoupdate_commit_msg: "chore: update pre-commit hooks"
+  autoupdate_branch: "develop"
+  autofix_prs: false # Comment "pre-commit.ci autofix" on a PR to trigger
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
