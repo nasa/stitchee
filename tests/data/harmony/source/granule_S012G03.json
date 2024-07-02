@@ -1,0 +1,49 @@
+{
+  "stac_version": "1.0.0-beta.2",
+  "stac_extensions": [],
+  "id": "dc07a25a-54bd-4389-97b6-c1d68cf0d586",
+  "type": "Feature",
+  "links": [],
+  "properties": {
+    "start_datetime": "2020-01-05T00:00:00.000Z",
+    "end_datetime": "2020-01-05T23:59:59.000Z"
+  },
+  "bbox": [-4, -2, -4, 2],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -179.95,
+          -89.95
+        ],
+        [
+          -179.95,
+          89.95
+        ],
+        [
+          179.95,
+          89.95
+        ],
+        [
+          179.95,
+          -89.95
+        ],
+        [
+          -179.95,
+          -89.95
+        ]
+      ]
+    ]
+  },
+  "assets": {
+    "data": {
+      "href": "file://tests/data/harmony/granule_copies_dir/TEMPO_NO2_L2_V03_20240601T212254Z_S012G03_subsetted.nc4",
+      "title": "TEMPO_NO2_L2_V03_20240601T212254Z_S012G03_subsetted.nc4",
+      "type": "application/x-netcdf4",
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

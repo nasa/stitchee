@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Issue #194](https://github.com/nasa/stitchee/issues/194): Add page about the SAMBAH service chain to the Readthedocs documentation
 ### Changed
 - [Issue #206](https://github.com/nasa/stitchee/issues/206): Group dependabot updates into one PR
+- [issue #208](https://github.com/nasa/stitchee/issues/208): Increase continuous integration/unit test coverage
 ### Deprecated
 ### Removed
 ### Fixed
