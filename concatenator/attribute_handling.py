@@ -26,7 +26,7 @@ def regroup_coordinate_attribute(attribute_string: str) -> str:
     Examples
     --------
     >>> coord_att = "__Time_and_Position__time  __Time_and_Position__instrument_fov_latitude  __Time_and_Position__instrument_fov_longitude"
-    >>> _flatten_coordinate_attribute(coord_att)
+    >>> flatten_string_with_groups(coord_att)
         Time_and_Position/time  Time_and_Position/instrument_fov_latitude  Time_and_Position/instrument_fov_longitude
 
     Parameters
@@ -58,23 +58,25 @@ def flatten_coordinate_attribute_paths(
     if "coordinates" in var.ncattrs():
         coord_att = var.getncattr("coordinates")
 
-        new_coord_att = _flatten_coordinate_attribute(coord_att)
+        new_coord_att = flatten_string_with_groups(coord_att)
 
         dataset.variables[variable_name].setncattr("coordinates", new_coord_att)
 
 
-def _flatten_coordinate_attribute(attribute_string: str) -> str:
-    """Converts attributes that specify group membership via "/" to use new group delimiter, even for the root level.
+def flatten_string_with_groups(str_with_groups: str) -> str:
+    """Determine separator and flatten string specifying group membership via "/".
+
+    Applies to variable paths or attributes, even for the root level.
 
     Examples
     --------
     >>> coord_att = "Time_and_Position/time  Time_and_Position/instrument_fov_latitude  Time_and_Position/instrument_fov_longitude"
-    >>> _flatten_coordinate_attribute(coord_att)
+    >>> flatten_string_with_groups(coord_att)
         __Time_and_Position__time  __Time_and_Position__instrument_fov_latitude  __Time_and_Position__instrument_fov_longitude
 
     Parameters
     ----------
-    attribute_string : str
+    str_with_groups : str
 
     Returns
     -------
@@ -82,8 +84,10 @@ def _flatten_coordinate_attribute(attribute_string: str) -> str:
     """
     # Use the separator that's in the attribute string only if all separators in the string are the same.
     # Otherwise, we will use our own default separator.
-    whitespaces = re.findall(r"\s+", attribute_string)
-    if len(set(whitespaces)) <= 1:
+    whitespaces = re.findall(r"\s+", str_with_groups)
+    if len(set(whitespaces)) == 0:
+        new_sep = ""
+    elif len(set(whitespaces)) == 1:
         new_sep = whitespaces[0]
     else:
         new_sep = concatenator.coord_delim
@@ -91,7 +95,7 @@ def _flatten_coordinate_attribute(attribute_string: str) -> str:
     # A new string is constructed.
     return new_sep.join(
         f'{concatenator.group_delim}{c.replace("/", concatenator.group_delim)}'
-        for c in attribute_string.split()  # split on any whitespace
+        for c in str_with_groups.split()  # split on any whitespace
     )
 
 
