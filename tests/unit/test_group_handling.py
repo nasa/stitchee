@@ -1,44 +1,36 @@
 """Tests for manipulating netCDF groups."""
 
 # pylint: disable=C0116, C0301
+import logging
+from pathlib import Path
 
-from concatenator.attribute_handling import (
-    _flatten_coordinate_attribute,
-    regroup_coordinate_attribute,
-)
+import pytest
 
+from concatenator.dataset_and_group_handling import validate_workable_files
 
-def test_coordinate_attribute_flattening():
-    # Case with groups present and double spaces.
-    assert (
-        _flatten_coordinate_attribute(
-            "Time_and_Position/time  Time_and_Position/instrument_fov_latitude  Time_and_Position/instrument_fov_longitude"
-        )
-        == "__Time_and_Position__time  __Time_and_Position__instrument_fov_latitude  __Time_and_Position__instrument_fov_longitude"
-    )
+from ..conftest import path_str
 
-    # Case with NO groups present and single spaces.
-    assert (
-        _flatten_coordinate_attribute(
-            "time longitude latitude ozone_profile_pressure ozone_profile_altitude"
-        )
-        == "__time __longitude __latitude __ozone_profile_pressure __ozone_profile_altitude"
-    )
+logger = logging.getLogger(__name__)
 
 
-def test_coordinate_attribute_regrouping():
-    # Case with groups present and double spaces.
-    assert (
-        regroup_coordinate_attribute(
-            "__Time_and_Position__time  __Time_and_Position__instrument_fov_latitude  __Time_and_Position__instrument_fov_longitude"
-        )
-        == "Time_and_Position/time  Time_and_Position/instrument_fov_latitude  Time_and_Position/instrument_fov_longitude"
-    )
+@pytest.mark.usefixtures("pass_options")
+class TestGroupHandling:
+    __test_path = Path(__file__).parents[1].resolve()
+    __data_path = __test_path.joinpath("data")
+    __harmony_path = __data_path.joinpath("harmony")
+    __granules_path = __harmony_path.joinpath("granules")
 
-    # Case with NO groups present and single spaces.
-    assert (
-        regroup_coordinate_attribute(
-            "__time __longitude __latitude __ozone_profile_pressure __ozone_profile_altitude"
-        )
-        == "time longitude latitude ozone_profile_pressure ozone_profile_altitude"
-    )
+    def test_workable_files_validation(self, temp_output_dir):
+        filepaths = [
+            path_str(
+                self.__granules_path, "TEMPO_NO2_L2_V03_20240601T210934Z_S012G01_subsetted.nc4"
+            ),
+            path_str(
+                self.__granules_path, "TEMPO_NO2_L2_V03_20240601T211614Z_S012G02_subsetted.nc4"
+            ),
+            path_str(
+                self.__granules_path, "TEMPO_NO2_L2_V03_20240601T212254Z_S012G03_subsetted.nc4"
+            ),
+        ]
+
+        assert validate_workable_files(filepaths, logger)[1] == 3

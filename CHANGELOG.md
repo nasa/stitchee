@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - [Issue #206](https://github.com/nasa/stitchee/issues/206): Group dependabot updates into one PR
 - [issue #208](https://github.com/nasa/stitchee/issues/208): Increase continuous integration/unit test coverage
+- [issue #198](https://github.com/nasa/stitchee/issues/198): Use time variable instead of concat dim for ordering datasets
 ### Deprecated
 ### Removed
 ### Fixed
