@@ -170,7 +170,7 @@ jobs:
       - name: Build and push Docker image
         if: ${{ !startsWith(github.ref, 'refs/heads/main/') }}
         id: docker-push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile

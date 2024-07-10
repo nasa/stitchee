@@ -15,6 +15,7 @@ import netCDF4 as nc
 import xarray as xr
 
 import concatenator
+from concatenator.attribute_handling import flatten_string_with_groups
 from concatenator.dataset_and_group_handling import (
     flatten_grouped_dataset,
     regroup_flattened_dataset,
@@ -39,6 +40,7 @@ def stitchee(
     concat_method: str | None = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
+    time_variable: str = "geolocation/time",
     history_to_append: str | None = None,
     copy_input_files: bool = False,
     overwrite_output_file: bool = False,
@@ -137,9 +139,11 @@ def stitchee(
                         decode_coords=False,
                         drop_variables=coord_vars,
                     ) as xrds:
-                        first_value = xrds[concatenator.group_delim + concat_dim].values.flatten()[
-                            0
-                        ]
+                        # Determine value for later dataset sorting.
+                        first_value = xrds[
+                            flatten_string_with_groups(time_variable)
+                        ].values.flatten()[0]
+                        # first_value = xrds[concatenator.group_delim + concat_dim].values.flatten()[0]
                         concat_dim_order.append(first_value)
 
                         benchmark_log["flattening"] = time.time() - start_time

@@ -12,7 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [Issue #181](https://github.com/nasa/stitchee/issues/181): Add a group delimiter argument
 - [Issue #134](https://github.com/nasa/stitchee/issues/134): Add an integration test that runs stitchee on files first subsetted by the operational Harmony subsetter
 - [Issue #194](https://github.com/nasa/stitchee/issues/194): Add page about the SAMBAH service chain to the Readthedocs documentation
+- [issue #193](https://github.com/nasa/stitchee/issues/193): Add autoupdate schedule for pre-commit
 ### Changed
+- [Issue #206](https://github.com/nasa/stitchee/issues/206): Group dependabot updates into one PR
+- [issue #208](https://github.com/nasa/stitchee/issues/208): Increase continuous integration/unit test coverage
+- [issue #198](https://github.com/nasa/stitchee/issues/198): Use time variable instead of concat dim for ordering datasets
 ### Deprecated
 ### Removed
 ### Fixed

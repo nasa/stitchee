@@ -1,4 +1,5 @@
 """A Harmony CLI wrapper around the concatenate-batcher"""
+
 from argparse import ArgumentParser
 
 import harmony

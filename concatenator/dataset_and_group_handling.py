@@ -8,6 +8,7 @@ Functions for converting multidimensional data structures
 from __future__ import annotations
 
 import re
+from logging import Logger
 
 import netCDF4 as nc
 import numpy as np
@@ -273,7 +274,7 @@ def _get_nested_group(dataset: nc.Dataset, group_path: str) -> nc.Group:
     return nested_group
 
 
-def _calculate_chunks(dim_sizes: list, default_low_dim_chunksize=4000) -> tuple:
+def _calculate_chunks(dim_sizes: list, default_low_dim_chunksize: int = 4000) -> tuple:
     """
     For the given dataset, calculate if the size on any dimension is
     worth chunking. Any dimension larger than 4000 will be chunked. This
@@ -324,8 +325,8 @@ def _get_dimension_size(dataset: nc.Dataset, dim_name: str) -> int:
     return dim_size
 
 
-def validate_workable_files(files, logger) -> tuple[list[str], int]:
-    """Remove files from list that are not open-able as netCDF or that are empty."""
+def validate_workable_files(files: list[str], logger: Logger) -> tuple[list[str], int]:
+    """Remove files from a list that are not open-able as netCDF or that are empty."""
     workable_files = []
     for file in files:
         try:
@@ -336,7 +337,7 @@ def validate_workable_files(files, logger) -> tuple[list[str], int]:
         except OSError:
             logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
 
-    # addressing the issue 153: propagate first empty file if all input files are empty
+    # addressing GitHub issue 153: propagate the first empty file if all input files are empty
     if (len(workable_files)) == 0 and (len(files) > 0):
         workable_files.append(files[0])
 

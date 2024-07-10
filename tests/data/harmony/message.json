@@ -1,0 +1,16 @@
+{
+    "sources": [{
+        "collection": "C1234088182-EEDTEST"
+    }],
+    "format": {
+        "mime": "application/x-netcdf4"
+    },
+    "subset": {},
+    "requestId": "00001111-2222-3333-4444-555566667777",
+    "user": "jdoe",
+    "client": "harmony-example",
+    "isSynchronous": false,
+    "stagingLocation": "s3://example-bucket/public/some-org/some-service/some-uuid/",
+    "callback": "http://localhost/some-path",
+    "version": "0.10.0"
+}
