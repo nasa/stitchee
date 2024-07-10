@@ -8,12 +8,13 @@ Functions for converting multidimensional data structures
 from __future__ import annotations
 
 import re
+from logging import Logger
 
 import netCDF4 as nc
 import numpy as np
 import xarray as xr
 
-from concatenator import GROUP_DELIM
+import concatenator
 from concatenator.attribute_handling import (
     flatten_coordinate_attribute_paths,
     regroup_coordinate_attribute,
@@ -32,12 +33,12 @@ def walk(
 ):
     """Recursive function to step through each group and subgroup."""
     for key, item in group_node.items():
-        group_path = f"{path}{GROUP_DELIM}{key}"
+        group_path = f"{path}{concatenator.group_delim}{key}"
 
         if item.dimensions:
             dims = list(item.dimensions.keys())
             for dim_name in dims:
-                new_dim_name = f'{group_path.replace("/", GROUP_DELIM)}{GROUP_DELIM}{dim_name}'
+                new_dim_name = f'{group_path.replace("/", concatenator.group_delim)}{concatenator.group_delim}{dim_name}'
                 item.dimensions[new_dim_name] = item.dimensions[dim_name]
                 dimensions_dict_to_populate[new_dim_name] = item.dimensions[dim_name]
                 item.renameDimension(dim_name, new_dim_name)
@@ -47,7 +48,7 @@ def walk(
         if item.variables:
             # Copy variables to root group with new name
             for var_name, var in item.variables.items():
-                var_group_name = f"{group_path}{GROUP_DELIM}{var_name}"
+                var_group_name = f"{group_path}{concatenator.group_delim}{var_name}"
                 new_dataset.variables[var_group_name] = var
 
                 # Flatten the paths of variables referenced in the coordinates attribute
@@ -88,7 +89,7 @@ def flatten_grouped_dataset(
     dataset. xarray does not work with groups, so this transformation
     will flatten the variables in the dataset and use the group path as
     the new variable name. For example, data_01 > km > sst would become
-    'data_01__km__sst', where GROUP_DELIM is __.
+    'data_01__km__sst', where concatenator.group_delim is __.
 
     This same pattern is applied to dimensions, which are located under
     the appropriate group. They are renamed and placed in the root
@@ -109,14 +110,14 @@ def flatten_grouped_dataset(
     dimensions = {}
 
     # for var_name in list(nc_dataset.variables.keys()):
-    #     new_var_name = f'{GROUP_DELIM}{var_name}'
+    #     new_var_name = f'{concatenator.group_delim}{var_name}'
     #     nc_dataset.variables[new_var_name] = nc_dataset.variables[var_name]
     #     del nc_dataset.variables[var_name]
 
     if nc_dataset.variables:
         temp_copy_for_iterating = list(nc_dataset.variables.items())
         for var_name, var in temp_copy_for_iterating:
-            new_var_name = f"{GROUP_DELIM}{var_name}"
+            new_var_name = f"{concatenator.group_delim}{var_name}"
 
             # ds_new.variables[new_var_name] = ds_old.variables[var_name]
 
@@ -132,7 +133,7 @@ def flatten_grouped_dataset(
     if nc_dataset.dimensions:
         temp_copy_for_iterating = list(nc_dataset.dimensions.keys())
         for dim_name in temp_copy_for_iterating:
-            new_dim_name = f"{GROUP_DELIM}{dim_name}"
+            new_dim_name = f"{concatenator.group_delim}{dim_name}"
             # dimensions[new_dim_name] = item.dimensions[dim_name]
             # item.renameDimension(dim_name, new_dim_name)
             # ds_new.dimensions[new_dim_name] = item.dimensions[dim_name]
@@ -184,7 +185,7 @@ def regroup_flattened_dataset(
         group_lst = []
         # need logic if there is data in the top level not in a group
         for var_name, _ in dataset.variables.items():
-            group_lst.append("/".join(str(var_name).split(GROUP_DELIM)[:-1]))
+            group_lst.append("/".join(str(var_name).split(concatenator.group_delim)[:-1]))
         group_lst = ["/" if group == "" else group for group in group_lst]
         groups = set(group_lst)
         for group in groups:
@@ -192,7 +193,7 @@ def regroup_flattened_dataset(
 
         # Copy dimensions
         for dim_name, _ in dataset.dims.items():
-            new_dim_name = str(dim_name).rsplit(GROUP_DELIM, 1)[-1]
+            new_dim_name = str(dim_name).rsplit(concatenator.group_delim, 1)[-1]
             dim_group = _get_nested_group(base_dataset, str(dim_name))
             dim_group.createDimension(new_dim_name, dataset.dims[dim_name])
             # dst.createDimension(
@@ -200,9 +201,9 @@ def regroup_flattened_dataset(
 
         # Copy variables
         for var_name, var in dataset.variables.items():
-            new_var_name = str(var_name).rsplit(GROUP_DELIM, 1)[-1]
+            new_var_name = str(var_name).rsplit(concatenator.group_delim, 1)[-1]
             var_group = _get_nested_group(base_dataset, str(var_name))
-            # grouping = '/'.join(var_name.split(GROUP_DELIM)[:-1])
+            # grouping = '/'.join(var_name.split(concatenator.group_delim)[:-1])
             try:
                 this_dtype = var.dtype
 
@@ -222,7 +223,9 @@ def regroup_flattened_dataset(
                     new_var_dims = (new_var_name,)
                     chunk_sizes = None
                 else:
-                    new_var_dims = tuple(str(d).rsplit(GROUP_DELIM, 1)[-1] for d in var.dims)
+                    new_var_dims = tuple(
+                        str(d).rsplit(concatenator.group_delim, 1)[-1] for d in var.dims
+                    )
                     dim_sizes = [_get_dimension_size(base_dataset, dim) for dim in new_var_dims]
 
                     chunk_sizes = _calculate_chunks(dim_sizes, default_low_dim_chunksize=4000)
@@ -266,12 +269,12 @@ def regroup_flattened_dataset(
 
 def _get_nested_group(dataset: nc.Dataset, group_path: str) -> nc.Group:
     nested_group = dataset
-    for group in group_path.strip(GROUP_DELIM).split(GROUP_DELIM)[:-1]:
+    for group in group_path.strip(concatenator.group_delim).split(concatenator.group_delim)[:-1]:
         nested_group = nested_group.groups[group]
     return nested_group
 
 
-def _calculate_chunks(dim_sizes: list, default_low_dim_chunksize=4000) -> tuple:
+def _calculate_chunks(dim_sizes: list, default_low_dim_chunksize: int = 4000) -> tuple:
     """
     For the given dataset, calculate if the size on any dimension is
     worth chunking. Any dimension larger than 4000 will be chunked. This
@@ -322,8 +325,8 @@ def _get_dimension_size(dataset: nc.Dataset, dim_name: str) -> int:
     return dim_size
 
 
-def validate_workable_files(files, logger) -> tuple[list[str], int]:
-    """Remove files from list that are not open-able as netCDF or that are empty."""
+def validate_workable_files(files: list[str], logger: Logger) -> tuple[list[str], int]:
+    """Remove files from a list that are not open-able as netCDF or that are empty."""
     workable_files = []
     for file in files:
         try:
@@ -334,7 +337,7 @@ def validate_workable_files(files, logger) -> tuple[list[str], int]:
         except OSError:
             logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
 
-    # addressing the issue 153: propagate first empty file if all input files are empty
+    # addressing GitHub issue 153: propagate the first empty file if all input files are empty
     if (len(workable_files)) == 0 and (len(files) > 0):
         workable_files.append(files[0])
 

@@ -113,6 +113,6 @@ def _download_worker(
             dest_path = path.parent.joinpath(filename)
             path = path.rename(dest_path)
         else:
-            logger.warning("Origin filename could not be assertained - %s", url)
+            logger.warning("Origin filename could not be ascertained - %s", url)
 
         path_list.append(str(path))

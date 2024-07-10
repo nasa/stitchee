@@ -4,11 +4,10 @@ import xarray as xr
 
 from concatenator.attribute_handling import construct_history
 from concatenator.stitchee import stitchee
+from tests.conftest import prep_input_files
 
-from .conftest import prep_input_files
 
-
-def test_simple_sample_with_history(
+def test_construct_and_append_history_for_sample_concatenation(
     temp_toy_data_dir,
     temp_output_dir,
     ds_3dims_3vars_4coords_1group_part1,
@@ -29,6 +28,7 @@ def test_simple_sample_with_history(
         concat_method="xarray-concat",
         history_to_append=new_history_json,
         concat_dim="step",
+        time_variable="step",
     )
     stitcheed_dataset = xr.open_dataset(output_path)
 
