@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.3.0] - 2024-07-10
@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Group dependabot updates into one PR ([#206](https://github.com/nasa/stitchee/issues/206))([**@danielfromearth**](https://github.com/danielfromearth))
 - Increase continuous integration/unit test coverage ([#208](https://github.com/nasa/stitchee/issues/208))([**@danielfromearth**](https://github.com/danielfromearth))
 - Use time variable instead of concat dim for ordering datasets ([#198](https://github.com/nasa/stitchee/issues/198))([**@danielfromearth**](https://github.com/danielfromearth), [**@ank1m**](https://github.com/ank1m))
+- Update `CHANGELOG.md` to follow Common Changelog conventions ([#226](https://github.com/nsidc/earthaccess/pull/226))([**@danielfromearth**](https://github.com/danielfromearth))
 
 ### Added
 
