@@ -82,4 +82,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Error with TEMPO ozone profile data because of duplicated dimension names ([#4](https://github.com/danielfromearth/stitchee/pull/4))
-- Fix conflicting dimensions on record dimension sorting ([#133](https://github.com/danielfromearth/stitchee/pull/133))
+- Fix conflicting dimensions on record dimension sorting ([#136](https://github.com/danielfromearth/stitchee/pull/136))
