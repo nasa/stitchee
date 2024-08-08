@@ -94,13 +94,19 @@ def stitchee(
         logger.info("No non-empty netCDF files found. Exiting.")
         return ""
 
+    output_file = validate_output_path(output_file, overwrite=overwrite_output_file)
+
+    # Exit cleanly with the file copied if one workable netCDF file found.
+    if num_input_files == 1:
+        shutil.copyfile(input_files[0], output_file)
+        logger.info("One workable netCDF file. Copied to output path without modification.")
+        return output_file
+
     if concat_dim and (concat_method == "xarray-combine"):
         warn(
             "'concat_dim' was specified, but will not be used because xarray-combine method was "
             "selected."
         )
-
-    output_file = validate_output_path(output_file, overwrite=overwrite_output_file)
 
     # If requested, make a temporary directory with new copies of the original input files
     temporary_dir_to_remove = None
