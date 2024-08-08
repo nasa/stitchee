@@ -70,3 +70,22 @@ class TestBatching:
 
         with patch.object(sys, "argv", test_args):
             concatenator.run_stitchee.main()
+
+    def test_run_stitchee_cli_with_one_netCDFpath(self, temp_output_dir):
+        test_args = [
+            concatenator.run_stitchee.__file__,
+            path_str(
+                self.__granules_path, "TEMPO_NO2_L2_V03_20240601T210934Z_S012G01_subsetted.nc4"
+            ),
+            "--copy_input_files",
+            "--verbose",
+            "-o",
+            path_str(temp_output_dir, "test_run_stitchee_output.nc"),
+            "--concat_method",
+            "xarray-concat",
+            "--concat_dim",
+            "mirror_step",
+        ]
+
+        with patch.object(sys, "argv", test_args):
+            concatenator.run_stitchee.main()
