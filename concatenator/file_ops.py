@@ -8,6 +8,8 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+netcdf_extensions = [".nc", ".nc4", ".netcdf"]
+
 
 def add_label_to_path(x: str, label="_flat_intermediate") -> str:
     """Constructs new filepath with label at end."""
@@ -55,7 +57,15 @@ def validate_output_path(filepath: str, overwrite: bool = False) -> str:
 
 
 def validate_input_path(path_or_paths: list[str]) -> list[str]:
-    """Checks whether input is a valid directory, list of files, or a text file containing paths."""
+    """Checks whether input is a list of files, a directory, or a text file containing paths.
+
+    If the input is...
+    - a list of filepaths, then use those filepaths.
+    - a valid directory, then get the paths for all the files in the directory.
+    - a single file:
+        - that is a valid text file, then get the names of the files from each row in the text file.
+        - that is a valid netCDF file, then use that one filepath
+    """
     print(f"parsed_input === {path_or_paths}")
     if len(path_or_paths) > 1:
         input_files = path_or_paths
@@ -64,7 +74,10 @@ def validate_input_path(path_or_paths: list[str]) -> list[str]:
         if directory_or_path.is_dir():
             input_files = _get_list_of_filepaths_from_dir(directory_or_path)
         elif directory_or_path.is_file():
-            input_files = _get_list_of_filepaths_from_file(directory_or_path)
+            if directory_or_path.suffix in netcdf_extensions:
+                input_files = [str(directory_or_path)]
+            else:
+                input_files = _get_list_of_filepaths_from_file(directory_or_path)
         else:
             raise TypeError(
                 "If one path is provided for 'data_dir_or_file_or_filepaths', "

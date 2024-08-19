@@ -8,6 +8,11 @@ import netCDF4 as nc
 import numpy as np
 import pytest
 
+test_path = Path(__file__).parents[0].resolve()
+data_path = test_path.joinpath("data")
+harmony_path = data_path.joinpath("harmony")
+granules_path = harmony_path.joinpath("granules")
+
 
 class DataDirs(typing.NamedTuple):
     test_path: Path
@@ -158,5 +163,28 @@ def ds_3dims_3vars_4coords_1group_part3(temp_toy_data_dir):
     f = nc.Dataset(filename=filepath, mode="w")
     f = add_to_ds_3dims_3vars_4coords_1group_with_step_values(f, step_values=[6, 7, 8])
     f.close()
+
+    return filepath
+
+
+@pytest.fixture(scope="function")
+def text_file_with_three_paths(temp_toy_data_dir) -> Path:
+    filepath = temp_toy_data_dir / "text_file_with_paths.txt"
+
+    paths = [
+        path_str(granules_path, x)
+        for x in [
+            "TEMPO_NO2_L2_V03_20240601T210934Z_S012G01_subsetted.nc4",
+            "TEMPO_NO2_L2_V03_20240601T211614Z_S012G02_subsetted.nc4",
+            "TEMPO_NO2_L2_V03_20240601T212254Z_S012G03_subsetted.nc4",
+        ]
+    ]
+
+    contents = f"""{paths[0]}
+{paths[1]}
+{paths[2]}
+"""
+    with open(filepath, "w") as f:
+        f.write(contents)
 
     return filepath
