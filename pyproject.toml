@@ -21,8 +21,8 @@ stitchee = 'concatenator.run_stitchee:main'
 python = "^3.10"
 netcdf4 = ">=1.6.5"
 xarray = ">=2024.3.0"
-dask = ">=2024.4.1"
-pystac = ">=0.5.6"
+pystac = ">=0.5.3"
+importlib-metadata = "^8.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.1.1"
@@ -38,10 +38,10 @@ mkdocs-jupyter = ">=0.24.7"
 mkdocs-material = ">=9.5.22"
 
 [tool.poetry.group.harmony.dependencies]
-harmony-service-lib = ">=1.0.26"
+harmony-service-lib = ">=1.0.27"
 
 [tool.poetry.group.integration.dependencies]
-harmony-py = ">=0.4.14"
+harmony-py = ">=0.4.15"
 
 [build-system]
 requires = ["poetry-core"]
