@@ -21,7 +21,6 @@ stitchee = 'concatenator.run_stitchee:main'
 python = "^3.10"
 netcdf4 = ">=1.6.5"
 xarray = ">=2024.3.0"
-dask = ">=2024.4.1"
 pystac = ">=0.5.3"
 
 [tool.poetry.group.dev.dependencies]
