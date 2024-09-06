@@ -123,6 +123,7 @@ class StitcheeAdapter(BaseHarmonyAdapter):
                     write_tmp_flat_concatenated=False,
                     keep_tmp_files=False,
                     concat_dim="mirror_step",  # This is currently set only for TEMPO
+                    sorting_variable="geolocation/time",  # This is currently set only for TEMPO
                     history_to_append=new_history_json,
                     logger=self.logger,
                 )

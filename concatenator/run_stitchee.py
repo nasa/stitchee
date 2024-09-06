@@ -70,6 +70,11 @@ def parse_args(args: list) -> argparse.Namespace:
         "This is required if using the 'xarray-concat' method",
     )
     parser.add_argument(
+        "--sorting_variable",
+        help="Name of a variable to use for sorting datasets before concatenation by xarray. "
+        "E.g., 'time'.",
+    )
+    parser.add_argument(
         "--xarray_arg_compat",
         help="'compat' argument passed to xarray.concat() or xarray.combine_by_coords().",
     )
