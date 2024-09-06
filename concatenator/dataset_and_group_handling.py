@@ -1,12 +1,8 @@
-"""
-dataset_and_group_handling.py
-
-Functions for converting multidimensional data structures
- between a group hierarchy and a flat structure
-"""
+"""Functions to convert data structures between a group hierarchy and a flat structure."""
 
 from __future__ import annotations
 
+import logging
 import re
 from logging import Logger
 
@@ -19,6 +15,8 @@ from concatenator.attribute_handling import (
     flatten_coordinate_attribute_paths,
     regroup_coordinate_attribute,
 )
+
+module_logger = logging.getLogger(__name__)
 
 # Match dimension names such as "__char28" or "__char16". Used for CERES datasets.
 _string_dimension_name_pattern = re.compile(r"__char[0-9]+")
@@ -51,7 +49,7 @@ def walk(
                 var_group_name = f"{group_path}{concatenator.group_delim}{var_name}"
                 new_dataset.variables[var_group_name] = var
 
-                # Flatten the paths of variables referenced in the coordinates attribute
+                # Flatten the paths of variables referenced in the 'coordinates' attribute
                 flatten_coordinate_attribute_paths(new_dataset, var, var_group_name)
 
                 if (len(var.dimensions) == 1) and _string_dimension_name_pattern.fullmatch(
@@ -99,6 +97,7 @@ def flatten_grouped_dataset(
     ----------
     nc_dataset : nc.Dataset
         netCDF4 Dataset that contains groups
+    ensure_all_dims_are_coords
 
     Returns
     -------
@@ -124,7 +123,7 @@ def flatten_grouped_dataset(
             # Copy variables to root group with new name
             nc_dataset.variables[new_var_name] = var
 
-            # Flatten the paths of variables referenced in the coordinates attribute.
+            # Flatten the paths of variables referenced in the 'coordinates' attribute.
             flatten_coordinate_attribute_paths(nc_dataset, var, new_var_name)
 
             del nc_dataset.variables[var_name]  # Delete old variable
@@ -173,6 +172,7 @@ def regroup_flattened_dataset(
         List of xarray datasets to be combined
     output_file : str
         Name of the output file to write the resulting NetCDF file to.
+    history_to_append : str
     """
     with nc.Dataset(output_file, mode="w", format="NETCDF4") as base_dataset:
         # Copy global attributes
@@ -325,7 +325,9 @@ def _get_dimension_size(dataset: nc.Dataset, dim_name: str) -> int:
     return dim_size
 
 
-def validate_workable_files(files: list[str], logger: Logger) -> tuple[list[str], int]:
+def validate_workable_files(
+    files: list[str], logger: Logger | None = module_logger
+) -> tuple[list[str], int]:
     """Remove files from a list that are not open-able as netCDF or that are empty."""
     workable_files = []
     for file in files:
@@ -335,7 +337,10 @@ def validate_workable_files(files: list[str], logger: Logger) -> tuple[list[str]
                 if is_empty is False:
                     workable_files.append(file)
         except OSError:
-            logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
+            if logger:
+                logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
+            else:
+                print("Error opening <%s> as a netCDF dataset. Skipping.")
 
     # addressing GitHub issue 153: propagate the first empty file if all input files are empty
     if (len(workable_files)) == 0 and (len(files) > 0):
