@@ -28,7 +28,7 @@ def test_construct_and_append_history_for_sample_concatenation(
         concat_method="xarray-concat",
         history_to_append=new_history_json,
         concat_dim="step",
-        time_variable="step",
+        sorting_variable="step",
     )
     stitcheed_dataset = xr.open_dataset(output_path)
 
