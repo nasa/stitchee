@@ -22,7 +22,7 @@ python = "^3.10"
 netcdf4 = ">=1.6.5"
 xarray = ">=2024.3.0"
 pystac = ">=0.5.3"
-importlib-resources = ">=6.4.4"
+importlib-metadata = "^8.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.1.1"
