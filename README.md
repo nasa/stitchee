@@ -34,7 +34,7 @@
 _____
 
 _STITCHEE_ (STITCH by Extending a dimEnsion) is used for concatenating netCDF data *along an existing dimension*,
-and it is deigned as both a standalone utility and for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
+and it is designed as both a standalone utility and for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
 
 ## Getting started, with poetry
 
