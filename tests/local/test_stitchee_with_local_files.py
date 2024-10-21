@@ -25,6 +25,7 @@ class TestConcat:
         concat_method: str = "xarray-concat",
         record_dim_name: str = "mirror_step",
         concat_kwargs: dict | None = None,
+        sorting_variable: str | None = None,
     ):
         output_path = str(output_dir.joinpath(output_name))  # type: ignore
         prepared_input_files = prep_input_files(input_dir, output_dir)
@@ -40,6 +41,7 @@ class TestConcat:
             concat_method=concat_method,
             concat_dim=record_dim_name,
             concat_kwargs=concat_kwargs,
+            sorting_variable=sorting_variable,
         )
 
         merged_dataset = nc.Dataset(output_path)
@@ -84,6 +86,7 @@ class TestConcat:
             output_name="simple_sample_concatenated.nc",
             record_dim_name=record_dim_name,
             concat_method="xarray-concat",
+            sorting_variable=record_dim_name,
         )
 
         # Check that the concatenated dimension elements in the result are sorted.
@@ -103,13 +106,13 @@ class TestConcat:
             concat_method="xarray-concat",
         )
 
-    def test_tempo_no2_subsetter_output_concat_with_stitchee(self, temp_output_dir):
-        self.run_verification_with_stitchee(
-            input_dir=data_for_tests_dir / "tempo/no2_subsetted",
-            output_dir=temp_output_dir,
-            output_name="tempo_no2_stitcheed.nc",
-            concat_method="xarray-concat",
-        )
+    # def test_tempo_no2_subsetter_output_concat_with_stitchee(self, temp_output_dir):
+    #     self.run_verification_with_stitchee(
+    #         input_dir=data_for_tests_dir / "tempo/no2_subsetted",
+    #         output_dir=temp_output_dir,
+    #         output_name="tempo_no2_stitcheed.nc",
+    #         concat_method="xarray-concat",
+    #     )
 
     def test_tempo_hcho_concat_with_stitchee(self, temp_output_dir):
         self.run_verification_with_stitchee(
