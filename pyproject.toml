@@ -38,7 +38,7 @@ mkdocs-jupyter = ">=0.24.7"
 mkdocs-material = ">=9.5.22"
 
 [tool.poetry.group.harmony.dependencies]
-harmony-service-lib = ">=1.0.27"
+harmony-service-lib = ">=2.0.0"
 
 [tool.poetry.group.integration.dependencies]
 harmony-py = ">=0.4.15"
