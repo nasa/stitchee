@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Remove the dask dependency ([#235](https://github.com/nasa/stitchee/issues/235))([**@danielfromearth**](https://github.com/danielfromearth))
 - Expose sorting variable argument in the command line interface ([#233](https://github.com/nasa/stitchee/issues/233))([**@danielfromearth**](https://github.com/danielfromearth))
+- Update tutorial notebook to use PROD instead of UAT and improve readability ([#241](https://github.com/nasa/stitchee/issues/241))([**@danielfromearth**](https://github.com/danielfromearth))
 
 ## [1.4.0] - 2024-08-19
 
