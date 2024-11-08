@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.5.0] - 2024-10-28
+## [1.5.0] - 2024-11-08
 
 ### Changed
 - Update tutorial notebook to use PROD instead of UAT and improve readability ([#241](https://github.com/nasa/stitchee/issues/241))([**@danielfromearth**](https://github.com/danielfromearth))
