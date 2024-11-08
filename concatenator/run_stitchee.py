@@ -30,10 +30,11 @@ def parse_args(args: list) -> argparse.Namespace:
         "input",
         metavar="path/directory or path list",
         nargs="+",
-        help="Files to be concatenated, specified via a "
-        "(1) single directory containing the files to be concatenated, "
-        "(2) single text file containing linebreak-separated paths of the files to be concatenated, "
-        "or (3) multiple filepaths of the files to be concatenated.",
+        help="Files to be concatenated, specified via "
+        "(1) multiple paths of the files to be concatenated, "
+        "(2) single path to text file containing linebreak-separated paths of files to be concatenated, "
+        "(3) single path to netCDF file to be copied to output path, "
+        "or a (4) single directory containing the files to be concatenated.",
     )
     req_grp.add_argument(
         "-o",

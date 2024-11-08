@@ -4,12 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [1.5.0] - 2024-10-28
 
 ### Changed
-- Remove the dask dependency ([#235](https://github.com/nasa/stitchee/issues/235))([**@danielfromearth**](https://github.com/danielfromearth))
-- Expose sorting variable argument in the command line interface ([#233](https://github.com/nasa/stitchee/issues/233))([**@danielfromearth**](https://github.com/danielfromearth))
 - Update tutorial notebook to use PROD instead of UAT and improve readability ([#241](https://github.com/nasa/stitchee/issues/241))([**@danielfromearth**](https://github.com/danielfromearth))
+
+### Added
+
+- Expose sorting variable argument in the command line interface ([#233](https://github.com/nasa/stitchee/issues/233))([**@danielfromearth**](https://github.com/danielfromearth))
+
+### Removed
+
+- Remove the dask dependency ([#235](https://github.com/nasa/stitchee/issues/235))([**@danielfromearth**](https://github.com/danielfromearth))
 
 ## [1.4.0] - 2024-08-19
 
