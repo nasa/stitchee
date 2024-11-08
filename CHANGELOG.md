@@ -4,11 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2024-11-08
+
+### Changed
+- Update tutorial notebook to use PROD instead of UAT and improve readability ([#241](https://github.com/nasa/stitchee/issues/241))([**@danielfromearth**](https://github.com/danielfromearth))
+
+### Added
+
+- Expose sorting variable argument in the command line interface ([#233](https://github.com/nasa/stitchee/issues/233))([**@danielfromearth**](https://github.com/danielfromearth))
+
+### Removed
+
+- Remove the dask dependency ([#235](https://github.com/nasa/stitchee/issues/235))([**@danielfromearth**](https://github.com/danielfromearth))
+
 ## [1.4.0] - 2024-08-19
 
 ### Changed
 - Allow single netCDF file input in addition to single text file listings ([#230](https://github.com/nasa/stitchee/issues/230))([**@danielfromearth**](https://github.com/danielfromearth))
-
 
 ## [1.3.0] - 2024-07-11
 

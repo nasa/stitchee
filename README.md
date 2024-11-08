@@ -34,7 +34,7 @@
 _____
 
 _STITCHEE_ (STITCH by Extending a dimEnsion) is used for concatenating netCDF data *along an existing dimension*,
-and it is deigned as both a standalone utility and for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
+and it is designed as both a standalone utility and for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
 
 ## Getting started, with poetry
 
@@ -73,6 +73,8 @@ options:
                         Whether to use the xarray concat method or the combine-by-coords method.
   --concat_dim CONCAT_DIM
                         Dimension to concatenate along, if possible. This is required if using the 'xarray-concat' method
+  --sorting_variable SORTING_VARIABLE
+                        Name of a variable to use for sorting datasets before concatenation by xarray. E.g., 'time'.
   --xarray_arg_compat XARRAY_ARG_COMPAT
                         'compat' argument passed to xarray.concat() or xarray.combine_by_coords().
   --xarray_arg_combine_attrs XARRAY_ARG_COMBINE_ATTRS

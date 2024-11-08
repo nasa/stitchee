@@ -1,8 +1,5 @@
-"""
-attribute_handling.py
-
-Functions for converting "coordinates" in netCDF variable attributes
- between paths that reference a group hierarchy and flattened paths.
+"""Functions for converting "coordinates" in netCDF variable attributes
+    between paths that reference a group hierarchy and flattened paths.
 """
 
 import json

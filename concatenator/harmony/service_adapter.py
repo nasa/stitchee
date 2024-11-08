@@ -7,8 +7,8 @@ from uuid import uuid4
 
 import netCDF4 as nc
 import pystac
-from harmony.adapter import BaseHarmonyAdapter
-from harmony.util import bbox_to_geometry, stage
+from harmony_service_lib.adapter import BaseHarmonyAdapter
+from harmony_service_lib.util import bbox_to_geometry, stage
 from pystac import Item
 from pystac.item import Asset
 
@@ -123,6 +123,7 @@ class StitcheeAdapter(BaseHarmonyAdapter):
                     write_tmp_flat_concatenated=False,
                     keep_tmp_files=False,
                     concat_dim="mirror_step",  # This is currently set only for TEMPO
+                    sorting_variable="geolocation/time",  # This is currently set only for TEMPO
                     history_to_append=new_history_json,
                     logger=self.logger,
                 )

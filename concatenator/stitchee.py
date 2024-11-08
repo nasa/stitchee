@@ -40,7 +40,7 @@ def stitchee(
     concat_method: str | None = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
-    time_variable: str = "geolocation/time",
+    sorting_variable: str | None = None,
     history_to_append: str | None = None,
     copy_input_files: bool = False,
     overwrite_output_file: bool = False,
@@ -62,11 +62,15 @@ def stitchee(
     concat_method
         either "xarray-concat" (default) or "xarray-combine".
     concat_dim
-        dimension along which to concatenate (default: ""). Not needed is concat_method is "xarray-combine".
+        dimension along which to concatenate (default: "").
+        Not needed if concat_method is "xarray-combine".
     concat_kwargs
         keyword arguments to pass to xarray.concat or xarray.combine_by_coords (default: None).
+    sorting_variable
+        name of a variable to use for sorting datasets before concatenation by xarray.
+        E.g., `time`.
     history_to_append
-        json string to append to the history attribute of the concatenated file (default: None).
+        JSON string to append to the history attribute of the concatenated file (default: None).
     copy_input_files
         whether to copy input files or not (default: False).
     overwrite_output_file
@@ -146,7 +150,12 @@ def stitchee(
                 )
 
                 # Determine value for later dataset sorting.
-                first_value = xrds[flatten_string_with_groups(time_variable)].values.flatten()[0]
+                if sorting_variable:
+                    first_value = xrds[
+                        flatten_string_with_groups(sorting_variable)
+                    ].values.flatten()[0]
+                else:
+                    first_value = i
                 # first_value = xrds[concatenator.group_delim + concat_dim].values.flatten()[0]
                 concat_dim_order.append(first_value)
 
@@ -200,7 +209,7 @@ def stitchee(
 
             if write_tmp_flat_concatenated:
                 logger.info("Writing concatenated flattened temporary file to disk...")
-                # Concatenated, yet still flat, file is written to disk for debugging.
+                # The concatenated, yet still flat, file is written to disk for debugging.
                 tmp_flat_concatenated_path = add_label_to_path(
                     output_file, label="_flat_intermediate"
                 )

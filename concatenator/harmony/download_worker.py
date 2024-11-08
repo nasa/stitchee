@@ -8,8 +8,8 @@ from os import cpu_count
 from pathlib import Path
 from urllib.parse import urlparse
 
-from harmony.logging import build_logger
-from harmony.util import download
+from harmony_service_lib.logging import build_logger
+from harmony_service_lib.util import download
 
 
 def multi_core_download(
