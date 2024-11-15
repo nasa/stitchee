@@ -63,9 +63,7 @@ class TestBatching:
             out_catalog_path = temp_output_dir.joinpath("catalog.json")
             out_catalog = json.loads(out_catalog_path.read_text())
 
-            item_meta = next(
-                item for item in out_catalog["links"] if item["rel"] == "item"
-            )
+            item_meta = next(item for item in out_catalog["links"] if item["rel"] == "item")
             item_href = item_meta["href"]
             item_path = temp_output_dir.joinpath(item_href).resolve()
 

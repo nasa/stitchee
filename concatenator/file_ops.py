@@ -22,9 +22,7 @@ def make_temp_dir_with_input_file_copies(
 ) -> tuple[list[str], str]:
     """Creates temporary directory and copies input files."""
     new_data_dir = Path(
-        add_label_to_path(
-            str(output_path.parent / "temp_copy"), label=str(uuid.uuid4())
-        )
+        add_label_to_path(str(output_path.parent / "temp_copy"), label=str(uuid.uuid4()))
     ).resolve()
     os.makedirs(new_data_dir, exist_ok=True)
     logger.info("Created temporary directory: %s", str(new_data_dir))
@@ -54,9 +52,7 @@ def validate_output_path(filepath: str, overwrite: bool = False) -> str:
                 f"Run again with `overwrite` option to overwrite existing file."
             )
     if path.is_dir():  # the specified path is an existing directory
-        raise TypeError(
-            "Output path cannot be a directory. Please specify a new filepath."
-        )
+        raise TypeError("Output path cannot be a directory. Please specify a new filepath.")
     return str(path)
 
 

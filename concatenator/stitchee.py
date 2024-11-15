@@ -107,9 +107,7 @@ def stitchee(
     # Exit cleanly with the file copied if one workable netCDF file found.
     if num_input_files == 1:
         shutil.copyfile(input_files[0], output_file)
-        logger.info(
-            "One workable netCDF file. Copied to output path without modification."
-        )
+        logger.info("One workable netCDF file. Copied to output path without modification.")
         return output_file
 
     if concat_dim and (concat_method == "xarray-combine"):
@@ -135,9 +133,7 @@ def stitchee(
             for i, filepath in enumerate(input_files):
                 # The group structure is flattened.
                 start_time = time.time()
-                logger.info(
-                    "    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath
-                )
+                logger.info("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
 
                 ncfile = context_stack.enter_context(nc.Dataset(filepath, "r+"))
 
@@ -178,9 +174,7 @@ def stitchee(
             # Reorder the xarray datasets according to the concat dim values.
             xrdataset_list = [
                 dataset
-                for _, dataset in sorted(
-                    zip(concat_dim_order, xrdataset_list), key=lambda x: x[0]
-                )
+                for _, dataset in sorted(zip(concat_dim_order, xrdataset_list), key=lambda x: x[0])
             ]
 
             # Flattened files are concatenated together (Using XARRAY).

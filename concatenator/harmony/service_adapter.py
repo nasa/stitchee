@@ -53,9 +53,7 @@ class StitcheeAdapter(BaseHarmonyAdapter):
             # Message-only support is being depreciated in Harmony, so we should expect to
             # only see requests with catalogs when invoked with a newer Harmony instance
             # https://github.com/nasa/harmony-service-lib-py/blob/21bcfbda17caf626fb14d2ac4f8673be9726b549/harmony/adapter.py#L71
-            raise RuntimeError(
-                "Invoking Batchee without a STAC catalog is not supported"
-            )
+            raise RuntimeError("Invoking Batchee without a STAC catalog is not supported")
 
         return self.message, self.process_catalog(self.catalog)
 
@@ -106,9 +104,7 @@ class StitcheeAdapter(BaseHarmonyAdapter):
                 history_json: list[dict] = []
                 for file_count, file in enumerate(input_files):
                     file_size = sizeof_fmt(file.stat().st_size)
-                    self.logger.info(
-                        f"File {file_count} is size <{file_size}>. Path={file}"
-                    )
+                    self.logger.info(f"File {file_count} is size <{file_size}>. Path={file}")
 
                     with nc.Dataset(file, "r") as dataset:
                         history_json.extend(retrieve_history(dataset))

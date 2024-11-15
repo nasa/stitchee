@@ -36,9 +36,7 @@ def test_concat_with_subsetting_first(temp_output_dir):
     output_path = stitchee(
         file_names,
         output_file=str(
-            (
-                temp_output_dir / "output_harmony_subsetting_to_stitchee_test.nc"
-            ).resolve()
+            (temp_output_dir / "output_harmony_subsetting_to_stitchee_test.nc").resolve()
         ),
         concat_dim="mirror_step",
         concat_method="xarray-concat",

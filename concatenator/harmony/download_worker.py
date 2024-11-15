@@ -112,9 +112,7 @@ def _download_worker(
             break
 
         path = Path(
-            download(
-                url, destination_dir, logger=logger, access_token=access_token, cfg=cfg
-            )
+            download(url, destination_dir, logger=logger, access_token=access_token, cfg=cfg)
         )
         filename_match = re.match(r".*\/(.+\..+)", urlparse(url).path)
 
