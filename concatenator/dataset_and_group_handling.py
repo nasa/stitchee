@@ -268,6 +268,11 @@ def regroup_flattened_dataset(
 
 
 def _get_nested_group(dataset: nc.Dataset, group_path: str) -> nc.Group:
+    """Get the group object that is represented by the group_path string.
+
+    If the 'group_path' string represents a dimension in the root group,
+    then this returns the root group.
+    """
     nested_group = dataset
     for group in group_path.strip(concatenator.group_delim).split(concatenator.group_delim)[:-1]:
         nested_group = nested_group.groups[group]
