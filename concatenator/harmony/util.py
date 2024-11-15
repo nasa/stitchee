@@ -1,4 +1,5 @@
 """Misc utility functions"""
+
 from datetime import datetime
 
 from pystac import Asset, Item
@@ -78,7 +79,10 @@ def _get_output_date_range(input_items: list[Item]) -> dict[str, str]:
         start_datetime = min(start_datetime, new_start_datetime)
         end_datetime = max(end_datetime, new_end_datetime)
 
-    return {"start_datetime": start_datetime.isoformat(), "end_datetime": end_datetime.isoformat()}
+    return {
+        "start_datetime": start_datetime.isoformat(),
+        "end_datetime": end_datetime.isoformat(),
+    }
 
 
 def _get_item_date_range(item: Item) -> tuple[datetime, datetime]:

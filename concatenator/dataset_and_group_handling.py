@@ -52,9 +52,9 @@ def walk(
                 # Flatten the paths of variables referenced in the 'coordinates' attribute
                 flatten_coordinate_attribute_paths(new_dataset, var, var_group_name)
 
-                if (len(var.dimensions) == 1) and _string_dimension_name_pattern.fullmatch(
-                    var.dimensions[0]
-                ):
+                if (
+                    len(var.dimensions) == 1
+                ) and _string_dimension_name_pattern.fullmatch(var.dimensions[0]):
                     list_of_character_string_vars.append(var_group_name)
 
             # Delete variables
@@ -145,7 +145,9 @@ def flatten_grouped_dataset(
             if ensure_all_dims_are_coords and (
                 new_dim_name not in list(nc_dataset.variables.keys())
             ):
-                nc_dataset.createVariable(dim.name, datatype=np.int32, dimensions=(dim.name,))
+                nc_dataset.createVariable(
+                    dim.name, datatype=np.int32, dimensions=(dim.name,)
+                )
                 temporary_coordinate_variables.append(dim.name)
 
     list_of_character_string_vars: list[str] = []
@@ -185,7 +187,9 @@ def regroup_flattened_dataset(
         group_lst = []
         # need logic if there is data in the top level not in a group
         for var_name, _ in dataset.variables.items():
-            group_lst.append("/".join(str(var_name).split(concatenator.group_delim)[:-1]))
+            group_lst.append(
+                "/".join(str(var_name).split(concatenator.group_delim)[:-1])
+            )
         group_lst = ["/" if group == "" else group for group in group_lst]
         groups = set(group_lst)
         for group in groups:
@@ -226,9 +230,13 @@ def regroup_flattened_dataset(
                     new_var_dims = tuple(
                         str(d).rsplit(concatenator.group_delim, 1)[-1] for d in var.dims
                     )
-                    dim_sizes = [_get_dimension_size(base_dataset, dim) for dim in new_var_dims]
+                    dim_sizes = [
+                        _get_dimension_size(base_dataset, dim) for dim in new_var_dims
+                    ]
 
-                    chunk_sizes = _calculate_chunks(dim_sizes, default_low_dim_chunksize=4000)
+                    chunk_sizes = _calculate_chunks(
+                        dim_sizes, default_low_dim_chunksize=4000
+                    )
 
                 # Do the variable creation
                 if var.dtype == "O":
@@ -237,7 +245,11 @@ def regroup_flattened_dataset(
                     vartype = str(var.dtype)
 
                 compression: str | None = "zlib"
-                if vartype.startswith("<U") and len(var.shape) == 1 and var.shape[0] < 10:
+                if (
+                    vartype.startswith("<U")
+                    and len(var.shape) == 1
+                    and var.shape[0] < 10
+                ):
                     compression = None
 
                 var_group.createVariable(
@@ -269,7 +281,9 @@ def regroup_flattened_dataset(
 
 def _get_nested_group(dataset: nc.Dataset, group_path: str) -> nc.Group:
     nested_group = dataset
-    for group in group_path.strip(concatenator.group_delim).split(concatenator.group_delim)[:-1]:
+    for group in group_path.strip(concatenator.group_delim).split(
+        concatenator.group_delim
+    )[:-1]:
         nested_group = nested_group.groups[group]
     return nested_group
 

@@ -15,9 +15,13 @@ from .. import data_for_tests_dir
 def test_dataset_with_single_empty_input_file():
     """Ensure that a dataset with a single empty input file is propagating empty granule to the output"""
     files_to_concat = [
-        data_for_tests_dir / "unit-test-data" / "TEMPO_NO2_L2_V03_20240328T154353Z_S008G01.nc4"
+        data_for_tests_dir
+        / "unit-test-data"
+        / "TEMPO_NO2_L2_V03_20240328T154353Z_S008G01.nc4"
     ]
-    workable_files, number_of_workable_files = validate_workable_files(files_to_concat, None)
+    workable_files, number_of_workable_files = validate_workable_files(
+        files_to_concat, None
+    )
     assert number_of_workable_files == 1
 
 
@@ -32,13 +36,17 @@ def test_dataset_with_singleton_null_values_is_identified_as_empty():
         assert _is_file_empty(ds)
 
 
-def test_toy_dataset_with_singleton_null_values_is_identified_as_empty(toy_empty_dataset):
+def test_toy_dataset_with_singleton_null_values_is_identified_as_empty(
+    toy_empty_dataset,
+):
     """Ensure that a dataset with only null arrays with 1-length dimensions is identified as empty."""
     with nc.Dataset(toy_empty_dataset) as ds:
         assert _is_file_empty(ds)
 
 
-def test_dataset_with_values_is_identified_as_not_empty(ds_3dims_3vars_4coords_1group_part1):
+def test_dataset_with_values_is_identified_as_not_empty(
+    ds_3dims_3vars_4coords_1group_part1,
+):
     """Ensure that a dataset with non-null arrays is identified as NOT empty."""
     with nc.Dataset(ds_3dims_3vars_4coords_1group_part1) as ds:
         assert _is_file_empty(ds) is False

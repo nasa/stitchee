@@ -88,7 +88,11 @@ def stitchee(
     concatenator.group_delim = group_delimiter
 
     intermediate_flat_filepaths: list[str] = []
-    benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
+    benchmark_log = {
+        "flattening": 0.0,
+        "concatenating": 0.0,
+        "reconstructing_groups": 0.0,
+    }
 
     # Proceed to concatenate only files that are workable (can be opened and are not empty).
     input_files, num_input_files = validate_workable_files(files_to_concat, logger)
@@ -103,7 +107,9 @@ def stitchee(
     # Exit cleanly with the file copied if one workable netCDF file found.
     if num_input_files == 1:
         shutil.copyfile(input_files[0], output_file)
-        logger.info("One workable netCDF file. Copied to output path without modification.")
+        logger.info(
+            "One workable netCDF file. Copied to output path without modification."
+        )
         return output_file
 
     if concat_dim and (concat_method == "xarray-combine"):
@@ -123,14 +129,15 @@ def stitchee(
         # Instead of "with nc.Dataset() as" inside the loop, we use a context manager stack.
         # This way all files are cleanly closed outside the loop.
         with ExitStack() as context_stack:
-
             logger.info("Flattening all input files...")
             xrdataset_list = []
             concat_dim_order = []
             for i, filepath in enumerate(input_files):
                 # The group structure is flattened.
                 start_time = time.time()
-                logger.info("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
+                logger.info(
+                    "    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath
+                )
 
                 ncfile = context_stack.enter_context(nc.Dataset(filepath, "r+"))
 
@@ -171,7 +178,9 @@ def stitchee(
             # Reorder the xarray datasets according to the concat dim values.
             xrdataset_list = [
                 dataset
-                for _, dataset in sorted(zip(concat_dim_order, xrdataset_list), key=lambda x: x[0])
+                for _, dataset in sorted(
+                    zip(concat_dim_order, xrdataset_list), key=lambda x: x[0]
+                )
             ]
 
             # Flattened files are concatenated together (Using XARRAY).

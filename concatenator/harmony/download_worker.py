@@ -13,7 +13,11 @@ from harmony_service_lib.util import download
 
 
 def multi_core_download(
-    urls: list, destination_dir: str, access_token: str, cfg: dict, process_count: int | None = None
+    urls: list,
+    destination_dir: str,
+    access_token: str,
+    cfg: dict,
+    process_count: int | None = None,
 ) -> list[Path]:
     """
     A method which automagically scales downloads to the number of CPU
@@ -74,7 +78,11 @@ def multi_core_download(
 
 
 def _download_worker(
-    url_queue: queue.Queue, path_list: list, destination_dir: str, access_token: str, cfg: dict
+    url_queue: queue.Queue,
+    path_list: list,
+    destination_dir: str,
+    access_token: str,
+    cfg: dict,
 ) -> None:
     """
     A method to be executed in a separate process which processes the url_queue
@@ -104,7 +112,9 @@ def _download_worker(
             break
 
         path = Path(
-            download(url, destination_dir, logger=logger, access_token=access_token, cfg=cfg)
+            download(
+                url, destination_dir, logger=logger, access_token=access_token, cfg=cfg
+            )
         )
         filename_match = re.match(r".*\/(.+\..+)", urlparse(url).path)
 

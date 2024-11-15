@@ -96,7 +96,9 @@ def toy_empty_dataset(temp_toy_data_dir):
     return filepath
 
 
-def add_to_ds_3dims_3vars_4coords_1group_with_step_values(open_ds: nc.Dataset, step_values: list):
+def add_to_ds_3dims_3vars_4coords_1group_with_step_values(
+    open_ds: nc.Dataset, step_values: list
+):
     """Creates groups, dimensions, variables; and uses chosen step values in an open dataset"""
     grp1 = open_ds.createGroup("Group1")
 
@@ -126,9 +128,33 @@ def add_to_ds_3dims_3vars_4coords_1group_with_step_values(open_ds: nc.Dataset, s
         [200, 300, 400, 500, 600, 700, 800],
     ]
     grp1["var2"][:] = [
-        [[200, 150], [300, 150], [400, 150], [500, 150], [600, 150], [700, 150], [800, 150]],
-        [[200, 150], [300, 150], [400, 150], [500, 150], [600, 150], [700, 150], [800, 150]],
-        [[200, 150], [300, 150], [400, 150], [500, 150], [600, 150], [700, 150], [800, 150]],
+        [
+            [200, 150],
+            [300, 150],
+            [400, 150],
+            [500, 150],
+            [600, 150],
+            [700, 150],
+            [800, 150],
+        ],
+        [
+            [200, 150],
+            [300, 150],
+            [400, 150],
+            [500, 150],
+            [600, 150],
+            [700, 150],
+            [800, 150],
+        ],
+        [
+            [200, 150],
+            [300, 150],
+            [400, 150],
+            [500, 150],
+            [600, 150],
+            [700, 150],
+            [800, 150],
+        ],
     ]
 
     return open_ds
@@ -139,7 +165,9 @@ def ds_3dims_3vars_4coords_1group_part1(temp_toy_data_dir) -> Path:
     filepath = temp_toy_data_dir / "test_3dims_3vars_4coords_1group_part1.nc"
 
     f = nc.Dataset(filename=filepath, mode="w")
-    f = add_to_ds_3dims_3vars_4coords_1group_with_step_values(f, step_values=[9, 10, 11])
+    f = add_to_ds_3dims_3vars_4coords_1group_with_step_values(
+        f, step_values=[9, 10, 11]
+    )
     f.close()
 
     return filepath
@@ -150,7 +178,9 @@ def ds_3dims_3vars_4coords_1group_part2(temp_toy_data_dir):
     filepath = temp_toy_data_dir / "test_3dims_3vars_4coords_1group_part2.nc"
 
     f = nc.Dataset(filename=filepath, mode="w")
-    f = add_to_ds_3dims_3vars_4coords_1group_with_step_values(f, step_values=[12, 13, 14])
+    f = add_to_ds_3dims_3vars_4coords_1group_with_step_values(
+        f, step_values=[12, 13, 14]
+    )
     f.close()
 
     return filepath

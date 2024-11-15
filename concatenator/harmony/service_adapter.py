@@ -53,7 +53,9 @@ class StitcheeAdapter(BaseHarmonyAdapter):
             # Message-only support is being depreciated in Harmony, so we should expect to
             # only see requests with catalogs when invoked with a newer Harmony instance
             # https://github.com/nasa/harmony-service-lib-py/blob/21bcfbda17caf626fb14d2ac4f8673be9726b549/harmony/adapter.py#L71
-            raise RuntimeError("Invoking Batchee without a STAC catalog is not supported")
+            raise RuntimeError(
+                "Invoking Batchee without a STAC catalog is not supported"
+            )
 
         return self.message, self.process_catalog(self.catalog)
 
@@ -104,7 +106,9 @@ class StitcheeAdapter(BaseHarmonyAdapter):
                 history_json: list[dict] = []
                 for file_count, file in enumerate(input_files):
                     file_size = sizeof_fmt(file.stat().st_size)
-                    self.logger.info(f"File {file_count} is size <{file_size}>. Path={file}")
+                    self.logger.info(
+                        f"File {file_count} is size <{file_size}>. Path={file}"
+                    )
 
                     with nc.Dataset(file, "r") as dataset:
                         history_json.extend(retrieve_history(dataset))
@@ -134,14 +138,22 @@ class StitcheeAdapter(BaseHarmonyAdapter):
             # -- Output to STAC catalog --
             result.clear_items()
             properties = dict(
-                start_datetime=datetimes["start_datetime"], end_datetime=datetimes["end_datetime"]
+                start_datetime=datetimes["start_datetime"],
+                end_datetime=datetimes["end_datetime"],
             )
 
             item = Item(
-                str(uuid4()), bbox_to_geometry(bounding_box), bounding_box, None, properties
+                str(uuid4()),
+                bbox_to_geometry(bounding_box),
+                bounding_box,
+                None,
+                properties,
             )
             asset = Asset(
-                staged_url, title=filename, media_type="application/x-netcdf4", roles=["data"]
+                staged_url,
+                title=filename,
+                media_type="application/x-netcdf4",
+                roles=["data"],
             )
             item.add_asset("data", asset)
             result.add_item(item)

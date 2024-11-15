@@ -1,5 +1,5 @@
 """Functions for converting "coordinates" in netCDF variable attributes
-    between paths that reference a group hierarchy and flattened paths.
+between paths that reference a group hierarchy and flattened paths.
 """
 
 import json
@@ -12,9 +12,13 @@ import netCDF4
 import concatenator
 
 # Values needed for history_json attribute
-HISTORY_JSON_SCHEMA = "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-v0.1.0.json"
+HISTORY_JSON_SCHEMA = (
+    "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-v0.1.0.json"
+)
 PROGRAM = "stitchee"
-PROGRAM_REF = "https://cmr.earthdata.nasa.gov:443/search/concepts/S2940253910-LARC_CLOUD"
+PROGRAM_REF = (
+    "https://cmr.earthdata.nasa.gov:443/search/concepts/S2940253910-LARC_CLOUD"
+)
 VERSION = importlib_metadata.distribution("stitchee").version
 
 
