@@ -23,13 +23,16 @@ class TestGroupHandling:
     def test_workable_files_validation(self, temp_output_dir):
         filepaths = [
             path_str(
-                self.__granules_path, "TEMPO_NO2_L2_V03_20240601T210934Z_S012G01_subsetted.nc4"
+                self.__granules_path,
+                "TEMPO_NO2_L2_V03_20240601T210934Z_S012G01_subsetted.nc4",
             ),
             path_str(
-                self.__granules_path, "TEMPO_NO2_L2_V03_20240601T211614Z_S012G02_subsetted.nc4"
+                self.__granules_path,
+                "TEMPO_NO2_L2_V03_20240601T211614Z_S012G02_subsetted.nc4",
             ),
             path_str(
-                self.__granules_path, "TEMPO_NO2_L2_V03_20240601T212254Z_S012G03_subsetted.nc4"
+                self.__granules_path,
+                "TEMPO_NO2_L2_V03_20240601T212254Z_S012G03_subsetted.nc4",
             ),
         ]
 

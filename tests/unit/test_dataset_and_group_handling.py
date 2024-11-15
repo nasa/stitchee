@@ -32,13 +32,17 @@ def test_dataset_with_singleton_null_values_is_identified_as_empty():
         assert _is_file_empty(ds)
 
 
-def test_toy_dataset_with_singleton_null_values_is_identified_as_empty(toy_empty_dataset):
+def test_toy_dataset_with_singleton_null_values_is_identified_as_empty(
+    toy_empty_dataset,
+):
     """Ensure that a dataset with only null arrays with 1-length dimensions is identified as empty."""
     with nc.Dataset(toy_empty_dataset) as ds:
         assert _is_file_empty(ds)
 
 
-def test_dataset_with_values_is_identified_as_not_empty(ds_3dims_3vars_4coords_1group_part1):
+def test_dataset_with_values_is_identified_as_not_empty(
+    ds_3dims_3vars_4coords_1group_part1,
+):
     """Ensure that a dataset with non-null arrays is identified as NOT empty."""
     with nc.Dataset(ds_3dims_3vars_4coords_1group_part1) as ds:
         assert _is_file_empty(ds) is False

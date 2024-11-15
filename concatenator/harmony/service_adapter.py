@@ -134,14 +134,22 @@ class StitcheeAdapter(BaseHarmonyAdapter):
             # -- Output to STAC catalog --
             result.clear_items()
             properties = dict(
-                start_datetime=datetimes["start_datetime"], end_datetime=datetimes["end_datetime"]
+                start_datetime=datetimes["start_datetime"],
+                end_datetime=datetimes["end_datetime"],
             )
 
             item = Item(
-                str(uuid4()), bbox_to_geometry(bounding_box), bounding_box, None, properties
+                str(uuid4()),
+                bbox_to_geometry(bounding_box),
+                bounding_box,
+                None,
+                properties,
             )
             asset = Asset(
-                staged_url, title=filename, media_type="application/x-netcdf4", roles=["data"]
+                staged_url,
+                title=filename,
+                media_type="application/x-netcdf4",
+                roles=["data"],
             )
             item.add_asset("data", asset)
             result.add_item(item)

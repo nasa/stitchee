@@ -88,7 +88,11 @@ def stitchee(
     concatenator.group_delim = group_delimiter
 
     intermediate_flat_filepaths: list[str] = []
-    benchmark_log = {"flattening": 0.0, "concatenating": 0.0, "reconstructing_groups": 0.0}
+    benchmark_log = {
+        "flattening": 0.0,
+        "concatenating": 0.0,
+        "reconstructing_groups": 0.0,
+    }
 
     # Proceed to concatenate only files that are workable (can be opened and are not empty).
     input_files, num_input_files = validate_workable_files(files_to_concat, logger)
@@ -123,7 +127,6 @@ def stitchee(
         # Instead of "with nc.Dataset() as" inside the loop, we use a context manager stack.
         # This way all files are cleanly closed outside the loop.
         with ExitStack() as context_stack:
-
             logger.info("Flattening all input files...")
             xrdataset_list = []
             concat_dim_order = []

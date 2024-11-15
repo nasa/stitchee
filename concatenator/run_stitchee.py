@@ -93,7 +93,10 @@ def parse_args(args: list) -> argparse.Namespace:
         default="__",
     )
     parser.add_argument(
-        "-O", "--overwrite", action="store_true", help="Overwrite output file if it already exists."
+        "-O",
+        "--overwrite",
+        action="store_true",
+        help="Overwrite output file if it already exists.",
     )
     parser.add_argument(
         "-v",
