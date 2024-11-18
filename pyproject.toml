@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stitchee"
-version = "1.6.0a3"
+version = "1.7.0a0"
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
 authors = ["Daniel Kaufman <daniel.kaufman@nasa.gov>"]
 readme = "README.md"
@@ -27,7 +27,6 @@ importlib-metadata = ">=8.4.0"
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.1.1"
 mypy = ">=1.9.0"
-black = ">=24.4.0"
 ruff = ">=0.5.0"
 pytest-cov = ">=5.0.0"
 mkdocs = ">=1.6.0"
@@ -51,9 +50,6 @@ build-backend = "poetry.core.masonry.api"
 module = "netCDF4.*"
 ignore_missing_imports = true
 
-[tool.black]
-line-length = 100
-
 [tool.ruff]
 builtins = ["ellipsis"]
 exclude = [
@@ -61,6 +57,8 @@ exclude = [
   "doc",
   "_typed_ops.pyi",
 ]
+# Allow lines to be as long as 100.
+line-length = 100
 target-version = "py310"
 
 [tool.ruff.lint]

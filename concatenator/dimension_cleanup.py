@@ -53,7 +53,9 @@ def remove_duplicate_dims(nc_dataset: nc.Dataset) -> nc.Dataset:
 
         # Attributes for the original variable are retrieved.
         attrs_contents = get_attributes_minus_fillvalue_and_renamed_coords(
-            original_var_name=dup_var_name, new_var_name=dim_dup_new, original_dataset=nc_dataset
+            original_var_name=dup_var_name,
+            new_var_name=dim_dup_new,
+            original_dataset=nc_dataset,
         )
         # for attrname in dup_var.ncattrs():
         #     if attrname != '_FillValue':
@@ -67,13 +69,11 @@ def remove_duplicate_dims(nc_dataset: nc.Dataset) -> nc.Dataset:
 
         # Only create a new *Dimension* if it doesn't already exist.
         if dim_dup_new not in nc_dataset.dimensions.keys():
-
             # New dimension is created by copying from the duplicated dimension.
             nc_dataset.createDimension(dim_dup_new, dim_dup_length)
 
             # Only create a new dimension *Variable* if it existed originally in the NetCDF structure.
             if dim_dup in nc_dataset.variables.keys():
-
                 # New variable object is created for the renamed, previously duplicated dimension.
                 new_dup_var[dim_dup_new] = nc_dataset.createVariable(
                     dim_dup_new,
@@ -82,7 +82,9 @@ def remove_duplicate_dims(nc_dataset: nc.Dataset) -> nc.Dataset:
                     fill_value=fill_value,
                 )
                 dim_var_attr_contents = get_attributes_minus_fillvalue_and_renamed_coords(
-                    original_var_name=dim_dup, new_var_name=dim_dup_new, original_dataset=nc_dataset
+                    original_var_name=dim_dup,
+                    new_var_name=dim_dup_new,
+                    original_dataset=nc_dataset,
                 )
                 for attr_name, contents in dim_var_attr_contents.items():
                     new_dup_var[dim_dup_new].setncattr(attr_name, contents)
@@ -94,7 +96,10 @@ def remove_duplicate_dims(nc_dataset: nc.Dataset) -> nc.Dataset:
 
         # Replace original *Variable* with new variable with no duplicated dimensions.
         new_dup_var[dup_var_name] = nc_dataset.createVariable(
-            dup_var_name, str(dup_var[:].dtype), tuple(new_dim_list), fill_value=fill_value
+            dup_var_name,
+            str(dup_var[:].dtype),
+            tuple(new_dim_list),
+            fill_value=fill_value,
         )
         for attr_name, contents in attrs_contents.items():
             new_dup_var[dup_var_name].setncattr(attr_name, contents)

@@ -11,9 +11,6 @@
     <a href='https://stitchee.readthedocs.io/en/latest/?badge=latest'>
         <img src='https://readthedocs.org/projects/stitchee/badge/?version=latest' alt='Documentation Status' />
     </a>
-    <a href="https://github.com/python/black" target="_blank">
-        <img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style">
-    </a>
     <a href="http://mypy-lang.org/" target="_blank">
         <img src="http://www.mypy-lang.org/static/mypy_badge.svg" alt="Mypy checked">
     </a>

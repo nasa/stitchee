@@ -11,7 +11,15 @@ from ..conftest import granules_path, path_str
 
 def test_parser():
     parsed = parse_args(
-        ["ncfile1", "ncfile2", "ncfile3", "-o", "outfile", "--concat_dim", "mirror_step"]
+        [
+            "ncfile1",
+            "ncfile2",
+            "ncfile3",
+            "-o",
+            "outfile",
+            "--concat_dim",
+            "mirror_step",
+        ]
     )
 
     assert parsed.input == ["ncfile1", "ncfile2", "ncfile3"]
@@ -23,7 +31,6 @@ def test_parser():
 
 @pytest.mark.usefixtures("pass_options")
 class TestBatching:
-
     def test_run_stitchee_cli_with_three_filepaths(self, temp_output_dir):
         test_args = [
             concatenator.run_stitchee.__file__,
