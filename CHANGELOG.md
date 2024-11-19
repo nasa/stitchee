@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - update pre-commit: to autoupdate and with gitleaks ([#247](https://github.com/nasa/stitchee/pull/247))([**@danielfromearth**](https://github.com/danielfromearth))
+- improved test coverage ([#248](https://github.com/nasa/stitchee/pull/248))([**@danielfromearth**](https://github.com/danielfromearth))
 
 ## [1.5.0] - 2024-11-08
 
