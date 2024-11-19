@@ -195,7 +195,7 @@ def regroup_flattened_dataset(
         for dim_name, _ in dataset.dims.items():
             new_dim_name = str(dim_name).rsplit(concatenator.group_delim, 1)[-1]
             dim_group = _get_nested_group(base_dataset, str(dim_name))
-            dim_group.createDimension(new_dim_name, dataset.dims[dim_name])
+            dim_group.createDimension(new_dim_name, dataset.sizes[dim_name])
             # dst.createDimension(
             #     name, (len(dimension) if not dimension.isunlimited() else None))
 
@@ -268,6 +268,11 @@ def regroup_flattened_dataset(
 
 
 def _get_nested_group(dataset: nc.Dataset, group_path: str) -> nc.Group:
+    """Get the group object that is represented by the group_path string.
+
+    If the 'group_path' string represents a dimension in the root group,
+    then this returns the root group.
+    """
     nested_group = dataset
     for group in group_path.strip(concatenator.group_delim).split(concatenator.group_delim)[:-1]:
         nested_group = nested_group.groups[group]

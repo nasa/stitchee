@@ -121,7 +121,7 @@ jobs:
         run: |
           git config --global user.name 'stitchee bot'
           git config --global user.email 'stitchee@noreply.github.com'
-          git commit -am "/version ${{ env.software_version }}"
+          git commit -am "/version ${{ env.software_version }}" --no-verify
           git push
 
       # Builds and pushes the package to the Python Package Index (PyPI)

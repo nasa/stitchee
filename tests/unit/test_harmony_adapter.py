@@ -26,7 +26,6 @@ class TestBatching:
 
         # test with both paged catalogs and un-paged catalogs
         for in_catalog_name in ["catalog.json", "catalog0.json"]:
-
             # Copy granule files, because Dataset's variable names are modified during flattening.
             # If stitchee is run two times on the same file, it will likely fail the second time.
             _ = prep_input_files(self.__granules_path, self.__granule_copies_path)

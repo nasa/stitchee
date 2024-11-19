@@ -10,8 +10,8 @@ from tests.conftest import prep_input_files
 def test_construct_and_append_history_for_sample_concatenation(
     temp_toy_data_dir,
     temp_output_dir,
-    ds_3dims_3vars_4coords_1group_part1,
-    ds_3dims_3vars_4coords_1group_part2,
+    ds_3dims_3vars_3coords_1group_part1,
+    ds_3dims_3vars_3coords_1group_part2,
 ):
     output_path = str(temp_output_dir.joinpath("simple_sample_concatenated.nc"))  # type: ignore
     prepared_input_files = prep_input_files(temp_toy_data_dir, temp_output_dir)

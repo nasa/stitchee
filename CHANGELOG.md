@@ -4,9 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2024-11-19
+
+### Changed
+
+- update pre-commit: to autoupdate and with gitleaks ([#247](https://github.com/nasa/stitchee/pull/247))([**@danielfromearth**](https://github.com/danielfromearth))
+- improved test coverage ([#248](https://github.com/nasa/stitchee/pull/248))([**@danielfromearth**](https://github.com/danielfromearth))
+
 ## [1.5.0] - 2024-11-08
 
 ### Changed
+
 - Update tutorial notebook to use PROD instead of UAT and improve readability ([#241](https://github.com/nasa/stitchee/issues/241))([**@danielfromearth**](https://github.com/danielfromearth))
 
 ### Added
@@ -20,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.0] - 2024-08-19
 
 ### Changed
+
 - Allow single netCDF file input in addition to single text file listings ([#230](https://github.com/nasa/stitchee/issues/230))([**@danielfromearth**](https://github.com/danielfromearth))
 
 ## [1.3.0] - 2024-07-11
