@@ -96,7 +96,57 @@ def toy_empty_dataset(temp_toy_data_dir):
     return filepath
 
 
-def add_to_ds_3dims_3vars_4coords_1group_with_step_values(open_ds: nc.Dataset, step_values: list):
+def add_to_ds_3dims_3vars_2coords_nogroup(open_ds: nc.Dataset, step_values: list):
+    """Creates groups, dimensions, variables; and uses chosen step values in an open dataset"""
+    # Root-level Dimensions/Variables
+    open_ds.createDimension("step", 3)
+    open_ds.createDimension("track", 7)
+    open_ds.createVariable("step", "i2", ("step",), fill_value=False)
+    open_ds.createVariable("track", "i2", ("track",), fill_value=False)
+    open_ds.createVariable("var0", "f4", ("step", "track"))
+    #
+    open_ds["step"][:] = step_values
+    open_ds["track"][:] = [1, 2, 3, 4, 5, 6, 7]
+    open_ds["var0"][:] = [
+        [33, 78, 65, 12, 85, 35, 44],
+        [64, 24, 87, 12, 54, 82, 24],
+        [66, 18, 99, 52, 77, 88, 59],
+    ]
+
+    open_ds["var0"].coordinates = "var0 track"
+
+    return open_ds
+
+
+def add_to_ds_3dims_3vars_2coords_nogroup_duplicate_dimensions(
+    open_ds: nc.Dataset, step_values: list
+):
+    """Creates groups, dimensions, variables; and uses chosen step values in an open dataset"""
+    # Root-level Dimensions/Variables
+    open_ds.createDimension("step", 3)
+    open_ds.createDimension("track", 7)
+    open_ds.createVariable("step", "i2", ("step",), fill_value=False)
+    open_ds.createVariable("track", "i2", ("track",), fill_value=False)
+    open_ds.createVariable("var0", "f4", ("track", "step", "step"), fill_value=-99)
+    #
+    open_ds["step"][:] = step_values
+    open_ds["track"][:] = [1, 2, 3, 4, 5, 6, 7]
+    open_ds["var0"][:] = [
+        [[33, 78, 65], [33, 78, 65], [33, 78, 65]],
+        [[64, 24, 87], [64, 24, 87], [64, 24, 87]],
+        [[66, 18, 99], [66, 18, 99], [66, 18, 99]],
+        [[77, 88, 59], [77, 88, 59], [77, 88, 59]],
+        [[52, 77, 88], [52, 77, 88], [52, 77, 88]],
+        [[66, 18, 99], [66, 18, 99], [66, 18, 99]],
+        [[18, 99, 52], [18, 99, 52], [18, 99, 52]],
+    ]
+
+    open_ds["var0"].coordinates = "track step step"
+
+    return open_ds
+
+
+def add_to_ds_3dims_3vars_3coords_1group_with_step_values(open_ds: nc.Dataset, step_values: list):
     """Creates groups, dimensions, variables; and uses chosen step values in an open dataset"""
     grp1 = open_ds.createGroup("Group1")
 
@@ -159,33 +209,55 @@ def add_to_ds_3dims_3vars_4coords_1group_with_step_values(open_ds: nc.Dataset, s
 
 
 @pytest.fixture(scope="function")
-def ds_3dims_3vars_4coords_1group_part1(temp_toy_data_dir) -> Path:
-    filepath = temp_toy_data_dir / "test_3dims_3vars_4coords_1group_part1.nc"
+def ds_3dims_3vars_2coords_nogroup(temp_toy_data_dir) -> Path:
+    filepath = temp_toy_data_dir / "test_3dims_3vars_2coords_nogroup.nc"
 
     f = nc.Dataset(filename=filepath, mode="w")
-    f = add_to_ds_3dims_3vars_4coords_1group_with_step_values(f, step_values=[9, 10, 11])
+    f = add_to_ds_3dims_3vars_2coords_nogroup(f, step_values=[9, 10, 11])
     f.close()
 
     return filepath
 
 
 @pytest.fixture(scope="function")
-def ds_3dims_3vars_4coords_1group_part2(temp_toy_data_dir):
-    filepath = temp_toy_data_dir / "test_3dims_3vars_4coords_1group_part2.nc"
+def ds_3dims_3vars_2coords_nogroup_duplicate_dimensions(temp_toy_data_dir) -> Path:
+    filepath = temp_toy_data_dir / "test_3dims_3vars_2coords_nogroup_duplicate_dimensions.nc"
 
     f = nc.Dataset(filename=filepath, mode="w")
-    f = add_to_ds_3dims_3vars_4coords_1group_with_step_values(f, step_values=[12, 13, 14])
+    f = add_to_ds_3dims_3vars_2coords_nogroup_duplicate_dimensions(f, step_values=[9, 10, 11])
     f.close()
 
     return filepath
 
 
 @pytest.fixture(scope="function")
-def ds_3dims_3vars_4coords_1group_part3(temp_toy_data_dir):
-    filepath = temp_toy_data_dir / "test_3dims_3vars_4coords_1group_part3.nc"
+def ds_3dims_3vars_3coords_1group_part1(temp_toy_data_dir) -> Path:
+    filepath = temp_toy_data_dir / "test_3dims_3vars_3coords_1group_part1.nc"
 
     f = nc.Dataset(filename=filepath, mode="w")
-    f = add_to_ds_3dims_3vars_4coords_1group_with_step_values(f, step_values=[6, 7, 8])
+    f = add_to_ds_3dims_3vars_3coords_1group_with_step_values(f, step_values=[9, 10, 11])
+    f.close()
+
+    return filepath
+
+
+@pytest.fixture(scope="function")
+def ds_3dims_3vars_3coords_1group_part2(temp_toy_data_dir):
+    filepath = temp_toy_data_dir / "test_3dims_3vars_3coords_1group_part2.nc"
+
+    f = nc.Dataset(filename=filepath, mode="w")
+    f = add_to_ds_3dims_3vars_3coords_1group_with_step_values(f, step_values=[12, 13, 14])
+    f.close()
+
+    return filepath
+
+
+@pytest.fixture(scope="function")
+def ds_3dims_3vars_3coords_1group_part3(temp_toy_data_dir):
+    filepath = temp_toy_data_dir / "test_3dims_3vars_3coords_1group_part3.nc"
+
+    f = nc.Dataset(filename=filepath, mode="w")
+    f = add_to_ds_3dims_3vars_3coords_1group_with_step_values(f, step_values=[6, 7, 8])
     f.close()
 
     return filepath

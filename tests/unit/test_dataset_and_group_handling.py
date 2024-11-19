@@ -42,29 +42,29 @@ def test_toy_dataset_with_singleton_null_values_is_identified_as_empty(
 
 
 def test_dataset_with_values_is_identified_as_not_empty(
-    ds_3dims_3vars_4coords_1group_part1,
+    ds_3dims_3vars_3coords_1group_part1,
 ):
     """Ensure that a dataset with non-null arrays is identified as NOT empty."""
-    with nc.Dataset(ds_3dims_3vars_4coords_1group_part1) as ds:
+    with nc.Dataset(ds_3dims_3vars_3coords_1group_part1) as ds:
         assert _is_file_empty(ds) is False
 
 
-def test_get_nested_group(ds_3dims_3vars_4coords_1group_part1):
+def test_get_nested_group(ds_3dims_3vars_3coords_1group_part1):
     """Ensure that the retrieved group is correct."""
-    with nc.Dataset(ds_3dims_3vars_4coords_1group_part1) as ds:
+    with nc.Dataset(ds_3dims_3vars_3coords_1group_part1) as ds:
         group_obj = _get_nested_group(ds, "__Group1__level")
         assert isinstance(group_obj, nc.Group)
 
 
-def test_get_root_group(ds_3dims_3vars_4coords_1group_part1):
+def test_get_root_group(ds_3dims_3vars_3coords_1group_part1):
     """Ensure that the retrieved group is correct."""
-    with nc.Dataset(ds_3dims_3vars_4coords_1group_part1) as ds:
+    with nc.Dataset(ds_3dims_3vars_3coords_1group_part1) as ds:
         group_obj = _get_nested_group(ds, "__track")
         assert group_obj == ds
 
 
-def test_get_root_group_when_no_delimiter_present(ds_3dims_3vars_4coords_1group_part1):
+def test_get_root_group_when_no_delimiter_present(ds_3dims_3vars_3coords_1group_part1):
     """Ensure that the retrieved group is correct."""
-    with nc.Dataset(ds_3dims_3vars_4coords_1group_part1) as ds:
+    with nc.Dataset(ds_3dims_3vars_3coords_1group_part1) as ds:
         group_obj = _get_nested_group(ds, "track")
         assert group_obj == ds

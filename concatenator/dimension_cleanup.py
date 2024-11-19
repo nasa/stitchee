@@ -31,7 +31,7 @@ def remove_duplicate_dims(nc_dataset: nc.Dataset) -> nc.Dataset:
     for dup_var_name, dup_var in dup_vars.items():
         dim_list = list(
             dup_var.dimensions
-        )  # original dimensions of the variable with duplicated dims
+        )  # original dimensions of the variable with duplicated dimensions
 
         # Dimension(s) that are duplicated are retrieved.
         #   Note: this is not yet tested for more than one duplicated dimension.
@@ -95,15 +95,15 @@ def remove_duplicate_dims(nc_dataset: nc.Dataset) -> nc.Dataset:
         del nc_dataset.variables[dup_var_name]
 
         # Replace original *Variable* with new variable with no duplicated dimensions.
-        new_dup_var[dup_var_name] = nc_dataset.createVariable(
+        nc_dataset.variables[dup_var_name] = nc_dataset.createVariable(
             dup_var_name,
             str(dup_var[:].dtype),
             tuple(new_dim_list),
             fill_value=fill_value,
         )
         for attr_name, contents in attrs_contents.items():
-            new_dup_var[dup_var_name].setncattr(attr_name, contents)
-        new_dup_var[dup_var_name][:] = dup_var[:]
+            nc_dataset[dup_var_name].setncattr(attr_name, contents)
+        nc_dataset[dup_var_name][:] = dup_var[:]
 
     return nc_dataset
 
@@ -111,14 +111,14 @@ def remove_duplicate_dims(nc_dataset: nc.Dataset) -> nc.Dataset:
 def get_attributes_minus_fillvalue_and_renamed_coords(
     original_var_name: str, new_var_name: str, original_dataset: nc.Dataset
 ) -> dict:
-    """Variable attributes are retrieved."""
+    """Variable attributes (other than FillValue) are retrieved."""
     attrs_contents = {}
 
     for ncattr in original_dataset.variables[original_var_name].ncattrs():
         if ncattr != "_FillValue":
             contents: str = original_dataset.variables[original_var_name].getncattr(ncattr)
             if ncattr == "coordinates":
-                contents.replace(original_var_name, new_var_name)
+                contents = contents.replace(original_var_name, new_var_name)
             attrs_contents[ncattr] = contents
 
     return attrs_contents
