@@ -195,7 +195,7 @@ def regroup_flattened_dataset(
         for dim_name, _ in dataset.dims.items():
             new_dim_name = str(dim_name).rsplit(concatenator.group_delim, 1)[-1]
             dim_group = _get_nested_group(base_dataset, str(dim_name))
-            dim_group.createDimension(new_dim_name, dataset.dims[dim_name])
+            dim_group.createDimension(new_dim_name, dataset.sizes[dim_name])
             # dst.createDimension(
             #     name, (len(dimension) if not dimension.isunlimited() else None))
 
