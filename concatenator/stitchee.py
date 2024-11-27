@@ -150,6 +150,7 @@ def stitchee(
                     decode_times=False,
                     decode_coords=False,
                     drop_variables=coord_vars,
+                    mask_and_scale=False
                 )
 
                 # Determine value for later dataset sorting.
