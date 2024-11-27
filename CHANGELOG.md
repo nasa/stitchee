@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2024-11-27
+
+### Fixed
+
+- prevent xarray from changing variable types on open_dataset ([#254](https://github.com/nasa/stitchee/pull/254))([**@ank1m**](https://github.com/ank1m))
+
 ## [1.6.0] - 2024-11-19
 
 ### Changed
