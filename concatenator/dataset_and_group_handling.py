@@ -36,7 +36,7 @@ def walk(
         if item.dimensions:
             dims = list(item.dimensions.keys())
             for dim_name in dims:
-                new_dim_name = f'{group_path.replace("/", concatenator.group_delim)}{concatenator.group_delim}{dim_name}'
+                new_dim_name = f"{group_path.replace('/', concatenator.group_delim)}{concatenator.group_delim}{dim_name}"
                 item.dimensions[new_dim_name] = item.dimensions[dim_name]
                 dimensions_dict_to_populate[new_dim_name] = item.dimensions[dim_name]
                 item.renameDimension(dim_name, new_dim_name)
