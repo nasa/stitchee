@@ -91,7 +91,7 @@ def flatten_string_with_groups(str_with_groups: str) -> str:
 
     # A new string is constructed.
     return new_sep.join(
-        f'{concatenator.group_delim}{c.replace("/", concatenator.group_delim)}'
+        f"{concatenator.group_delim}{c.replace('/', concatenator.group_delim)}"
         for c in str_with_groups.split()  # split on any whitespace
     )
 
