@@ -36,8 +36,6 @@ class TestConcat:
         output_path = stitchee(
             files_to_concat=prepared_input_files,
             output_file=output_path,
-            write_tmp_flat_concatenated=True,
-            keep_tmp_files=True,
             concat_method=concat_method,
             concat_dim=record_dim_name,
             concat_kwargs=concat_kwargs,
