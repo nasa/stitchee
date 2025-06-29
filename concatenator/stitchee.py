@@ -93,7 +93,6 @@ def stitchee(
         )
 
     try:
-        logger.info("Flattening all input files...")
         xrdatatree_list = []
         concat_dim_order = []
         for i, filepath in enumerate(input_files):
@@ -127,10 +126,10 @@ def stitchee(
 
         tree_dicts = [tree.to_dict() for tree in xrdatatree_list]
         keys_list = [set(t.keys()) for t in tree_dicts]
-        symmetric_diff = reduce(lambda x, y: x ^ y, keys_list)
+        symmetric_diff = any( [kl ^ keys_list[0] for kl in keys_list] )
 
         if symmetric_diff:
-            raise KeyError(f"Datatrees do not have matching Dataset nodes. Nodes that do not match: {symmetric_diff}")
+            raise KeyError(f"Datatrees do not have matching Dataset nodes. Nodes that do not match: {symmetric_diff}.")
 
         # Files are concatenated together (Using XARRAY).
         start_time = time.time()
