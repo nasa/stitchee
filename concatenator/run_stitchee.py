@@ -97,7 +97,7 @@ def parse_args(args: list) -> argparse.Namespace:
 
 def validate_parsed_args(
     parsed: argparse.Namespace,
-) -> tuple[list[str], str, str, bool, str, dict, bool, str]:
+) -> tuple[list[str], str, str, str, dict, str]:
     """Perform preliminary validation of the parsed arguments and return them as a tuple."""
     if parsed.verbose:
         logging.basicConfig(level=logging.DEBUG)
