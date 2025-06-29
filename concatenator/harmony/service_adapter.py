@@ -120,8 +120,6 @@ class StitcheeAdapter(BaseHarmonyAdapter):
                 stitchee(
                     [str(f) for f in input_files],
                     output_path,
-                    write_tmp_flat_concatenated=False,
-                    keep_tmp_files=False,
                     concat_dim="mirror_step",  # This is currently set only for TEMPO
                     sorting_variable="geolocation/time",  # This is currently set only for TEMPO
                     history_to_append=new_history_json,
