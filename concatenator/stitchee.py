@@ -7,7 +7,6 @@ import shutil
 import time
 from logging import Logger
 from warnings import warn
-from functools import reduce
 
 import xarray as xr
 
