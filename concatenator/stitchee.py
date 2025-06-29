@@ -19,6 +19,7 @@ from concatenator.file_ops import (
 
 default_logger = logging.getLogger(__name__)
 
+
 def stitchee(
     files_to_concat: list[str],
     output_file: str,
@@ -125,10 +126,12 @@ def stitchee(
 
         tree_dicts = [tree.to_dict() for tree in xrdatatree_list]
         keys_list = [set(t.keys()) for t in tree_dicts]
-        symmetric_diff = any( [kl ^ keys_list[0] for kl in keys_list] )
+        symmetric_diff = any([kl ^ keys_list[0] for kl in keys_list])
 
         if symmetric_diff:
-            raise KeyError(f"Datatrees do not have matching Dataset nodes. Nodes that do not match: {symmetric_diff}.")
+            raise KeyError(
+                f"Datatrees do not have matching Dataset nodes. Nodes that do not match: {symmetric_diff}."
+            )
 
         # Files are concatenated together (Using XARRAY).
         start_time = time.time()
@@ -147,7 +150,7 @@ def stitchee(
 
         if concat_method == "xarray-concat":
             combined_dict = {
-                kk : xr.concat(
+                kk: xr.concat(
                     [tree_dict[kk] for tree_dict in tree_dicts],
                     data_vars="minimal",
                     coords="minimal",
@@ -159,7 +162,7 @@ def stitchee(
 
         elif concat_method == "xarray-combine":
             combined_dict = {
-                kk : xr.combine_by_coords(
+                kk: xr.combine_by_coords(
                     [tree_dict[kk] for tree_dict in tree_dicts],
                     data_vars="minimal",
                     coords="minimal",
