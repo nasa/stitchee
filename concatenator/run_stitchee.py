@@ -45,21 +45,6 @@ def parse_args(args: list) -> argparse.Namespace:
 
     # Optional arguments
     parser.add_argument(
-        "--copy_input_files",
-        action="store_true",
-        help="By default, input files are not copied. "
-        "This option copies the input files into a temporary directory to avoid modification "
-        "of input files. This is useful for testing, but uses more disk space.  "
-        "By specifying this argument, no copying is performed.",
-    )
-    parser.add_argument(
-        "--keep_tmp_files",
-        action="store_true",
-        help="Prevents removal, after successful execution, of "
-        "(1) the flattened concatenated file and "
-        "(2) the input directory copy  if created by '--make_dir_copy'.",
-    )
-    parser.add_argument(
         "--concat_method",
         choices=["xarray-concat", "xarray-combine"],
         default="xarray-concat",
@@ -148,10 +133,8 @@ def validate_parsed_args(
         input_files,
         output_path,
         parsed.concat_dim,
-        bool(parsed.keep_tmp_files),
         parsed.concat_method,
         concat_kwargs,
-        parsed.copy_input_files,
         parsed.group_delim,
     )
 
@@ -162,10 +145,8 @@ def run_stitchee(args: list) -> None:
         input_files,
         output_path,
         concat_dim,
-        keep_tmp_files,
         concat_method,
         concat_kwargs,
-        copy_input_files,
         group_delimiter,
     ) = validate_parsed_args(parse_args(args))
     num_inputs = len(input_files)
@@ -183,13 +164,10 @@ def run_stitchee(args: list) -> None:
     stitchee(
         input_files,
         output_path,
-        write_tmp_flat_concatenated=keep_tmp_files,
-        keep_tmp_files=keep_tmp_files,
         concat_method=concat_method,
         concat_dim=concat_dim,
         concat_kwargs=concat_kwargs,
         history_to_append=new_history_json,
-        copy_input_files=copy_input_files,
         group_delimiter=group_delimiter,
     )
     logging.info("STITCHEE complete. Result in %s", output_path)

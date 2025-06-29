@@ -3,46 +3,31 @@
 from __future__ import annotations
 
 import logging
-import os
 import shutil
 import time
-from contextlib import ExitStack
 from logging import Logger
-from pathlib import Path
 from warnings import warn
+from functools import reduce
 
-import netCDF4 as nc
 import xarray as xr
 
 import concatenator
-from concatenator.attribute_handling import flatten_string_with_groups
-from concatenator.dataset_and_group_handling import (
-    flatten_grouped_dataset,
-    regroup_flattened_dataset,
-    validate_workable_files,
-)
-from concatenator.dimension_cleanup import remove_duplicate_dims
+from concatenator.dataset_and_group_handling import validate_workable_files
 from concatenator.file_ops import (
-    add_label_to_path,
-    make_temp_dir_with_input_file_copies,
     validate_input_path,
     validate_output_path,
 )
 
 default_logger = logging.getLogger(__name__)
 
-
 def stitchee(
     files_to_concat: list[str],
     output_file: str,
-    write_tmp_flat_concatenated: bool = False,
-    keep_tmp_files: bool = True,
     concat_method: str | None = "xarray-concat",
     concat_dim: str = "",
     concat_kwargs: dict | None = None,
     sorting_variable: str | None = None,
     history_to_append: str | None = None,
-    copy_input_files: bool = False,
     overwrite_output_file: bool = False,
     group_delimiter: str = "__",
     logger: Logger = default_logger,
@@ -55,10 +40,6 @@ def stitchee(
         netCDF files to concatenate
     output_file
         file path for output file
-    write_tmp_flat_concatenated
-        whether to save intermediate flattened files or not (default: False).
-    keep_tmp_files
-        whether to keep all temporary files created (default: True).
     concat_method
         either "xarray-concat" (default) or "xarray-combine".
     concat_dim
@@ -71,8 +52,6 @@ def stitchee(
         E.g., `time`.
     history_to_append
         JSON string to append to the history attribute of the concatenated file (default: None).
-    copy_input_files
-        whether to copy input files or not (default: False).
     overwrite_output_file
         whether to overwrite output file (default: False).
     group_delimiter
@@ -87,11 +66,8 @@ def stitchee(
     validate_input_path(files_to_concat)
     concatenator.group_delim = group_delimiter
 
-    intermediate_flat_filepaths: list[str] = []
     benchmark_log = {
-        "flattening": 0.0,
         "concatenating": 0.0,
-        "reconstructing_groups": 0.0,
     }
 
     # Proceed to concatenate only files that are workable (can be opened and are not empty).
@@ -116,134 +92,102 @@ def stitchee(
             "selected."
         )
 
-    # If requested, make a temporary directory with new copies of the original input files
-    temporary_dir_to_remove = None
-    if copy_input_files:
-        input_files, temporary_dir_to_remove = make_temp_dir_with_input_file_copies(
-            input_files, Path(output_file)
-        )
-
     try:
-        # Instead of "with nc.Dataset() as" inside the loop, we use a context manager stack.
-        # This way all files are cleanly closed outside the loop.
-        with ExitStack() as context_stack:
-            logger.info("Flattening all input files...")
-            xrdataset_list = []
-            concat_dim_order = []
-            for i, filepath in enumerate(input_files):
-                # The group structure is flattened.
-                start_time = time.time()
-                logger.info("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
-
-                ncfile = context_stack.enter_context(nc.Dataset(filepath, "r+"))
-
-                flat_dataset, coord_vars, _ = flatten_grouped_dataset(
-                    ncfile, ensure_all_dims_are_coords=True
-                )
-
-                logger.info("Removing duplicate dimensions")
-                flat_dataset = remove_duplicate_dims(flat_dataset)
-
-                logger.info("Opening flattened file with xarray.")
-                xrds = xr.open_dataset(
-                    xr.backends.NetCDF4DataStore(flat_dataset),
-                    decode_times=False,
-                    decode_coords=False,
-                    drop_variables=coord_vars,
-                    mask_and_scale=False,
-                )
-
-                # Determine value for later dataset sorting.
-                if sorting_variable:
-                    first_value = xrds[
-                        flatten_string_with_groups(sorting_variable)
-                    ].values.flatten()[0]
-                else:
-                    first_value = i
-                # first_value = xrds[concatenator.group_delim + concat_dim].values.flatten()[0]
-                concat_dim_order.append(first_value)
-
-                benchmark_log["flattening"] = time.time() - start_time
-
-                # The flattened file is written to disk.
-                # flat_file_path = add_label_to_path(filepath, label="_flat_intermediate")
-                # xrds.to_netcdf(flat_file_path, encoding={v_name: {'dtype': 'str'} for v_name in string_vars})
-                # intermediate_flat_filepaths.append(flat_file_path)
-                # xrdataset_list.append(xr.open_dataset(flat_file_path))
-                xrdataset_list.append(xrds)
-
-            # Reorder the xarray datasets according to the concat dim values.
-            xrdataset_list = [
-                dataset
-                for _, dataset in sorted(zip(concat_dim_order, xrdataset_list), key=lambda x: x[0])
-            ]
-
-            # Flattened files are concatenated together (Using XARRAY).
+        logger.info("Flattening all input files...")
+        xrdatatree_list = []
+        concat_dim_order = []
+        for i, filepath in enumerate(input_files):
+            # The group structure is flattened.
             start_time = time.time()
-            logger.info("Concatenating flattened files...")
-            # combined_ds = xr.open_mfdataset(intermediate_flat_filepaths,
-            #                                 decode_times=False,
-            #                                 decode_coords=False,
-            #                                 data_vars='minimal',
-            #                                 coords='minimal',
-            #                                 compat='override')
+            logger.info("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
 
-            if concat_kwargs is None:
-                concat_kwargs = {}
+            logger.info("Opening flattened file with xarray.")
+            datatree = xr.open_datatree(
+                filepath,
+                decode_times=False,
+                decode_coords=False,
+                mask_and_scale=False,
+            )
 
-            if concat_method == "xarray-concat":
-                combined_ds = xr.concat(
-                    xrdataset_list,
-                    dim=concatenator.group_delim + concat_dim,
+            # Determine value for later dataset sorting.
+            if sorting_variable:
+                first_value = datatree[sorting_variable].values.flatten()[0]
+            else:
+                first_value = i
+            # first_value = xrds[concatenator.group_delim + concat_dim].values.flatten()[0]
+            concat_dim_order.append(first_value)
+
+            xrdatatree_list.append(datatree)
+
+        # Reorder the xarray datasets according to the concat dim values.
+        xrdatatree_list = [
+            datatree
+            for _, datatree in sorted(zip(concat_dim_order, xrdatatree_list), key=lambda x: x[0])
+        ]
+
+        tree_dicts = [tree.to_dict() for tree in xrdatatree_list]
+        keys_list = [set(t.keys()) for t in tree_dicts]
+        symmetric_diff = reduce(lambda x, y: x ^ y, keys_list)
+
+        if symmetric_diff:
+            raise KeyError(f"Datatrees do not have matching Dataset nodes. Nodes that do not match: {symmetric_diff}")
+
+        # Files are concatenated together (Using XARRAY).
+        start_time = time.time()
+        logger.info("Concatenating files...")
+        # combined_ds = xr.open_mfdataset(intermediate_flat_filepaths,
+        #                                 decode_times=False,
+        #                                 decode_coords=False,
+        #                                 data_vars='minimal',
+        #                                 coords='minimal',
+        #                                 compat='override')
+
+        if concat_kwargs is None:
+            concat_kwargs = {}
+
+        tree_keys = keys_list[0]
+
+        if concat_method == "xarray-concat":
+            combined_dict = {
+                kk : xr.concat(
+                    [tree_dict[kk] for tree_dict in tree_dicts],
                     data_vars="minimal",
                     coords="minimal",
                     **concat_kwargs,
+                    dim=concat_dim,
                 )
-            elif concat_method == "xarray-combine":
-                combined_ds = xr.combine_by_coords(
-                    xrdataset_list,
+                for kk in tree_keys
+            }
+
+        elif concat_method == "xarray-combine":
+            combined_dict = {
+                kk : xr.combine_by_coords(
+                    [tree_dict[kk] for tree_dict in tree_dicts],
                     data_vars="minimal",
                     coords="minimal",
                     **concat_kwargs,
+                    dim=concat_dim,
                 )
-            else:
-                raise ValueError(f"Unexpected concatenation method, <{concat_method}>.")
+                for kk in tree_keys
+            }
+        else:
+            raise ValueError(f"Unexpected concatenation method, <{concat_method}>.")
 
-            benchmark_log["concatenating"] = time.time() - start_time
+        xr.DataTree.from_dict(combined_dict).to_netcdf(output_file)
 
-            if write_tmp_flat_concatenated:
-                logger.info("Writing concatenated flattened temporary file to disk...")
-                # The concatenated, yet still flat, file is written to disk for debugging.
-                tmp_flat_concatenated_path = add_label_to_path(
-                    output_file, label="_flat_intermediate"
-                )
-                combined_ds.to_netcdf(tmp_flat_concatenated_path, format="NETCDF4")
-            else:
-                tmp_flat_concatenated_path = None
+        benchmark_log["concatenating"] = time.time() - start_time
 
-            # new_global_attributes = create_new_attributes(combined_ds, request_parameters=dict())
+        # new_global_attributes = create_new_attributes(combined_ds, request_parameters=dict())
 
-            # The group hierarchy of the concatenated file is reconstructed (using XARRAY).
-            start_time = time.time()
-            logger.info("Reconstructing groups within concatenated file...")
-            regroup_flattened_dataset(combined_ds, output_file, history_to_append)
-            benchmark_log["reconstructing_groups"] = time.time() - start_time
+        # The group hierarchy of the concatenated file is reconstructed (using XARRAY).
+        start_time = time.time()
 
-            logger.info("--- Benchmark results ---")
-            total_time = 0.0
-            for k, v in benchmark_log.items():
-                logger.info("%s: %f", k, v)
-                total_time += v
-            logger.info("-- total processing time: %f", total_time)
-
-            # If requested, remove temporary intermediate files.
-            if not keep_tmp_files:
-                for file in intermediate_flat_filepaths:
-                    os.remove(file)
-                if tmp_flat_concatenated_path:
-                    os.remove(tmp_flat_concatenated_path)
-                if not keep_tmp_files and temporary_dir_to_remove:
-                    shutil.rmtree(temporary_dir_to_remove)
+        logger.info("--- Benchmark results ---")
+        total_time = 0.0
+        for k, v in benchmark_log.items():
+            logger.info("%s: %f", k, v)
+            total_time += v
+        logger.info("-- total processing time: %f", total_time)
 
     except Exception as err:
         logger.info("Stitchee encountered an error!")
