@@ -17,6 +17,7 @@ def test_concat_with_subsetting_first(temp_output_dir):
             "stop": dt.datetime(2024, 5, 13, 20, 0, 0),
         },
         spatial=BBox(-130, 30, -115, 35),
+        extend=False,
         concatenate=False,
     )
     if not request.is_valid():
@@ -40,8 +41,6 @@ def test_concat_with_subsetting_first(temp_output_dir):
         ),
         concat_dim="mirror_step",
         concat_method="xarray-concat",
-        write_tmp_flat_concatenated=True,
-        keep_tmp_files=True,
     )
 
     assert output_path

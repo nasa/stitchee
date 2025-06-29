@@ -37,7 +37,6 @@ class TestBatching:
             path_str(granules_path, "TEMPO_NO2_L2_V03_20240601T210934Z_S012G01_subsetted.nc4"),
             path_str(granules_path, "TEMPO_NO2_L2_V03_20240601T211614Z_S012G02_subsetted.nc4"),
             path_str(granules_path, "TEMPO_NO2_L2_V03_20240601T212254Z_S012G03_subsetted.nc4"),
-            "--copy_input_files",
             "--verbose",
             "-o",
             path_str(temp_output_dir, "test_run_stitchee_output.nc"),
@@ -54,7 +53,6 @@ class TestBatching:
         test_args = [
             concatenator.run_stitchee.__file__,
             str(granules_path),
-            "--copy_input_files",
             "--verbose",
             "-o",
             path_str(temp_output_dir, "test_run_stitchee_output.nc"),
@@ -71,7 +69,6 @@ class TestBatching:
         test_args = [
             concatenator.run_stitchee.__file__,
             path_str(granules_path, "TEMPO_NO2_L2_V03_20240601T210934Z_S012G01_subsetted.nc4"),
-            "--copy_input_files",
             "--verbose",
             "-o",
             path_str(temp_output_dir, "test_run_stitchee_output.nc"),
@@ -90,7 +87,6 @@ class TestBatching:
         test_args = [
             concatenator.run_stitchee.__file__,
             str(text_file_with_three_paths),
-            "--copy_input_files",
             "--verbose",
             "-o",
             path_str(temp_output_dir, "test_run_stitchee_output.nc"),
