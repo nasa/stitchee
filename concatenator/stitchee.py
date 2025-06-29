@@ -172,7 +172,10 @@ def stitchee(
         else:
             raise ValueError(f"Unexpected concatenation method, <{concat_method}>.")
 
-        xr.DataTree.from_dict(combined_dict).to_netcdf(output_file)
+        output_dt = xr.DataTree.from_dict(combined_dict)
+        if history_to_append is not None:
+            output_dt.attrs["history_json"] = history_to_append
+        output_dt.to_netcdf(output_file)
 
         benchmark_log["concatenating"] = time.time() - start_time
 
