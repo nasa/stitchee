@@ -97,7 +97,7 @@ def validate_workable_files(
                 print("Error opening <%s> as a netCDF dataset. Skipping.")
 
     # addressing GitHub issue 153: propagate the first empty file if all input files are empty
-    if (len(workable_files)) == 0 and (len(files) > 0):
+    if (len(workable_files) == 0) and (len(files) > 0):
         workable_files.append(files[0])
 
     number_of_workable_files = len(workable_files)
