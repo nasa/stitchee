@@ -11,10 +11,10 @@ from warnings import warn
 import xarray as xr
 
 import concatenator
-from concatenator.dataset_and_group_handling import validate_workable_files
 from concatenator.file_ops import (
     validate_input_path,
     validate_output_path,
+    validate_workable_files,
 )
 
 default_logger = logging.getLogger(__name__)
@@ -129,7 +129,7 @@ def stitchee(
                 f"Nodes that do not match: {symmetric_diff}."
             )
 
-        # Files are concatenated together (Using XARRAY).
+        # Files are concatenated together (Using `xarray`).
         start_time = time.time()
         logger.info("Concatenating files...")
 

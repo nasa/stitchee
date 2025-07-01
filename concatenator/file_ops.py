@@ -1,43 +1,18 @@
 """File operation functions."""
 
+from __future__ import annotations
+
 import logging
 import os
-import shutil
-import uuid
+from logging import Logger
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
+import netCDF4 as nc
+import numpy as np
+
+module_logger = logging.getLogger(__name__)
 
 netcdf_extensions = [".nc", ".nc4", ".netcdf"]
-
-
-def add_label_to_path(x: str, label="_flat_intermediate") -> str:
-    """Constructs new filepath with label at end."""
-    pathlib_x = Path(x)
-    return str(pathlib_x.parent / f"{pathlib_x.stem}{label}{pathlib_x.suffix}")
-
-
-def make_temp_dir_with_input_file_copies(
-    input_files: list[str], output_path: Path
-) -> tuple[list[str], str]:
-    """Creates temporary directory and copies input files."""
-    new_data_dir = Path(
-        add_label_to_path(str(output_path.parent / "temp_copy"), label=str(uuid.uuid4()))
-    ).resolve()
-    os.makedirs(new_data_dir, exist_ok=True)
-    logger.info("Created temporary directory: %s", str(new_data_dir))
-
-    new_input_files = []
-    for file in input_files:
-        new_path = new_data_dir / Path(file).name
-        shutil.copyfile(file, new_path)
-        new_input_files.append(str(new_path))
-
-    input_files = new_input_files
-    logger.info("Copied files to temporary directory: %s", new_data_dir)
-    temporary_dir_to_remove = str(new_data_dir)
-
-    return input_files, temporary_dir_to_remove
 
 
 def validate_output_path(filepath: str, overwrite: bool = False) -> str:
@@ -102,3 +77,66 @@ def _get_list_of_filepaths_from_dir(data_dir: Path) -> list[str]:
     """Get a list of files (ignoring hidden files) in directory."""
     input_files = [str(f) for f in data_dir.iterdir() if not f.name.startswith(".")]
     return input_files
+
+
+def validate_workable_files(
+    files: list[str], logger: Logger | None = module_logger
+) -> tuple[list[str], int]:
+    """Remove files from a list that are not open-able as netCDF or that are empty."""
+    workable_files = []
+    for file in files:
+        try:
+            with nc.Dataset(file, "r") as dataset:
+                is_empty = _is_file_empty(dataset)
+                if is_empty is False:
+                    workable_files.append(file)
+        except OSError:
+            if logger:
+                logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
+            else:
+                print("Error opening <%s> as a netCDF dataset. Skipping.")
+
+    # addressing GitHub issue 153: propagate the first empty file if all input files are empty
+    if (len(workable_files)) == 0 and (len(files) > 0):
+        workable_files.append(files[0])
+
+    number_of_workable_files = len(workable_files)
+
+    return workable_files, number_of_workable_files
+
+
+def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
+    """Check if netCDF dataset is empty or not.
+
+    Tests if all variable arrays are empty.
+    As soon as a variable is detected with both (i) an array size not equal to zero and
+    (ii) not all null/fill values, then the granule is considered non-empty.
+
+    Returns
+    -------
+    False if the dataset is considered non-empty; True otherwise (dataset is indeed empty).
+    """
+    for var_name, var in parent_group.variables.items():
+        if var.size != 0:
+            if "_FillValue" in var.ncattrs():
+                fill_or_null = getattr(var, "_FillValue")
+            else:
+                fill_or_null = np.nan
+
+            # This checks three ways that the variable's array might be considered empty.
+            # If none of the ways are true,
+            #   a non-empty variable has been found and False is returned.
+            # If one of the ways is true, we consider the variable empty,
+            #   and continue checking other variables.
+            empty_way_1 = False
+            if np.ma.isMaskedArray(var[:]):
+                empty_way_1 = var[:].mask.all()
+            empty_way_2 = np.all(var[:].data == fill_or_null)
+            empty_way_3 = np.all(np.isnan(var[:].data))
+
+            if not (empty_way_1 or empty_way_2 or empty_way_3):
+                return False  # Found a non-empty variable.
+
+    for child_group in parent_group.groups.values():
+        return _is_file_empty(child_group)
+    return True
