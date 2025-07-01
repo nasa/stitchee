@@ -12,113 +12,131 @@ from concatenator.attribute_handling import construct_history, retrieve_history
 from concatenator.file_ops import validate_input_path, validate_output_path
 from concatenator.stitchee import stitchee
 
+# Configure module-level logger
+logger = logging.getLogger(__name__)
+
 
 def parse_args(args: list) -> argparse.Namespace:
-    """Parse args for this script.
+    """Parse command line arguments for the stitchee concatenation tool.
 
     Returns
     -------
     argparse.Namespace
+        Parsed command line arguments
     """
     parser = ArgumentParser(
-        prog="stitchee", description="Run the along-existing-dimension concatenator."
+        prog="stitchee",
+        description="Concatenate netCDF files along existing dimensions.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  stitchee file1.nc file2.nc -o output.nc --concat_dim time
+  stitchee /path/to/files/ -o output.nc --concat_method xarray-combine
+  stitchee filelist.txt -o output.nc --concat_dim time --sorting_variable time
+        """,
     )
 
     # Required arguments
-    req_grp = parser.add_argument_group(title="Required")
+    req_grp = parser.add_argument_group(title="Required Arguments")
     req_grp.add_argument(
         "input",
-        metavar="path/directory or path list",
+        metavar="INPUT",
         nargs="+",
-        help="Files to be concatenated, specified via "
-        "(1) multiple paths of the files to be concatenated, "
-        "(2) single path to text file containing linebreak-separated paths of files to be concatenated, "
-        "(3) single path to netCDF file to be copied to output path, "
-        "or a (4) single directory containing the files to be concatenated.",
+        help="Input specification: multiple file paths, directory path, "
+        "text file with file list, or single file to copy",
     )
     req_grp.add_argument(
         "-o",
         "--output_path",
         required=True,
-        help="The output filename for the merged output.",
+        metavar="PATH",
+        help="Output file path for concatenated result",
     )
 
-    # Optional arguments
-    parser.add_argument(
+    # Concatenation options
+    concat_grp = parser.add_argument_group("Concatenation Options")
+    concat_grp.add_argument(
         "--concat_method",
         choices=["xarray-concat", "xarray-combine"],
         default="xarray-concat",
-        help="Whether to use the xarray concat method or the combine-by-coords method.",
+        help="Concatenation method (default: %(default)s)",
     )
-    parser.add_argument(
+    concat_grp.add_argument(
         "--concat_dim",
-        help="Dimension to concatenate along, if possible.  "
-        "This is required if using the 'xarray-concat' method",
+        metavar="DIM",
+        help="Dimension to concatenate along (required for xarray-concat)",
     )
-    parser.add_argument(
+    concat_grp.add_argument(
         "--sorting_variable",
-        help="Name of a variable to use for sorting datasets before concatenation by xarray. "
-        "E.g., 'time'.",
+        metavar="VAR",
+        help="Name of a variable to use for sorting datasets before concatenation (e.g., 'time')",
     )
-    parser.add_argument(
+
+    # xarray arguments
+    xarray_grp = parser.add_argument_group("xarray Arguments")
+    xarray_grp.add_argument(
         "--xarray_arg_compat",
-        help="'compat' argument passed to xarray.concat() or xarray.combine_by_coords().",
+        metavar="COMPAT",
+        help="'compat' argument passed to xarray concatenation function",
     )
-    parser.add_argument(
+    xarray_grp.add_argument(
         "--xarray_arg_combine_attrs",
-        help="'combine_attrs' argument passed to xarray.concat() or xarray.combine_by_coords().",
+        metavar="ATTRS",
+        help="'combine_attrs' argument passed to xarray concatenation function",
     )
-    parser.add_argument(
+    xarray_grp.add_argument(
         "--xarray_arg_join",
-        help="'join' argument passed to xarray.concat() or xarray.combine_by_coords().",
+        metavar="JOIN",
+        help="'join' argument passed to xarray concatenation function",
     )
+
+    # Other options
     parser.add_argument(
         "--group_delim",
-        help="Character or string to use as group delimiter.",
         default="__",
+        metavar="DELIM",
+        help="Group delimiter string (default: '%(default)s')",
     )
     parser.add_argument(
         "-O",
         "--overwrite",
         action="store_true",
-        help="Overwrite output file if it already exists.",
+        help="Overwrite output file if it exists",
     )
     parser.add_argument(
         "-v",
         "--verbose",
-        help="Enable verbose output to stdout; useful for debugging",
         action="store_true",
+        help="Enable verbose output to stdout; useful for debugging",
     )
 
-    parsed = parser.parse_args(args)
-
-    return parsed
+    return parser.parse_args(args)
 
 
 def validate_parsed_args(
     parsed: argparse.Namespace,
 ) -> tuple[list[str], str, str, str, dict, str]:
-    """Perform preliminary validation of the parsed arguments and return them as a tuple."""
+    """Validate parsed arguments and return processed values.
+
+    Returns
+    -------
+    tuple
+        (input_files, output_path, concat_dim, concat_method, concat_kwargs, group_delim)
+    """
     if parsed.verbose:
         logging.basicConfig(level=logging.DEBUG)
+        logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger("concatenator").setLevel(logging.DEBUG)
 
     # Validate the input and output paths
-    output_path = validate_output_path(parsed.output_path, parsed.overwrite)
-    input_files = validate_input_path(parsed.input)
+    try:
+        input_files = validate_input_path(parsed.input)
+        output_path = validate_output_path(parsed.output_path, parsed.overwrite)
+    except Exception as e:
+        logger.error("Path validation failed: %s", e)
+        raise
 
-    print(f"CONCAT METHOD === {parsed.concat_method}")
-    print(f"CONCAT DIM === {parsed.concat_dim}")
-
-    if parsed.concat_method == "xarray-concat":
-        if not parsed.concat_dim:
-            raise ValueError(
-                "If using the xarray-concat method, then 'concat_dim' must be specified."
-            )
-    elif parsed.concat_method == "xarray-combine":
-        if parsed.concat_dim:
-            raise ValueError(
-                "If using the xarray-combine method, then 'concat_dim' cannot be specified."
-            )
+    _validate_concat_method_requirements(parsed.concat_method, parsed.concat_dim)
 
     # Gather the concatenation arguments that will be passed to xarray.
     concat_kwargs = {}
@@ -128,6 +146,10 @@ def validate_parsed_args(
         concat_kwargs["combine_attrs"] = parsed.xarray_arg_combine_attrs
     if parsed.xarray_arg_join:
         concat_kwargs["join"] = parsed.xarray_arg_join
+
+    logger.info("Concatenation method: %s", parsed.concat_method)
+    logger.info("Concatenation dimension: %s", parsed.concat_dim or "N/A")
+    logger.info("Input files found: %d", len(input_files))
 
     return (
         input_files,
@@ -139,8 +161,26 @@ def validate_parsed_args(
     )
 
 
+def _validate_concat_method_requirements(concat_method: str, concat_dim: str | None) -> None:
+    if concat_method == "xarray-concat" and not concat_dim:
+        raise ValueError(
+            "concat_dim is required when using 'xarray-concat' method. "
+            "Specify --concat_dim or use --concat_method xarray-combine"
+        )
+
+    if concat_method == "xarray-combine" and concat_dim:
+        logger.warning("concat_dim specified but will be ignored with 'xarray-combine' method")
+
+
 def run_stitchee(args: list) -> None:
-    """Parse arguments and run subsetter on the specified input file."""
+    """Parse arguments and run concatenation on specified input files.
+
+    Parameters
+    ----------
+    args
+        Command line arguments.
+    """
+    parsed_args = parse_args(args)
     (
         input_files,
         output_path,
@@ -148,37 +188,42 @@ def run_stitchee(args: list) -> None:
         concat_method,
         concat_kwargs,
         group_delimiter,
-    ) = validate_parsed_args(parse_args(args))
-    num_inputs = len(input_files)
+    ) = validate_parsed_args(parsed_args)
 
+    logger.info("Collecting history from %d input files...", len(input_files))
     history_json: list[dict] = []
     for file_count, file in enumerate(input_files):
         with nc.Dataset(file, "r") as dataset:
             history_json.extend(retrieve_history(dataset))
 
     history_json.append(construct_history(input_files, input_files))
-
     new_history_json = json.dumps(history_json, default=str)
 
-    logging.info("Executing stitchee concatenation on %d files...", num_inputs)
-    stitchee(
+    logger.info("Starting concatenation of %d files...", len(input_files))
+    result_path = stitchee(
         input_files,
         output_path,
         concat_method=concat_method,
         concat_dim=concat_dim,
         concat_kwargs=concat_kwargs,
+        sorting_variable=getattr(parsed_args, "sorting_variable", None),
         history_to_append=new_history_json,
+        overwrite_output_file=getattr(parsed_args, "overwrite", False),
         group_delimiter=group_delimiter,
     )
-    logging.info("STITCHEE complete. Result in %s", output_path)
+
+    if result_path:
+        logger.info("Concatenation completed successfully. Result in %s", result_path)
+    else:
+        logger.info("No output generated (likely no valid input files)")
 
 
 def main() -> None:
-    """Entry point to the script"""
+    """Entry point for the stitchee command line tool."""
     logging.basicConfig(
         stream=sys.stdout,
         format="[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s",
-        level=logging.DEBUG,
+        level=logging.INFO,
     )
     run_stitchee(sys.argv[1:])
 
