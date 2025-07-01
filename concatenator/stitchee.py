@@ -66,9 +66,7 @@ def stitchee(
     validate_input_path(files_to_concat)
     concatenator.group_delim = group_delimiter
 
-    benchmark_log = {
-        "concatenating": 0.0,
-    }
+    benchmark_log = {"concatenating": 0.0}
 
     # Proceed to concatenate only files that are workable (can be opened and are not empty).
     input_files, num_input_files = validate_workable_files(files_to_concat, logger)
@@ -88,19 +86,16 @@ def stitchee(
 
     if concat_dim and (concat_method == "xarray-combine"):
         warn(
-            "'concat_dim' was specified, but will not be used because xarray-combine method was "
-            "selected."
+            "'concat_dim' was specified, "
+            "but will not be used because xarray-combine method was selected."
         )
 
     try:
         xrdatatree_list = []
         concat_dim_order = []
         for i, filepath in enumerate(input_files):
-            # The group structure is flattened.
-            start_time = time.time()
             logger.info("    ..file %03d/%03d <%s>..", i + 1, num_input_files, filepath)
 
-            logger.info("Opening flattened file with xarray.")
             datatree = xr.open_datatree(
                 filepath,
                 decode_times=False,
@@ -113,7 +108,7 @@ def stitchee(
                 first_value = datatree[sorting_variable].values.flatten()[0]
             else:
                 first_value = i
-            # first_value = xrds[concatenator.group_delim + concat_dim].values.flatten()[0]
+
             concat_dim_order.append(first_value)
 
             xrdatatree_list.append(datatree)
@@ -124,24 +119,19 @@ def stitchee(
             for _, datatree in sorted(zip(concat_dim_order, xrdatatree_list), key=lambda x: x[0])
         ]
 
+        # Validate that the Datatrees have the same Dataset nodes.
         tree_dicts = [tree.to_dict() for tree in xrdatatree_list]
         keys_list = [set(t.keys()) for t in tree_dicts]
         symmetric_diff = any([kl ^ keys_list[0] for kl in keys_list])
-
         if symmetric_diff:
             raise KeyError(
-                f"Datatrees do not have matching Dataset nodes. Nodes that do not match: {symmetric_diff}."
+                f"Datatrees do not have matching Dataset nodes. "
+                f"Nodes that do not match: {symmetric_diff}."
             )
 
         # Files are concatenated together (Using XARRAY).
         start_time = time.time()
         logger.info("Concatenating files...")
-        # combined_ds = xr.open_mfdataset(intermediate_flat_filepaths,
-        #                                 decode_times=False,
-        #                                 decode_coords=False,
-        #                                 data_vars='minimal',
-        #                                 coords='minimal',
-        #                                 compat='override')
 
         if concat_kwargs is None:
             concat_kwargs = {}
@@ -182,9 +172,6 @@ def stitchee(
         benchmark_log["concatenating"] = time.time() - start_time
 
         # new_global_attributes = create_new_attributes(combined_ds, request_parameters=dict())
-
-        # The group hierarchy of the concatenated file is reconstructed (using XARRAY).
-        start_time = time.time()
 
         logger.info("--- Benchmark results ---")
         total_time = 0.0
