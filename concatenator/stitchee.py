@@ -66,8 +66,6 @@ def stitchee(
     validate_input_path(files_to_concat)
     concatenator.group_delim = group_delimiter
 
-    benchmark_log = {"concatenating": 0.0}
-
     # Proceed to concatenate only files that are workable (can be opened and are not empty).
     input_files, num_input_files = validate_workable_files(files_to_concat, logger)
 
@@ -89,6 +87,9 @@ def stitchee(
             "'concat_dim' was specified, "
             "but will not be used because xarray-combine method was selected."
         )
+
+    # Track time for benchmarking purposes.
+    start_time = time.time()
 
     try:
         xrdatatree_list = []
@@ -130,7 +131,6 @@ def stitchee(
             )
 
         # Files are concatenated together (Using `xarray`).
-        start_time = time.time()
         logger.info("Concatenating files...")
 
         if concat_kwargs is None:
@@ -168,16 +168,9 @@ def stitchee(
             output_dt.attrs["history_json"] = history_to_append
         output_dt.to_netcdf(output_file)
 
-        benchmark_log["concatenating"] = time.time() - start_time
-
         # new_global_attributes = create_new_attributes(combined_ds, request_parameters=dict())
 
-        logger.info("--- Benchmark results ---")
-        total_time = 0.0
-        for k, v in benchmark_log.items():
-            logger.info("%s: %f", k, v)
-            total_time += v
-        logger.info("-- total processing time: %f", total_time)
+        logger.info("-- total processing time: %f", time.time() - start_time)
 
     except Exception as err:
         logger.info("Stitchee encountered an error!")
