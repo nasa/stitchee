@@ -11,7 +11,6 @@ from warnings import warn
 
 import xarray as xr
 
-import concatenator
 from concatenator.file_ops import (
     validate_input_path,
     validate_output_path,
@@ -30,7 +29,6 @@ def stitchee(
     sorting_variable: str | None = None,
     history_to_append: str | None = None,
     overwrite_output_file: bool = False,
-    group_delimiter: str = "__",
     logger: Logger = default_logger,
 ) -> str:
     """Concatenate netCDF data files along an existing dimension.
@@ -54,8 +52,6 @@ def stitchee(
         JSON string to append to the history attribute of the concatenated file (default: None).
     overwrite_output_file
         whether to overwrite output file if it exists (default: False).
-    group_delimiter
-        character used to separate groups (default: "__").
     logger
         logger instance for output messages
 
@@ -74,7 +70,6 @@ def stitchee(
     if not files_to_concat:
         raise ValueError("files_to_concat cannot be empty")
     validate_input_path(files_to_concat)
-    concatenator.group_delim = group_delimiter
     concat_kwargs = concat_kwargs or {}
 
     _validate_concat_method_and_dim(concat_dim, concat_method)

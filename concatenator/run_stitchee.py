@@ -92,12 +92,6 @@ Examples:
 
     # Other options
     parser.add_argument(
-        "--group_delim",
-        default="__",
-        metavar="DELIM",
-        help="Group delimiter string (default: '%(default)s')",
-    )
-    parser.add_argument(
         "-O",
         "--overwrite",
         action="store_true",
@@ -115,13 +109,13 @@ Examples:
 
 def validate_parsed_args(
     parsed: argparse.Namespace,
-) -> tuple[list[str], str, str, str, dict, str]:
+) -> tuple[list[str], str, str, str, dict]:
     """Validate parsed arguments and return processed values.
 
     Returns
     -------
     tuple
-        (input_files, output_path, concat_dim, concat_method, concat_kwargs, group_delim)
+        (input_files, output_path, concat_dim, concat_method, concat_kwargs)
     """
     if parsed.verbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -151,14 +145,7 @@ def validate_parsed_args(
     logger.info("Concatenation dimension: %s", parsed.concat_dim or "N/A")
     logger.info("Input files found: %d", len(input_files))
 
-    return (
-        input_files,
-        output_path,
-        parsed.concat_dim,
-        parsed.concat_method,
-        concat_kwargs,
-        parsed.group_delim,
-    )
+    return (input_files, output_path, parsed.concat_dim, parsed.concat_method, concat_kwargs)
 
 
 def _validate_concat_method_requirements(concat_method: str, concat_dim: str | None) -> None:
@@ -181,14 +168,9 @@ def run_stitchee(args: list) -> None:
         Command line arguments.
     """
     parsed_args = parse_args(args)
-    (
-        input_files,
-        output_path,
-        concat_dim,
-        concat_method,
-        concat_kwargs,
-        group_delimiter,
-    ) = validate_parsed_args(parsed_args)
+    (input_files, output_path, concat_dim, concat_method, concat_kwargs) = validate_parsed_args(
+        parsed_args
+    )
 
     logger.info("Collecting history from %d input files...", len(input_files))
     history_json: list[dict] = []
@@ -209,7 +191,6 @@ def run_stitchee(args: list) -> None:
         sorting_variable=getattr(parsed_args, "sorting_variable", None),
         history_to_append=new_history_json,
         overwrite_output_file=getattr(parsed_args, "overwrite", False),
-        group_delimiter=group_delimiter,
     )
 
     if result_path:
