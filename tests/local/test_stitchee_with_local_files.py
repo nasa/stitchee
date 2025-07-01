@@ -72,9 +72,9 @@ class TestConcat:
         self,
         temp_toy_data_dir,
         temp_output_dir,
-        ds_3dims_3vars_4coords_1group_part1,
-        ds_3dims_3vars_4coords_1group_part2,
-        ds_3dims_3vars_4coords_1group_part3,
+        ds_3dims_3vars_3coords_1group_part1,
+        ds_3dims_3vars_3coords_1group_part2,
+        ds_3dims_3vars_3coords_1group_part3,
     ):
         record_dim_name = "step"
 
