@@ -157,7 +157,6 @@ def stitchee(
                     data_vars="minimal",
                     coords="minimal",
                     **concat_kwargs,
-                    dim=concat_dim,
                 )
                 for kk in tree_keys
             }
