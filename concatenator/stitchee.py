@@ -164,7 +164,7 @@ def _load_and_sort_datatrees(
         if sorting_variable:
             try:
                 sort_value = datatree[sorting_variable].values.flatten()[0]
-            except Exception as err:
+            except KeyError as err:
                 logger.error(
                     f"Cannot extract sorting value from '{sorting_variable}' in {filepath}: {err}"
                 )
