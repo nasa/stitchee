@@ -37,10 +37,10 @@ def test_validate_bad_non_existent_input_path():
         data_for_tests_dir / "unit-test-data" / "non-existent.nc4"
     )
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         validate_input_path([path_to_file_that_does_not_exist])
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         validate_input_path([])
 
 

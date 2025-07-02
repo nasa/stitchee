@@ -12,131 +12,193 @@ import numpy as np
 
 module_logger = logging.getLogger(__name__)
 
-netcdf_extensions = [".nc", ".nc4", ".netcdf"]
+# Module constants
+NETCDF_EXTENSIONS = [".nc", ".nc4", ".netcdf"]
 
 
 def validate_output_path(filepath: str, overwrite: bool = False) -> str:
-    """Checks whether an output path is a valid file and whether it already exists."""
+    """Validate output path and handle overwrite option.
+
+    Returns
+    -------
+    str
+        Resolved output file path
+    """
     path = Path(filepath).resolve()
-    if path.is_file():  # the file already exists
-        if overwrite:
-            os.remove(path)
-        else:
-            raise FileExistsError(
-                f"File already exists at <{path}>. "
-                f"Run again with `overwrite` option to overwrite existing file."
-            )
-    if path.is_dir():  # the specified path is an existing directory
-        raise TypeError("Output path cannot be a directory. Please specify a new filepath.")
+
+    if path.is_dir():
+        raise TypeError(f"Output path '{path}' is a directory. Please specify a file path.")
+
+    if path.is_file() and not overwrite:
+        raise FileExistsError(f"File already exists at <{path}>. Use overwrite=True to replace it.")
+
+    if path.is_file() and overwrite:
+        os.remove(path)
+
     return str(path)
 
 
 def validate_input_path(path_or_paths: list[str]) -> list[str]:
-    """Checks whether input is a list of files, a directory, or a text file containing paths.
+    """Process input path(s) into a list of file paths.
 
-    If the input is...
-    - a list of filepaths, then use those filepaths.
-    - a valid directory, then get the paths for all the files in the directory.
-    - a single file:
-        - that is a valid text file, then get the names of the files from each row in the text file.
-        - that is a valid netCDF file, then use that one filepath
+    Handles:
+    - List of file paths
+    - Directory path (returns all files in directory)
+    - Single netCDF file
+    - Text file containing paths (one per line)
+
+    Parameters
+    ----------
+    path_or_paths
+        One or more input paths
+
+    Returns
+    -------
+    list[str]
+        List of resolved file paths
+
+    Raises
+    ------
+    ValueError
+        If input path(s) cannot be resolved
     """
-    print(f"parsed_input === {path_or_paths}")
+    module_logger.debug("Validating input paths: %s", path_or_paths)
+
+    if not path_or_paths:
+        raise ValueError("No input paths provided")
+
+    # Multiple paths provided
     if len(path_or_paths) > 1:
-        input_files = path_or_paths
-    elif len(path_or_paths) == 1:
-        directory_or_path = Path(path_or_paths[0]).resolve()
-        if directory_or_path.is_dir():
-            input_files = _get_list_of_filepaths_from_dir(directory_or_path)
-        elif directory_or_path.is_file():
-            if directory_or_path.suffix in netcdf_extensions:
-                input_files = [str(directory_or_path)]
-            else:
-                input_files = _get_list_of_filepaths_from_file(directory_or_path)
+        return [str(Path(p).resolve()) for p in path_or_paths]
+
+    # Single path - could be file or directory
+    path = Path(path_or_paths[0]).resolve()
+
+    if path.is_dir():
+        return _get_list_of_filepaths_from_dir(path)
+
+    if path.is_file():
+        if path.suffix.lower() in NETCDF_EXTENSIONS:
+            return [str(path)]
         else:
-            raise TypeError(
-                "If one path is provided for 'data_dir_or_file_or_filepaths', "
-                "then it must be an existing directory or file."
-            )
-    else:
-        raise TypeError("input argument must be one path/directory or a list of paths.")
-    return input_files
+            return _get_list_of_filepaths_from_file(path)
 
-
-def _get_list_of_filepaths_from_file(file_with_paths: Path) -> list[str]:
-    """Each path listed in the specified file is resolved using pathlib for validation."""
-    paths_list = []
-    with open(file_with_paths, encoding="utf-8") as file:
-        while line := file.readline():
-            paths_list.append(str(Path(line.rstrip()).resolve()))
-
-    return paths_list
-
-
-def _get_list_of_filepaths_from_dir(data_dir: Path) -> list[str]:
-    """Get a list of files (ignoring hidden files) in directory."""
-    input_files = [str(f) for f in data_dir.iterdir() if not f.name.startswith(".")]
-    return input_files
+    raise ValueError(f"Input path '{path}' is not a valid file or directory")
 
 
 def validate_workable_files(
     files: list[str], logger: Logger = module_logger
 ) -> tuple[list[str], int]:
-    """Remove files from a list that are not open-able as netCDF or that are empty."""
+    """Filter input files to those that are valid non-empty netCDF files.
+
+    Returns
+    -------
+    tuple[list[str], int]
+        List of workable files and the count
+
+    Notes
+    -----
+    If all input files are empty, the first file will be returned
+    to maintain compatibility with downstream processes.
+    """
     workable_files = []
     for file in files:
         try:
             with nc.Dataset(file, "r") as dataset:
                 if not _is_file_empty(dataset):
                     workable_files.append(file)
-        except OSError:
-            if logger:
-                logger.debug("Error opening <%s> as a netCDF dataset. Skipping.", file)
-            else:
-                print("Error opening <%s> as a netCDF dataset. Skipping.")
+                    logger.debug("File is valid and non-empty: %s", file)
+                else:
+                    logger.debug("File is empty: %s", file)
 
-    # addressing GitHub issue 153: propagate the first empty file if all input files are empty
-    if (len(workable_files) == 0) and (len(files) > 0):
-        logger.info("No workable files. Propagating the first empty file..")
+        except Exception as e:
+            logger.debug("Error opening %s as netCDF: %s", file, e)
+
+    # addressing GitHub issue 153: If all files are empty, return the first file
+    if len(workable_files) == 0 and files:
+        logger.info("All input files are empty. Using first file: %s", files[0])
         workable_files.append(files[0])
 
-    number_of_workable_files = len(workable_files)
+    return workable_files, len(workable_files)
 
-    return workable_files, number_of_workable_files
+
+def _get_list_of_filepaths_from_dir(data_dir: Path) -> list[str]:
+    """Get list of files (ignoring hidden files) in directory."""
+    module_logger.debug("Getting files from directory: %s", data_dir)
+
+    # Filter out hidden files and return absolute paths
+    files = [
+        str(f.resolve()) for f in data_dir.iterdir() if f.is_file() and not f.name.startswith(".")
+    ]
+
+    if not files:
+        module_logger.warning("No files found in directory: %s", data_dir)
+
+    return files
+
+
+def _get_list_of_filepaths_from_file(file_with_paths: Path) -> list[str]:
+    """Extract file paths from a text file, one path per line."""
+    module_logger.debug("Reading paths from file: %s", file_with_paths)
+
+    paths = []
+    try:
+        with open(file_with_paths, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#"):  # Skip empty lines and comments
+                    paths.append(str(Path(line).resolve()))
+    except Exception as e:
+        raise ValueError(f"Failed to read paths from {file_with_paths}: {e}")
+
+    return paths
 
 
 def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
-    """Check if netCDF dataset is empty or not.
+    """Check if netCDF dataset is empty.
 
-    Tests if all variable arrays are empty.
-    As soon as a variable is detected with both (i) an array size not equal to zero and
-    (ii) not all null/fill values, then the granule is considered non-empty.
+    A dataset is considered empty if all variables are:
+    1. Zero size, OR
+    2. All masked values (for masked arrays), OR
+    3. All fill values, OR
+    4. All NaN values
+
+    Parameters
+    ----------
+    parent_group
+        netCDF dataset or group to check
 
     Returns
     -------
-    False if the dataset is considered non-empty; True otherwise (dataset is indeed empty).
+    bool
+        True if dataset is empty, False if any variable contains data
     """
     for var_name, var in parent_group.variables.items():
-        if var.size != 0:
-            if "_FillValue" in var.ncattrs():
-                fill_or_null = getattr(var, "_FillValue")
-            else:
-                fill_or_null = np.nan
+        if var.size == 0:
+            continue  # Empty variable, check next one
 
-            # This checks three ways that the variable's array might be considered empty.
-            # If none of the ways are true,
-            #   a non-empty variable has been found and False is returned.
-            # If one of the ways is true, we consider the variable empty,
-            #   and continue checking other variables.
-            empty_way_1 = False
-            if np.ma.isMaskedArray(var[:]):
-                empty_way_1 = var[:].mask.all()
-            empty_way_2 = np.all(var[:].data == fill_or_null)
-            empty_way_3 = np.all(np.isnan(var[:].data))
+        # Get fill value if defined
+        fill_or_null = (
+            getattr(var, "_FillValue", np.nan) if "_FillValue" in var.ncattrs() else np.nan
+        )
 
-            if not (empty_way_1 or empty_way_2 or empty_way_3):
-                return False  # Found a non-empty variable.
+        # Load the data
+        var_data = var[:]
 
+        # Check if variable is non-empty using three different methods
+        if np.ma.isMaskedArray(var_data):
+            # Check 1: Are all values masked?
+            if not var_data.mask.all() and not np.all(np.isnan(var_data.data)):
+                return False  # Found a non-empty masked array
+
+        # Check 2: Are all values equal to fill value?
+        # Check 3: Are all values NaN?
+        if not np.all(var_data.data == fill_or_null) and not np.all(np.isnan(var_data.data)):
+            return False  # Found a non-empty variable
+
+    # Check all child groups recursively
     for child_group in parent_group.groups.values():
-        return _is_file_empty(child_group)
-    return True
+        if not _is_file_empty(child_group):
+            return False  # Found non-empty child group
+
+    return True  # All variables and groups are empty
