@@ -2,7 +2,7 @@ import json
 
 import xarray as xr
 
-from concatenator.attribute_handling import construct_history
+from concatenator.history_handling import construct_history
 from concatenator.stitchee import stitchee
 from tests.conftest import prep_input_files
 

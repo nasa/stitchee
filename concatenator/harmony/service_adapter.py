@@ -12,7 +12,6 @@ from harmony_service_lib.util import bbox_to_geometry, stage
 from pystac import Item
 from pystac.item import Asset
 
-from concatenator.attribute_handling import construct_history, retrieve_history
 from concatenator.harmony.download_worker import multi_core_download
 from concatenator.harmony.util import (
     _get_netcdf_urls,
@@ -20,6 +19,7 @@ from concatenator.harmony.util import (
     _get_output_date_range,
     sizeof_fmt,
 )
+from concatenator.history_handling import construct_history, retrieve_history
 from concatenator.stitchee import stitchee
 
 

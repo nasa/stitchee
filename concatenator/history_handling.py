@@ -1,12 +1,12 @@
-"""Functions for converting "coordinates" in netCDF variable attributes
-between paths that reference a group hierarchy and flattened paths.
-"""
+"""Functions for handling history fields."""
 
 import json
+import logging
 from datetime import datetime, timezone
 
 import importlib_metadata
 import netCDF4
+import netCDF4 as nc
 
 # Values needed for history_json attribute
 HISTORY_JSON_SCHEMA = "https://harmony.earthdata.nasa.gov/schemas/history/0.1.0/history-v0.1.0.json"
@@ -14,10 +14,12 @@ PROGRAM = "stitchee"
 PROGRAM_REF = "https://cmr.earthdata.nasa.gov:443/search/concepts/S2940253910-LARC_CLOUD"
 VERSION = importlib_metadata.distribution("stitchee").version
 
+# Configure module-level logger
+module_logger = logging.getLogger(__name__)
+
 
 def retrieve_history(dataset: netCDF4.Dataset) -> dict:
-    """
-    Retrieve history_json field from NetCDF dataset, if it exists
+    """Retrieve history_json field from NetCDF dataset, if it exists.
 
     Parameters
     ----------
@@ -34,13 +36,9 @@ def retrieve_history(dataset: netCDF4.Dataset) -> dict:
 
 
 def construct_history(input_files: list, granule_urls: list) -> dict:
-    """
-    Construct history JSON entry for this concatenation operation
-    https://wiki.earthdata.nasa.gov/display/TRT/In-File+Provenance+Metadata+-+TRT-42
+    """Construct history JSON entry for this concatenation operation.
 
-    Parameters
-    ----------
-    input_files: List of input files
+    https://wiki.earthdata.nasa.gov/display/TRT/In-File+Provenance+Metadata+-+TRT-42
 
     Returns
     -------
@@ -56,3 +54,21 @@ def construct_history(input_files: list, granule_urls: list) -> dict:
         "program_ref": PROGRAM_REF,
     }
     return history_json
+
+
+def collect_history(input_files: list[str]) -> str:
+    """Collect history from input files and return as JSON string."""
+    history_json: list[dict] = []
+
+    # Gather histories from files
+    for file_path in input_files:
+        try:
+            with nc.Dataset(file_path, "r") as dataset:
+                history_json.extend(retrieve_history(dataset))
+        except Exception as e:
+            module_logger.warning("Could not read history from %s: %s", file_path, e)
+
+    # Add current operation to history
+    history_json.append(construct_history(input_files, input_files))
+
+    return json.dumps(history_json, default=str)

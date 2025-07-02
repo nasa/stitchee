@@ -1,15 +1,12 @@
 """A simple CLI wrapper around the main concatenation process."""
 
 import argparse
-import json
 import logging
 import sys
 from argparse import ArgumentParser
 
-import netCDF4 as nc
-
-from concatenator.attribute_handling import construct_history, retrieve_history
 from concatenator.file_ops import validate_input_path, validate_output_path
+from concatenator.history_handling import collect_history
 from concatenator.stitchee import SUPPORTED_CONCAT_METHODS, stitchee, validate_concat_method_and_dim
 
 # Configure module-level logger
@@ -136,24 +133,6 @@ def validate_parsed_args(
     return input_files, output_path, parsed.concat_dim, parsed.concat_method, concat_kwargs
 
 
-def _collect_history(input_files: list[str]) -> str:
-    """Collect history from input files and return as JSON string."""
-    history_json: list[dict] = []
-
-    # Gather histories from files
-    for file_path in input_files:
-        try:
-            with nc.Dataset(file_path, "r") as dataset:
-                history_json.extend(retrieve_history(dataset))
-        except Exception as e:
-            logger.warning("Could not read history from %s: %s", file_path, e)
-
-    # Add current operation to history
-    history_json.append(construct_history(input_files, input_files))
-
-    return json.dumps(history_json, default=str)
-
-
 def run_stitchee(args: list) -> None:
     """Parse arguments and run concatenation on specified input files."""
     try:
@@ -164,7 +143,7 @@ def run_stitchee(args: list) -> None:
         )
 
         logger.info("Collecting history from %d input files...", len(input_files))
-        history_json = _collect_history(input_files)
+        history_json = collect_history(input_files)
 
         logger.info("Starting concatenation...")
         result_path = stitchee(
