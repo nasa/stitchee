@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import shutil
 import time
+from collections.abc import Callable
 from functools import partial
 from logging import Logger
 from warnings import warn
@@ -16,6 +17,15 @@ from concatenator.file_ops import (
     validate_output_path,
     validate_workable_files,
 )
+
+# Module constants
+SUPPORTED_CONCAT_METHODS = ("xarray-concat", "xarray-combine")
+DEFAULT_XARRAY_SETTINGS = {"data_vars": "minimal", "coords": "minimal"}
+DATATREE_OPEN_OPTIONS = {
+    "decode_times": False,
+    "decode_coords": False,
+    "mask_and_scale": False,
+}
 
 default_logger = logging.getLogger(__name__)
 
@@ -67,148 +77,151 @@ def stitchee(
     KeyError
         If datatrees have mismatched dataset nodes or sorting variable is not found
     """
+    # Validate inputs
     if not files_to_concat:
         raise ValueError("files_to_concat cannot be empty")
     validate_input_path(files_to_concat)
-    concat_kwargs = concat_kwargs or {}
 
-    _validate_concat_method_and_dim(concat_dim, concat_method)
+    # Method validation is handled here
+    concat_function = _create_concat_function(concat_method, concat_dim, concat_kwargs or {})
 
     # Get workable files (those that can be opened and are not empty).
     input_files, num_input_files = validate_workable_files(files_to_concat, logger)
 
-    # Handle zero files case: exit cleanly.
-    if num_input_files < 1:
+    # Zero files: exit cleanly.
+    if num_input_files == 0:
         logger.info("No non-empty netCDF files found. Exiting.")
         return ""
 
     output_file = validate_output_path(output_file, overwrite=overwrite_output_file)
 
-    # Handle single file case: exit cleanly with the file copied.
+    # Single file: exit cleanly with the file copied.
     if num_input_files == 1:
         shutil.copyfile(input_files[0], output_file)
-        logger.info("One workable netCDF file. Copied to output path without modification.")
+        logger.info("Single workable file, copied to output path without modification.")
         return output_file
 
-    # Process multiple files.
-    start_time = time.time()
-
+    # Process and concatenate multiple files.
     try:
+        start_time = time.time()
         datatree_list = _load_and_sort_datatrees(input_files, sorting_variable, logger)
 
-        logger.info("Concatenating files...")
-        output_tree = _concatenate_datatrees(
-            datatree_list, concat_method, concat_dim, concat_kwargs
-        )
+        logger.info("Concatenating %d files...", len(datatree_list))
+        output_tree = _concatenate_datatrees(datatree_list, concat_function)
 
         _finalize_output(output_tree, output_file, history_to_append)
 
         logger.info("Total processing time: %.2f seconds", time.time() - start_time)
+        return output_file
 
     except Exception as err:
         logger.error("Stitchee encountered an error: %s", str(err))
         raise
 
-    return output_file
 
-
-def _validate_concat_method_and_dim(concat_dim: str, concat_method: str) -> None:
-    """Validate concatenation method and warn if concat_dim won't be used."""
-    if concat_method not in ("xarray-concat", "xarray-combine"):
-        raise ValueError(f"Unexpected concatenation method: {concat_method}")
-
-    if concat_method == "xarray-concat" and not concat_dim:
-        raise ValueError("concat_dim is required when using 'xarray-concat' method")
-
-    if concat_dim and (concat_method == "xarray-combine"):
-        warn(
-            "'concat_dim' was specified but will not be used "
-            "because 'xarray-combine' method was selected."
+def _create_concat_function(concat_method: str, concat_dim: str, concat_kwargs: dict) -> Callable:
+    """Create concatenation function after validating method and dimension requirements."""
+    # Validate method
+    if concat_method not in SUPPORTED_CONCAT_METHODS:
+        raise ValueError(
+            f"Unexpected concatenation method '{concat_method}'. "
+            f"Supported methods: {SUPPORTED_CONCAT_METHODS}"
         )
+
+    # Build base kwargs
+    base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs}
+
+    # Method-specific validation and setup
+    if concat_method == "xarray-concat":
+        if not concat_dim:
+            raise ValueError("concat_dim is required when using 'xarray-concat' method")
+        return partial(xr.concat, dim=concat_dim, **base_kwargs)
+
+    else:  # concat_method == "xarray-combine"
+        if concat_dim:
+            warn(
+                "'concat_dim' was specified but will not be used "
+                "because 'xarray-combine' method was selected."
+            )
+        return partial(xr.combine_by_coords, **base_kwargs)
 
 
 def _load_and_sort_datatrees(
     input_files: list[str], sorting_variable: str | None, logger: Logger
 ) -> list[xr.DataTree]:
-    """Load datatrees while validating consistency, and return trees in a sorted list."""
-    datatree_list = []
-    sort_values = []
-    first_keys = None
+    """Load datatrees from files, validate consistency, and return sorted list."""
+    loaded_data = []
+    expected_keys = None
 
     for i, filepath in enumerate(input_files):
         logger.info("Processing file %03d/%03d <%s>", i + 1, len(input_files), filepath)
 
-        # Open data file and add to the datatree list.
-        datatree = xr.open_datatree(
-            filepath,
-            decode_times=False,
-            decode_coords=False,
-            mask_and_scale=False,
+        # Load datatree with standard options
+        datatree = xr.open_datatree(filepath, **DATATREE_OPEN_OPTIONS)
+
+        # Validate consistency and get sort value
+        expected_keys = _check_dataset_consistency(datatree, expected_keys, i + 1, filepath)
+        sort_value = _get_sort_value(datatree, sorting_variable, filepath, i, logger)
+
+        loaded_data.append((sort_value, datatree))
+
+    # Sort by values and return datatrees
+    return [datatree for _, datatree in sorted(loaded_data)]
+
+
+def _check_dataset_consistency(
+    datatree: xr.DataTree, expected_keys: set | None, file_num: int, filepath: str
+) -> set:
+    """Check that dataset keys are consistent across files."""
+    current_keys = set(datatree.to_dict().keys())
+
+    if expected_keys is None:
+        return current_keys
+
+    if current_keys != expected_keys:
+        diff = current_keys ^ expected_keys
+        raise KeyError(
+            f"File {file_num} ({filepath}) has mismatched dataset nodes. "
+            f"Expected: {sorted(expected_keys)}, got: {sorted(current_keys)}, "
+            f"differences: {sorted(diff)}"
         )
-
-        # Check dataset node consistency immediately
-        current_keys = set(datatree.to_dict().keys())
-        if first_keys is None:
-            first_keys = current_keys
-        elif current_keys != first_keys:
-            mismatched = current_keys ^ first_keys
-            raise KeyError(
-                f"Mismatched dataset nodes. In file {i + 1} ({filepath}), "
-                f"expected keys: {sorted(first_keys)}, got: {sorted(current_keys)}. "
-                f"Differences: {sorted(mismatched)}"
-            )
-
-        datatree_list.append(datatree)
-
-        # Validate and extract sorting value.
-        if sorting_variable:
-            try:
-                sort_value = datatree[sorting_variable].values.flatten()[0]
-            except KeyError as err:
-                logger.error(
-                    f"Cannot extract sorting value from '{sorting_variable}' in {filepath}: {err}"
-                )
-                raise
-        else:
-            sort_value = i
-
-        sort_values.append(sort_value)
-
-    # Reorder the datatrees according to the sorting key values.
-    sorted_pairs = sorted(zip(sort_values, datatree_list), key=lambda x: x[0])
-    datatree_list = [datatree for _, datatree in sorted_pairs]
-    return datatree_list
+    return expected_keys
 
 
-def _concatenate_datatrees(
-    datatree_list: list[xr.DataTree], concat_method: str, concat_dim: str, concat_kwargs: dict
-) -> xr.DataTree:
-    """Concatenate the datatrees using the specified method."""
-    if not datatree_list:  # Add this check
+def _get_sort_value(
+    datatree: xr.DataTree, sorting_variable: str | None, filepath: str, index: int, logger: Logger
+) -> float | int:
+    """Extract sorting value from datatree or return file index."""
+    if not sorting_variable:
+        return index
+
+    try:
+        return datatree[sorting_variable].values.flatten()[0]
+    except Exception as err:
+        logger.error(
+            "Cannot extract sorting value from '%s' in %s: %s", sorting_variable, filepath, err
+        )
+        raise
+
+
+def _concatenate_datatrees(datatree_list: list[xr.DataTree], concat_func: Callable) -> xr.DataTree:
+    """Concatenate datatrees using a pre-configured concatenation function (e.g., partial(xr.concat, dim='time'))"""
+    if not datatree_list:
         raise ValueError("Cannot concatenate empty list of datatrees")
 
-    concat_func = {
-        "xarray-concat": partial(xr.concat, dim=concat_dim),
-        "xarray-combine": xr.combine_by_coords,
-    }.get(concat_method)
-
-    if concat_func is None:
-        raise ValueError(f"Unexpected concatenation method: {concat_method}")
-
+    # Convert to dictionaries and get dataset keys (should be consistent across all trees)
     tree_dicts = [tree.to_dict() for tree in datatree_list]
-    first_keys = set(tree_dicts[0].keys())
+    dataset_keys = set(tree_dicts[0].keys())
 
-    return xr.DataTree.from_dict(
-        {
-            key: concat_func(
-                [td[key] for td in tree_dicts],
-                data_vars="minimal",
-                coords="minimal",
-                **concat_kwargs,
-            )
-            for key in first_keys
-        }
-    )
+    # Concatenate each dataset separately
+    concatenated_datasets = {}
+    for key in dataset_keys:
+        # Extract the same dataset from each tree
+        datasets_to_concat = [tree_dict[key] for tree_dict in tree_dicts]
+        # Concatenate this dataset across all trees
+        concatenated_datasets[key] = concat_func(datasets_to_concat)
+
+    return xr.DataTree.from_dict(concatenated_datasets)
 
 
 def _finalize_output(
@@ -218,5 +231,3 @@ def _finalize_output(
     if history_to_append is not None:
         output_tree.attrs["history_json"] = history_to_append
     output_tree.to_netcdf(output_file)
-
-    # new_global_attributes = create_new_attributes(combined_ds, request_parameters=dict())
