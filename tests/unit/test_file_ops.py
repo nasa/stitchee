@@ -65,10 +65,10 @@ def test_dataset_with_singleton_null_values_is_identified_as_empty():
 
 
 def test_toy_dataset_with_singleton_null_values_is_identified_as_empty(
-    toy_empty_dataset,
+    toy_null_dataset,
 ):
     """Ensure that a dataset with only null arrays with 1-length dimensions is identified as empty."""
-    with nc.Dataset(toy_empty_dataset) as ds:
+    with nc.Dataset(toy_null_dataset) as ds:
         assert _is_file_empty(ds)
 
 
