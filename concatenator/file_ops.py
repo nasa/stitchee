@@ -80,15 +80,14 @@ def _get_list_of_filepaths_from_dir(data_dir: Path) -> list[str]:
 
 
 def validate_workable_files(
-    files: list[str], logger: Logger | None = module_logger
+    files: list[str], logger: Logger = module_logger
 ) -> tuple[list[str], int]:
     """Remove files from a list that are not open-able as netCDF or that are empty."""
     workable_files = []
     for file in files:
         try:
             with nc.Dataset(file, "r") as dataset:
-                is_empty = _is_file_empty(dataset)
-                if is_empty is False:
+                if not _is_file_empty(dataset):
                     workable_files.append(file)
         except OSError:
             if logger:
@@ -98,6 +97,7 @@ def validate_workable_files(
 
     # addressing GitHub issue 153: propagate the first empty file if all input files are empty
     if (len(workable_files) == 0) and (len(files) > 0):
+        logger.info("No workable files. Propagating the first empty file..")
         workable_files.append(files[0])
 
     number_of_workable_files = len(workable_files)
