@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- migrate to xarray.DataTree  ([#281](https://github.com/nasa/stitchee/pull/281))([**@ank1m**](https://github.com/ank1m), [**@danielfromearth**](https://github.com/danielfromearth))
+
 ## [1.6.1] - 2024-11-27
 
 ### Fixed

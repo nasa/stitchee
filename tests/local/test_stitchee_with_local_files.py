@@ -7,7 +7,6 @@ from pathlib import Path
 import netCDF4 as nc
 import pytest
 
-import concatenator
 from concatenator.stitchee import stitchee
 from tests import data_for_tests_dir
 from tests.conftest import prep_input_files
@@ -36,8 +35,6 @@ class TestConcat:
         output_path = stitchee(
             files_to_concat=prepared_input_files,
             output_file=output_path,
-            write_tmp_flat_concatenated=True,
-            keep_tmp_files=True,
             concat_method=concat_method,
             concat_dim=record_dim_name,
             concat_kwargs=concat_kwargs,
@@ -52,19 +49,9 @@ class TestConcat:
         for file in prepared_input_files:
             # length_sum += len(nc.Dataset(file).variables[record_dim_name])
             with nc.Dataset(file) as ncds:
-                try:
-                    original_files_length_sum += ncds.dimensions[record_dim_name].size
-                except KeyError:
-                    original_files_length_sum += ncds.dimensions[
-                        concatenator.group_delim + record_dim_name
-                    ].size
+                original_files_length_sum += ncds.dimensions[record_dim_name].size
 
-        try:
-            merged_file_length = merged_dataset.dimensions[record_dim_name].size
-        except KeyError:
-            merged_file_length = merged_dataset.dimensions[
-                concatenator.group_delim + record_dim_name
-            ].size
+        merged_file_length = merged_dataset.dimensions[record_dim_name].size
 
         assert original_files_length_sum == merged_file_length
 
@@ -74,9 +61,9 @@ class TestConcat:
         self,
         temp_toy_data_dir,
         temp_output_dir,
-        ds_3dims_3vars_4coords_1group_part1,
-        ds_3dims_3vars_4coords_1group_part2,
-        ds_3dims_3vars_4coords_1group_part3,
+        ds_3dims_3vars_3coords_1group_part1,
+        ds_3dims_3vars_3coords_1group_part2,
+        ds_3dims_3vars_3coords_1group_part3,
     ):
         record_dim_name = "step"
 
