@@ -69,33 +69,25 @@ def stitchee(
     -------
     str
         path of concatenated file, empty string if no workable files found
-
-    Raises
-    ------
-    ValueError
-        If concat_method or concat_dim are invalid
-    KeyError
-        If datatrees have mismatched dataset nodes or sorting variable is not found
     """
     # Validate inputs
     if not files_to_concat:
         raise ValueError("files_to_concat cannot be empty")
     validate_input_path(files_to_concat)
 
-    # Method validation is handled here
+    # Create concatenation function with validation
     concat_function = _create_concat_function(concat_method, concat_dim, concat_kwargs or {})
 
-    # Get workable files (those that can be opened and are not empty).
+    # Get workable files
     input_files, num_input_files = validate_workable_files(files_to_concat, logger)
 
-    # Zero files: exit cleanly.
+    # Handle zero or single file cases
     if num_input_files == 0:
-        logger.info("No non-empty netCDF files found. Exiting.")
+        logger.info("No non-empty netCDF files found.")
         return ""
 
     output_file = validate_output_path(output_file, overwrite=overwrite_output_file)
 
-    # Single file: exit cleanly with the file copied.
     if num_input_files == 1:
         shutil.copyfile(input_files[0], output_file)
         logger.info("Single workable file, copied to output path without modification.")
@@ -104,45 +96,60 @@ def stitchee(
     # Process and concatenate multiple files.
     try:
         start_time = time.time()
+
+        # Load, validate, and sort datatrees
         datatree_list = _load_and_sort_datatrees(input_files, sorting_variable, logger)
 
+        # Concatenate files
         logger.info("Concatenating %d files...", len(datatree_list))
         output_tree = _concatenate_datatrees(datatree_list, concat_function)
 
+        # Write output
         _finalize_output(output_tree, output_file, history_to_append)
 
-        logger.info("Total processing time: %.2f seconds", time.time() - start_time)
+        logger.info("Completed in %.2f seconds", time.time() - start_time)
         return output_file
 
     except Exception as err:
-        logger.error("Stitchee encountered an error: %s", str(err))
+        logger.error("Concatenation failed: %s", err)
         raise
 
 
-def _create_concat_function(concat_method: str, concat_dim: str, concat_kwargs: dict) -> Callable:
-    """Create concatenation function after validating method and dimension requirements."""
-    # Validate method
+def validate_concat_method_and_dim(concat_method: str, concat_dim: str | None = None) -> None:
+    """Validate concatenation method and dimension requirements."""
+    # Validate method is supported
     if concat_method not in SUPPORTED_CONCAT_METHODS:
         raise ValueError(
             f"Unexpected concatenation method '{concat_method}'. "
             f"Supported methods: {SUPPORTED_CONCAT_METHODS}"
         )
 
+    # Validate method-specific requirements
+    if concat_method == "xarray-concat" and not concat_dim:
+        raise ValueError(
+            "concat_dim is required when using 'xarray-concat' method. "
+            "Specify concat_dim or use 'xarray-combine' method instead"
+        )
+
+    # Warn about unused parameter
+    if concat_method == "xarray-combine" and concat_dim:
+        warn(
+            "'concat_dim' was specified but will not be used "
+            "because 'xarray-combine' method was selected."
+        )
+
+
+def _create_concat_function(concat_method: str, concat_dim: str, concat_kwargs: dict) -> Callable:
+    """Create concatenation function after validating method and dimension requirements."""
+    validate_concat_method_and_dim(concat_method, concat_dim)
+
     # Build base kwargs
     base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs}
 
-    # Method-specific validation and setup
+    # Create appropriate function
     if concat_method == "xarray-concat":
-        if not concat_dim:
-            raise ValueError("concat_dim is required when using 'xarray-concat' method")
         return partial(xr.concat, dim=concat_dim, **base_kwargs)
-
     else:  # concat_method == "xarray-combine"
-        if concat_dim:
-            warn(
-                "'concat_dim' was specified but will not be used "
-                "because 'xarray-combine' method was selected."
-            )
         return partial(xr.combine_by_coords, **base_kwargs)
 
 

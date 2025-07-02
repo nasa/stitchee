@@ -10,23 +10,17 @@ import netCDF4 as nc
 
 from concatenator.attribute_handling import construct_history, retrieve_history
 from concatenator.file_ops import validate_input_path, validate_output_path
-from concatenator.stitchee import stitchee
+from concatenator.stitchee import SUPPORTED_CONCAT_METHODS, stitchee, validate_concat_method_and_dim
 
 # Configure module-level logger
 logger = logging.getLogger(__name__)
 
 
 def parse_args(args: list) -> argparse.Namespace:
-    """Parse command line arguments for the stitchee concatenation tool.
-
-    Returns
-    -------
-    argparse.Namespace
-        Parsed command line arguments
-    """
+    """Parse command line arguments for the stitchee concatenation tool."""
     parser = ArgumentParser(
         prog="stitchee",
-        description="Concatenate netCDF files along existing dimensions.",
+        description="Concatenate netCDF files along an existing dimension.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -57,7 +51,7 @@ Examples:
     concat_grp = parser.add_argument_group("Concatenation Options")
     concat_grp.add_argument(
         "--concat_method",
-        choices=["xarray-concat", "xarray-combine"],
+        choices=SUPPORTED_CONCAT_METHODS,
         default="xarray-concat",
         help="Concatenation method (default: %(default)s)",
     )
@@ -110,29 +104,22 @@ Examples:
 def validate_parsed_args(
     parsed: argparse.Namespace,
 ) -> tuple[list[str], str, str, str, dict]:
-    """Validate parsed arguments and return processed values.
-
-    Returns
-    -------
-    tuple
-        (input_files, output_path, concat_dim, concat_method, concat_kwargs)
-    """
+    """Validate parsed arguments and return processed values."""
     if parsed.verbose:
         logging.basicConfig(level=logging.DEBUG)
         logging.getLogger().setLevel(logging.DEBUG)
         logging.getLogger("concatenator").setLevel(logging.DEBUG)
 
-    # Validate the input and output paths
+    # Validate paths and concatenation requirements
     try:
         input_files = validate_input_path(parsed.input)
         output_path = validate_output_path(parsed.output_path, parsed.overwrite)
+        validate_concat_method_and_dim(parsed.concat_method, parsed.concat_dim)
     except Exception as e:
-        logger.error("Path validation failed: %s", e)
+        logger.error("Validation failed: %s", e)
         raise
 
-    _validate_concat_method_requirements(parsed.concat_method, parsed.concat_dim)
-
-    # Gather the concatenation arguments that will be passed to xarray.
+    # Build concatenation kwargs to be passed to xarray.
     concat_kwargs = {}
     if parsed.xarray_arg_compat:
         concat_kwargs["compat"] = parsed.xarray_arg_compat
@@ -141,62 +128,67 @@ def validate_parsed_args(
     if parsed.xarray_arg_join:
         concat_kwargs["join"] = parsed.xarray_arg_join
 
+    # Log configuration
     logger.info("Concatenation method: %s", parsed.concat_method)
     logger.info("Concatenation dimension: %s", parsed.concat_dim or "N/A")
     logger.info("Input files found: %d", len(input_files))
 
-    return (input_files, output_path, parsed.concat_dim, parsed.concat_method, concat_kwargs)
+    return input_files, output_path, parsed.concat_dim, parsed.concat_method, concat_kwargs
 
 
-def _validate_concat_method_requirements(concat_method: str, concat_dim: str | None) -> None:
-    if concat_method == "xarray-concat" and not concat_dim:
-        raise ValueError(
-            "concat_dim is required when using 'xarray-concat' method. "
-            "Specify --concat_dim or use --concat_method xarray-combine"
-        )
+def _collect_history(input_files: list[str]) -> str:
+    """Collect history from input files and return as JSON string."""
+    history_json: list[dict] = []
 
-    if concat_method == "xarray-combine" and concat_dim:
-        logger.warning("concat_dim specified but will be ignored with 'xarray-combine' method")
+    # Gather histories from files
+    for file_path in input_files:
+        try:
+            with nc.Dataset(file_path, "r") as dataset:
+                history_json.extend(retrieve_history(dataset))
+        except Exception as e:
+            logger.warning("Could not read history from %s: %s", file_path, e)
+
+    # Add current operation to history
+    history_json.append(construct_history(input_files, input_files))
+
+    return json.dumps(history_json, default=str)
 
 
 def run_stitchee(args: list) -> None:
-    """Parse arguments and run concatenation on specified input files.
+    """Parse arguments and run concatenation on specified input files."""
+    try:
+        # Parse and validate arguments
+        parsed_args = parse_args(args)
+        (input_files, output_path, concat_dim, concat_method, concat_kwargs) = validate_parsed_args(
+            parsed_args
+        )
 
-    Parameters
-    ----------
-    args
-        Command line arguments.
-    """
-    parsed_args = parse_args(args)
-    (input_files, output_path, concat_dim, concat_method, concat_kwargs) = validate_parsed_args(
-        parsed_args
-    )
+        logger.info("Collecting history from %d input files...", len(input_files))
+        history_json = _collect_history(input_files)
 
-    logger.info("Collecting history from %d input files...", len(input_files))
-    history_json: list[dict] = []
-    for file_count, file in enumerate(input_files):
-        with nc.Dataset(file, "r") as dataset:
-            history_json.extend(retrieve_history(dataset))
+        logger.info("Starting concatenation...")
+        result_path = stitchee(
+            input_files,
+            output_path,
+            concat_method=concat_method,
+            concat_dim=concat_dim,
+            concat_kwargs=concat_kwargs,
+            sorting_variable=parsed_args.sorting_variable,
+            history_to_append=history_json,
+            overwrite_output_file=parsed_args.overwrite,
+        )
 
-    history_json.append(construct_history(input_files, input_files))
-    new_history_json = json.dumps(history_json, default=str)
+        if result_path:
+            logger.info("Concatenation completed successfully. Result in %s", result_path)
+        else:
+            logger.info("No output generated (likely no valid input files)")
 
-    logger.info("Starting concatenation of %d files...", len(input_files))
-    result_path = stitchee(
-        input_files,
-        output_path,
-        concat_method=concat_method,
-        concat_dim=concat_dim,
-        concat_kwargs=concat_kwargs,
-        sorting_variable=getattr(parsed_args, "sorting_variable", None),
-        history_to_append=new_history_json,
-        overwrite_output_file=getattr(parsed_args, "overwrite", False),
-    )
-
-    if result_path:
-        logger.info("Concatenation completed successfully. Result in %s", result_path)
-    else:
-        logger.info("No output generated (likely no valid input files)")
+    except KeyboardInterrupt:
+        logger.error("Operation cancelled by user")
+        sys.exit(1)
+    except Exception as e:
+        logger.error("Concatenation failed: %s", e)
+        sys.exit(1)
 
 
 def main() -> None:
