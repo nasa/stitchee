@@ -48,6 +48,7 @@ markdown-include = ">=0.8.1"
 mkdocstrings = ">=0.25.1"
 mkdocs-jupyter = ">=0.24.7"
 mkdocs-material = ">=9.5.22"
+mkdocstrings-python = ">=1.16.12"
 
 [tool.poetry.group.harmony.dependencies]
 harmony-service-lib = ">=2.0.0"
