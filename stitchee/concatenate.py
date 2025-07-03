@@ -12,7 +12,7 @@ from warnings import warn
 
 import xarray as xr
 
-from concatenator.file_ops import (
+from stitchee.file_ops import (
     validate_input_path,
     validate_output_path,
     validate_workable_files,
@@ -30,7 +30,7 @@ DATATREE_OPEN_OPTIONS = {
 default_logger = logging.getLogger(__name__)
 
 
-def stitchee(
+def concatenate(
     files_to_concat: list[str],
     output_file: str,
     concat_method: str = "xarray-concat",

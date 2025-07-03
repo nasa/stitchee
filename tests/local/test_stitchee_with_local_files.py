@@ -7,7 +7,7 @@ from pathlib import Path
 import netCDF4 as nc
 import pytest
 
-from concatenator.stitchee import stitchee
+from stitchee.concatenate import concatenate
 from tests import data_for_tests_dir
 from tests.conftest import prep_input_files
 
@@ -32,7 +32,7 @@ class TestConcat:
         if concat_kwargs is None:
             concat_kwargs = {}
 
-        output_path = stitchee(
+        output_path = concatenate(
             files_to_concat=prepared_input_files,
             output_file=output_path,
             concat_method=concat_method,

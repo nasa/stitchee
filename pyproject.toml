@@ -28,13 +28,13 @@ Documentation = "https://stitchee.readthedocs.io"
 Changelog = "https://github.com/nasa/stitchee/blob/main/CHANGELOG.md"
 
 [project.scripts]
-stitchee_harmony = 'concatenator.harmony.cli:main'
-stitchee = 'concatenator.run_stitchee:main'
+stitchee_harmony = 'stitchee.harmony.cli:main'
+stitchee = 'stitchee.cli:main'
 
 [tool.poetry]
 version = "1.7.0a24"
 packages = [
-    { include = "concatenator" },
+    { include = "stitchee" },
 ]
 
 [tool.poetry.group.dev.dependencies]

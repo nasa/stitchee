@@ -40,10 +40,10 @@ jobs:
 
       - name: Run linting
         run: |
-          poetry run ruff check concatenator
+          poetry run ruff check stitchee
 
       - name: Run tests and collect coverage
-        run: poetry run pytest --cov=concatenator --cov-report=xml tests/unit
+        run: poetry run pytest --cov=stitchee --cov-report=xml tests/unit
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5

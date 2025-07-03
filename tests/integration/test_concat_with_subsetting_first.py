@@ -2,7 +2,7 @@ import datetime as dt
 
 from harmony import BBox, Client, Collection, Request
 
-from concatenator.stitchee import stitchee
+from stitchee.concatenate import concatenate
 
 
 def test_concat_with_subsetting_first(temp_output_dir):
@@ -34,7 +34,7 @@ def test_concat_with_subsetting_first(temp_output_dir):
     print(f"File names: {file_names}")
 
     # Try concatenating the resulting files
-    output_path = stitchee(
+    output_path = concatenate(
         file_names,
         output_file=str(
             (temp_output_dir / "output_harmony_subsetting_to_stitchee_test.nc").resolve()
