@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 env:
-  POETRY_VERSION: "1.3.2"
-  PYTHON_VERSION: "3.10"
+  POETRY_VERSION: "2.1.3"
+  PYTHON_VERSION: "3.12"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
@@ -91,7 +91,7 @@ jobs:
           echo "venue=ops" >> $GITHUB_ENV
 
       - name: Run Snyk as a blocking step
-        uses: snyk/actions/python-3.10@master
+        uses: snyk/actions/python-3.11@master
         env:
             SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -102,7 +102,7 @@ jobs:
               --severity-threshold=high
               --fail-on=all
       - name: Run Snyk on Python
-        uses: snyk/actions/python-3.10@master
+        uses: snyk/actions/python-3.11@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:

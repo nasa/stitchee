@@ -1,5 +1,5 @@
 
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 RUN apt-get update \
      && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
