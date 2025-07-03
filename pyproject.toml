@@ -11,7 +11,7 @@ dynamic = [
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
 license = "Apache-2.0"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<4"
 authors = [
     { name = "Daniel Kaufman", email = "daniel.kaufman@nasa.gov" }
 ]
