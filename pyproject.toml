@@ -1,28 +1,42 @@
-[tool.poetry]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
 name = "stitchee"
-version = "1.7.0a23"
-description = "NetCDF4 Along-existing-dimension Concatenation Service"
-authors = ["Daniel Kaufman <daniel.kaufman@nasa.gov>"]
-readme = "README.md"
-repository = "https://github.com/nasa/stitchee"
-license = "Apache-2.0"
-classifiers = [
-    "Topic :: Software Development :: Libraries :: Python Modules"
+dynamic = [
+    "version",
+    "classifiers"
 ]
-packages = [
-    { include = "concatenator" },
+description = "NetCDF4 Along-existing-dimension Concatenation Service"
+license = { text = "Apache-2.0" }
+readme = "README.md"
+requires-python = "^3.12"
+authors = [
+    { name = "Daniel Kaufman", email = "daniel.kaufman@nasa.gov" }
 ]
 
-[tool.poetry.scripts]
+dependencies = [
+    "netcdf4 (>=1.6.5)",
+    "xarray (>=2024.3.0)",
+    "pystac (>=0.5.3)",
+    "importlib-metadata (>=8.4.0)",
+]
+
+[project.urls]
+Repository = "https://github.com/nasa/stitchee"
+Documentation = "https://stitchee.readthedocs.io"
+Changelog = "https://github.com/nasa/stitchee/blob/main/CHANGELOG.md"
+
+[project.scripts]
 stitchee_harmony = 'concatenator.harmony.cli:main'
 stitchee = 'concatenator.run_stitchee:main'
 
-[tool.poetry.dependencies]
-python = "^3.12"
-netcdf4 = ">=1.6.5"
-xarray = ">=2024.3.0"
-pystac = ">=0.5.3"
-importlib-metadata = ">=8.4.0"
+[tool.poetry]
+version = "1.7.0a23"
+packages = [
+    { include = "concatenator" },
+]
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.1.1"
@@ -41,10 +55,6 @@ harmony-service-lib = ">=2.0.0"
 
 [tool.poetry.group.integration.dependencies]
 harmony-py = ">=0.4.15"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
 
 [[tool.mypy.overrides]]
 module = "netCDF4.*"
