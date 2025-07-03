@@ -59,7 +59,7 @@ exclude = [
 ]
 # Allow lines to be as long as 100.
 line-length = 100
-target-version = "py310"
+target-version = "py312"
 
 [tool.ruff.lint]
 # E402: module level import not at top of file

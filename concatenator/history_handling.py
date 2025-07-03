@@ -2,7 +2,7 @@
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import importlib_metadata
 import netCDF4
@@ -46,7 +46,7 @@ def construct_history(input_files: list, granule_urls: list) -> dict:
     """
     history_json = {
         "$schema": HISTORY_JSON_SCHEMA,
-        "date_time": datetime.now(tz=timezone.utc).isoformat(),
+        "date_time": datetime.now(tz=UTC).isoformat(),
         "program": PROGRAM,
         "version": VERSION,
         "parameters": f"input_files={input_files}",
