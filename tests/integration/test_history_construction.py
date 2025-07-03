@@ -2,8 +2,8 @@ import json
 
 import xarray as xr
 
-from concatenator.history_handling import construct_history
-from concatenator.stitchee import stitchee
+from stitchee.concatenate import concatenate
+from stitchee.history_handling import construct_history
 from tests.conftest import prep_input_files
 
 
@@ -20,7 +20,7 @@ def test_construct_and_append_history_for_sample_concatenation(
 
     new_history_json = json.dumps(history_json, default=str)
 
-    output_path = stitchee(
+    output_path = concatenate(
         files_to_concat=prepared_input_files,
         output_file=output_path,
         concat_method="xarray-concat",

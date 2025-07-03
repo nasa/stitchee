@@ -7,7 +7,7 @@ from pathlib import Path
 import netCDF4 as nc
 import pytest
 
-from concatenator.file_ops import (
+from stitchee.file_ops import (
     _is_file_empty,
     validate_input_path,
     validate_output_path,

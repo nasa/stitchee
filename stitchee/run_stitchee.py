@@ -5,9 +5,13 @@ import logging
 import sys
 from argparse import ArgumentParser
 
-from concatenator.file_ops import validate_input_path, validate_output_path
-from concatenator.history_handling import collect_history
-from concatenator.stitchee import SUPPORTED_CONCAT_METHODS, stitchee, validate_concat_method_and_dim
+from stitchee.concatenate import (
+    SUPPORTED_CONCAT_METHODS,
+    concatenate,
+    validate_concat_method_and_dim,
+)
+from stitchee.file_ops import validate_input_path, validate_output_path
+from stitchee.history_handling import collect_history
 
 # Configure module-level logger
 logger = logging.getLogger(__name__)
@@ -105,7 +109,7 @@ def validate_parsed_args(
     if parsed.verbose:
         logging.basicConfig(level=logging.DEBUG)
         logging.getLogger().setLevel(logging.DEBUG)
-        logging.getLogger("concatenator").setLevel(logging.DEBUG)
+        logging.getLogger("stitchee").setLevel(logging.DEBUG)
 
     # Validate paths and concatenation requirements
     try:
@@ -146,7 +150,7 @@ def run_stitchee(args: list) -> None:
         history_json = collect_history(input_files)
 
         logger.info("Starting concatenation...")
-        result_path = stitchee(
+        result_path = concatenate(
             input_files,
             output_path,
             concat_method=concat_method,
