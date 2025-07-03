@@ -9,13 +9,12 @@ dynamic = [
     "classifiers"
 ]
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 readme = "README.md"
-requires-python = "^3.12"
+requires-python = ">=3.12"
 authors = [
     { name = "Daniel Kaufman", email = "daniel.kaufman@nasa.gov" }
 ]
-
 dependencies = [
     "netcdf4 (>=1.6.5)",
     "xarray (>=2024.3.0)",
