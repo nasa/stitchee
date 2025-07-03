@@ -32,7 +32,7 @@ stitchee_harmony = 'concatenator.harmony.cli:main'
 stitchee = 'concatenator.run_stitchee:main'
 
 [tool.poetry]
-version = "1.7.0a23"
+version = "1.7.0a24"
 packages = [
     { include = "concatenator" },
 ]
