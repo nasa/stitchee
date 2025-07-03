@@ -29,7 +29,7 @@ Changelog = "https://github.com/nasa/stitchee/blob/main/CHANGELOG.md"
 
 [project.scripts]
 stitchee_harmony = 'stitchee.harmony.cli:main'
-stitchee = 'stitchee.run_stitchee:main'
+stitchee = 'stitchee.cli:main'
 
 [tool.poetry]
 version = "1.7.0a24"

@@ -16,8 +16,11 @@ from stitchee.history_handling import collect_history
 # Configure module-level logger
 logger = logging.getLogger(__name__)
 
+# Module constants
+DEFAULT_CONCAT_METHOD = "xarray-concat"
 
-def parse_args(args: list) -> argparse.Namespace:
+
+def parse_args(args: list[str]) -> argparse.Namespace:
     """Parse command line arguments for the stitchee concatenation tool."""
     parser = ArgumentParser(
         prog="stitchee",
@@ -53,7 +56,7 @@ Examples:
     concat_grp.add_argument(
         "--concat_method",
         choices=SUPPORTED_CONCAT_METHODS,
-        default="xarray-concat",
+        default=DEFAULT_CONCAT_METHOD,
         help="Concatenation method (default: %(default)s)",
     )
     concat_grp.add_argument(
@@ -69,21 +72,12 @@ Examples:
 
     # xarray arguments
     xarray_grp = parser.add_argument_group("xarray Arguments")
-    xarray_grp.add_argument(
-        "--xarray_arg_compat",
-        metavar="COMPAT",
-        help="'compat' argument passed to xarray concatenation function",
-    )
-    xarray_grp.add_argument(
-        "--xarray_arg_combine_attrs",
-        metavar="ATTRS",
-        help="'combine_attrs' argument passed to xarray concatenation function",
-    )
-    xarray_grp.add_argument(
-        "--xarray_arg_join",
-        metavar="JOIN",
-        help="'join' argument passed to xarray concatenation function",
-    )
+    for arg, meta, help_text in [
+        ("--xarray_arg_compat", "COMPAT", "'compat' argument for xarray functions"),
+        ("--xarray_arg_combine_attrs", "ATTRS", "'combine_attrs' argument for xarray functions"),
+        ("--xarray_arg_join", "JOIN", "'join' argument for xarray functions"),
+    ]:
+        xarray_grp.add_argument(arg, metavar=meta, help=help_text)
 
     # Other options
     parser.add_argument(
@@ -102,13 +96,12 @@ Examples:
     return parser.parse_args(args)
 
 
-def validate_parsed_args(
+def _validate_args(
     parsed: argparse.Namespace,
 ) -> tuple[list[str], str, str, str, dict]:
     """Validate parsed arguments and return processed values."""
     if parsed.verbose:
         logging.basicConfig(level=logging.DEBUG)
-        logging.getLogger().setLevel(logging.DEBUG)
         logging.getLogger("stitchee").setLevel(logging.DEBUG)
 
     # Validate paths and concatenation requirements
@@ -137,12 +130,12 @@ def validate_parsed_args(
     return input_files, output_path, parsed.concat_dim, parsed.concat_method, concat_kwargs
 
 
-def run_stitchee(args: list) -> None:
+def run_concatenate(args: list[str]) -> None:
     """Parse arguments and run concatenation on specified input files."""
     try:
         # Parse and validate arguments
         parsed_args = parse_args(args)
-        (input_files, output_path, concat_dim, concat_method, concat_kwargs) = validate_parsed_args(
+        input_files, output_path, concat_dim, concat_method, concat_kwargs = _validate_args(
             parsed_args
         )
 
@@ -161,6 +154,7 @@ def run_stitchee(args: list) -> None:
             overwrite_output_file=parsed_args.overwrite,
         )
 
+        # Log results
         if result_path:
             logger.info("Concatenation completed successfully. Result in %s", result_path)
         else:
@@ -181,7 +175,7 @@ def main() -> None:
         format="[%(asctime)s] {%(filename)s:%(lineno)d} %(levelname)s - %(message)s",
         level=logging.INFO,
     )
-    run_stitchee(sys.argv[1:])
+    run_concatenate(sys.argv[1:])
 
 
 if __name__ == "__main__":
