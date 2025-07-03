@@ -32,7 +32,7 @@ stitchee_harmony = 'stitchee.harmony.cli:main'
 stitchee = 'stitchee.cli:main'
 
 [tool.poetry]
-version = "1.7.0a24"
+version = "1.7.0a25"
 packages = [
     { include = "stitchee" },
 ]
