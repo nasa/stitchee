@@ -91,7 +91,7 @@ jobs:
           echo "venue=ops" >> $GITHUB_ENV
 
       - name: Run Snyk as a blocking step
-        uses: snyk/actions/python-3.12@master
+        uses: snyk/actions/python-3.11@master
         env:
             SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -102,7 +102,7 @@ jobs:
               --severity-threshold=high
               --fail-on=all
       - name: Run Snyk on Python
-        uses: snyk/actions/python-3.12@master
+        uses: snyk/actions/python-3.11@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
