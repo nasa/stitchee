@@ -114,11 +114,6 @@ def validate_workable_files(
         except Exception as e:
             logger.debug("Error opening %s as netCDF: %s", file, e)
 
-    # addressing GitHub issue 153: If all files are empty, return the first file
-    if len(workable_files) == 0 and files:
-        logger.info("All input files are empty. Using first file: %s", files[0])
-        workable_files.append(files[0])
-
     return workable_files, len(workable_files)
 
 
