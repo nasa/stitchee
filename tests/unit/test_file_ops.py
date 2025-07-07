@@ -45,12 +45,12 @@ def test_validate_bad_non_existent_input_path():
 
 
 def test_dataset_with_single_empty_input_file():
-    """Ensure that a dataset with a single empty input file is propagating empty granule to the output"""
+    """Ensure that empty input files are filtered out and are not considered as valid input"""
     files_to_concat = [
         data_for_tests_dir / "unit-test-data" / "TEMPO_NO2_L2_V03_20240328T154353Z_S008G01.nc4"
     ]
     workable_files, number_of_workable_files = validate_workable_files(files_to_concat)
-    assert number_of_workable_files == 1
+    assert number_of_workable_files == 0
 
 
 def test_dataset_with_singleton_null_values_is_identified_as_empty():

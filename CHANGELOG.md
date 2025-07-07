@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - update the default python version from 3.10 to 3.12 ([#284](https://github.com/nasa/stitchee/pull/284))([**@danielfromearth**](https://github.com/danielfromearth))
 - flip package and module names, so package is "stitchee" ([#285](https://github.com/nasa/stitchee/pull/285))([**@danielfromearth**](https://github.com/danielfromearth))
 - add --no-verify to git push when committing version bump ([#286](https://github.com/nasa/stitchee/pull/286))([**@danielfromearth**](https://github.com/danielfromearth))
+- update to handle `NoDataException` from `l2ss-py` ([#288](https://github.com/nasa/stitchee/pull/288))([**@ank1m**](https://github.com/ank1m))
 
 ## [1.6.1] - 2024-11-27
 
