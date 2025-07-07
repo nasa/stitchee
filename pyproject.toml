@@ -1,28 +1,41 @@
-[tool.poetry]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
 name = "stitchee"
-version = "1.6.1"
+dynamic = [
+    "version",
+    "classifiers"
+]
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
-authors = ["Daniel Kaufman <daniel.kaufman@nasa.gov>"]
-readme = "README.md"
-repository = "https://github.com/nasa/stitchee"
 license = "Apache-2.0"
-classifiers = [
-    "Topic :: Software Development :: Libraries :: Python Modules"
+readme = "README.md"
+requires-python = ">=3.12,<4"
+authors = [
+    { name = "Daniel Kaufman", email = "daniel.kaufman@nasa.gov" }
 ]
+dependencies = [
+    "netcdf4 (>=1.6.5)",
+    "xarray (>=2024.3.0)",
+    "pystac (>=0.5.3)",
+    "importlib-metadata (>=8.4.0)",
+]
+
+[project.urls]
+Repository = "https://github.com/nasa/stitchee"
+Documentation = "https://stitchee.readthedocs.io"
+Changelog = "https://github.com/nasa/stitchee/blob/main/CHANGELOG.md"
+
+[project.scripts]
+stitchee_harmony = 'stitchee.harmony.cli:main'
+stitchee = 'stitchee.cli:main'
+
+[tool.poetry]
+version = "1.7.0rc2"
 packages = [
-    { include = "concatenator" },
+    { include = "stitchee" },
 ]
-
-[tool.poetry.scripts]
-stitchee_harmony = 'concatenator.harmony.cli:main'
-stitchee = 'concatenator.run_stitchee:main'
-
-[tool.poetry.dependencies]
-python = "^3.10"
-netcdf4 = ">=1.6.5"
-xarray = ">=2024.3.0"
-pystac = ">=0.5.3"
-importlib-metadata = ">=8.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.1.1"
@@ -35,16 +48,13 @@ markdown-include = ">=0.8.1"
 mkdocstrings = ">=0.25.1"
 mkdocs-jupyter = ">=0.24.7"
 mkdocs-material = ">=9.5.22"
+mkdocstrings-python = ">=1.16.12"
 
 [tool.poetry.group.harmony.dependencies]
 harmony-service-lib = ">=2.0.0"
 
 [tool.poetry.group.integration.dependencies]
 harmony-py = ">=0.4.15"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
 
 [[tool.mypy.overrides]]
 module = "netCDF4.*"
@@ -59,7 +69,7 @@ exclude = [
 ]
 # Allow lines to be as long as 100.
 line-length = 100
-target-version = "py310"
+target-version = "py312"
 
 [tool.ruff.lint]
 # E402: module level import not at top of file

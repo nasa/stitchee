@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 import harmony_service_lib
 
-from concatenator.harmony.service_adapter import StitcheeAdapter as HarmonyAdapter
+from stitchee.harmony.service_adapter import StitcheeAdapter as HarmonyAdapter
 
 
 def main(config: harmony_service_lib.util.Config = None) -> None:

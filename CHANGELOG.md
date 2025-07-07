@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2025-07-07
+
+### Changed
+
+- migrate to using xarray.DataTree  ([#281](https://github.com/nasa/stitchee/pull/281))([**@ank1m**](https://github.com/ank1m), [**@danielfromearth**](https://github.com/danielfromearth))
+- update the default python version from 3.10 to 3.12 ([#284](https://github.com/nasa/stitchee/pull/284))([**@danielfromearth**](https://github.com/danielfromearth))
+- flip package and module names, so package is "stitchee" ([#285](https://github.com/nasa/stitchee/pull/285))([**@danielfromearth**](https://github.com/danielfromearth))
+- skip pre-commit checks for git push when committing version bump ([#286](https://github.com/nasa/stitchee/pull/286), [#287](https://github.com/nasa/stitchee/pull/287))([**@danielfromearth**](https://github.com/danielfromearth))
+- pass no files (instead of one file or raising NoDataException) when all are empty ([#288](https://github.com/nasa/stitchee/pull/288))([**@ank1m**](https://github.com/ank1m))
+
 ## [1.6.1] - 2024-11-27
 
 ### Fixed

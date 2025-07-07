@@ -8,7 +8,7 @@ from urllib.parse import urlsplit
 import pytest
 from netCDF4 import Dataset
 
-import concatenator.harmony.cli
+import stitchee.harmony.cli
 from tests.conftest import prep_input_files
 
 
@@ -33,7 +33,7 @@ class TestBatching:
             in_catalog_path = self.__harmony_path.joinpath("source", in_catalog_name)
 
             test_args = [
-                concatenator.harmony.cli.__file__,
+                stitchee.harmony.cli.__file__,
                 "--harmony-action",
                 "invoke",
                 "--harmony-input",
@@ -57,7 +57,7 @@ class TestBatching:
             }
 
             with patch.object(sys, "argv", test_args), patch.dict(environ, test_env):
-                concatenator.harmony.cli.main()
+                stitchee.harmony.cli.main()
 
             # Open the outputs
             out_catalog_path = temp_output_dir.joinpath("catalog.json")

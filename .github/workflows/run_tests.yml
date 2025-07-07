@@ -14,8 +14,8 @@ on:
   workflow_dispatch:
 
 env:
-  POETRY_VERSION: "1.3.2"
-  PYTHON_VERSION: "3.10"
+  POETRY_VERSION: "2.1.3"
+  PYTHON_VERSION: "3.12"
 
 jobs:
   unit-tests:
@@ -31,7 +31,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up Poetry
-        uses: abatilo/actions-poetry@v3.0.1
+        uses: abatilo/actions-poetry@v4.0.0
         with:
           poetry-version: ${{ env.POETRY_VERSION }}
 
@@ -40,13 +40,13 @@ jobs:
 
       - name: Run linting
         run: |
-          poetry run ruff check concatenator
+          poetry run ruff check stitchee
 
       - name: Run tests and collect coverage
-        run: poetry run pytest --cov=concatenator --cov-report=xml tests/unit
+        run: poetry run pytest --cov=stitchee --cov-report=xml tests/unit
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true

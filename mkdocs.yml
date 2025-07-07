@@ -57,6 +57,7 @@ plugins:
             show_submodules: no
             show_root_heading: false
             show_source: false
+          paths: [stitchee] # Adjust 'src' to your project's source directory if different
   - mkdocs-jupyter:
       execute: False
       ignore:
@@ -64,4 +65,4 @@ plugins:
 
 watch:
   - docs
-  - concatenator
+  - stitchee

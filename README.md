@@ -50,52 +50,50 @@ poetry run pytest tests/
 
 ## Usage
 
-```shell
-$ poetry run stitchee --help
-usage: stitchee [-h] -o OUTPUT_PATH [--no_input_file_copies] [--keep_tmp_files] [--concat_method {xarray-concat,xarray-combine}] [--concat_dim CONCAT_DIM]
-                [--xarray_arg_compat XARRAY_ARG_COMPAT] [--xarray_arg_combine_attrs XARRAY_ARG_COMBINE_ATTRS] [--xarray_arg_join XARRAY_ARG_JOIN] [-O]
-                [-v]
-                path/directory or path list [path/directory or path list ...]
-
-Run the along-existing-dimension concatenator.
-
-options:
-  -h, --help            show this help message and exit
-  --no_input_file_copies
-                        By default, input files are copied into a temporary directory to avoid modification of input files. This is useful for testing,
-                        but uses more disk space. By specifying this argument, no copying is performed.
-  --keep_tmp_files      Prevents removal, after successful execution, of (1) the flattened concatenated file and (2) the input directory copy if created
-                        by '--make_dir_copy'.
-  --concat_method {xarray-concat,xarray-combine}
-                        Whether to use the xarray concat method or the combine-by-coords method.
-  --concat_dim CONCAT_DIM
-                        Dimension to concatenate along, if possible. This is required if using the 'xarray-concat' method
-  --sorting_variable SORTING_VARIABLE
-                        Name of a variable to use for sorting datasets before concatenation by xarray. E.g., 'time'.
-  --xarray_arg_compat XARRAY_ARG_COMPAT
-                        'compat' argument passed to xarray.concat() or xarray.combine_by_coords().
-  --xarray_arg_combine_attrs XARRAY_ARG_COMBINE_ATTRS
-                        'combine_attrs' argument passed to xarray.concat() or xarray.combine_by_coords().
-  --xarray_arg_join XARRAY_ARG_JOIN
-                        'join' argument passed to xarray.concat() or xarray.combine_by_coords().
-  --group_delim GROUP_DELIM
-                        Character or string to use as group delimiter
-  -O, --overwrite       Overwrite output file if it already exists.
-  -v, --verbose         Enable verbose output to stdout; useful for debugging
-
-Required:
-  path/directory or path list
-                        Files to be concatenated, specified via (1) multiple paths of the files to be concatenated, (2) single path to text
-                        file containing linebreak-separated paths of files to be concatenated, (3) single path to netCDF file to be copied to
-                        output path, or a (4) single directory containing the files to be concatenated.
-  -o OUTPUT_PATH, --output_path OUTPUT_PATH
-                        The output filename for the merged output.
-```
-
 For example:
 
 ```shell
-poetry run stitchee /path/to/netcdf/directory/ -o /path/to/output.nc
+poetry run stitchee /path/to/files/directory -o output.nc --concat_method xarray-combine
+```
+
+Command line options:
+```shell
+$ poetry run stitchee --help
+usage: stitchee [-h] -o PATH [--concat_method {xarray-concat,xarray-combine}] [--concat_dim DIM] [--sorting_variable VAR] [--xarray_arg_compat COMPAT]
+                [--xarray_arg_combine_attrs ATTRS] [--xarray_arg_join JOIN] [-O] [-v]
+                INPUT [INPUT ...]
+
+Concatenate netCDF files along existing dimensions.
+
+options:
+  -h, --help            show this help message and exit
+  -O, --overwrite       Overwrite output file if it exists
+  -v, --verbose         Enable verbose output to stdout; useful for debugging
+
+Required Arguments:
+  INPUT                 Input specification: multiple file paths, directory path, text file with file list, or single file to copy
+  -o PATH, --output_path PATH
+                        Output file path for concatenated result
+
+Concatenation Options:
+  --concat_method {xarray-concat,xarray-combine}
+                        Concatenation method (default: xarray-concat)
+  --concat_dim DIM      Dimension to concatenate along (required for xarray-concat)
+  --sorting_variable VAR
+                        Name of a variable to use for sorting datasets before concatenation (e.g., 'time')
+
+xarray Arguments:
+  --xarray_arg_compat COMPAT
+                        'compat' argument passed to xarray concatenation function
+  --xarray_arg_combine_attrs ATTRS
+                        'combine_attrs' argument passed to xarray concatenation function
+  --xarray_arg_join JOIN
+                        'join' argument passed to xarray concatenation function
+
+Examples:
+  stitchee file1.nc file2.nc -o output.nc --concat_dim time
+  stitchee /path/to/files/directory -o output.nc --concat_method xarray-combine
+  stitchee filelist.txt -o output.nc --concat_dim time --sorting_variable time
 ```
 
 ---

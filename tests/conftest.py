@@ -65,33 +65,30 @@ def temp_output_dir(tmpdir_factory) -> Path:
 
 
 @pytest.fixture(scope="function")
-def toy_empty_dataset(temp_toy_data_dir):
+def toy_null_dataset(temp_toy_data_dir):
     """Creates groups, dimensions, variables; and uses chosen step values in an open dataset"""
 
     filepath = temp_toy_data_dir / "test_empty_dataset.nc"
 
-    f = nc.Dataset(filename=filepath, mode="w")
+    with nc.Dataset(filename=filepath, mode="w") as f:
+        grp1 = f.createGroup("Group1")
 
-    grp1 = f.createGroup("Group1")
+        # Root-level Dimensions/Variables
+        f.createDimension("step", 1)
+        f.createDimension("track", 1)
+        f.createVariable("step", "f4", ("step",), fill_value=False)
+        f.createVariable("track", "f4", ("track",), fill_value=False)
+        f.createVariable("var0", "f4", ("step", "track"))
 
-    # Root-level Dimensions/Variables
-    f.createDimension("step", 1)
-    f.createDimension("track", 1)
-    f.createVariable("step", "f4", ("step",), fill_value=False)
-    f.createVariable("track", "f4", ("track",), fill_value=False)
-    f.createVariable("var0", "f4", ("step", "track"))
+        #
+        f["step"][:] = [np.nan]
+        f["track"][:] = [np.nan]
+        f["var0"][:] = [np.nan]
 
-    #
-    f["step"][:] = [np.nan]
-    f["track"][:] = [np.nan]
-    f["var0"][:] = [np.nan]
-
-    # Group 1 Dimensions/Variables
-    grp1.createVariable("var1", "f8", ("step", "track"))
-    #
-    grp1["var1"][:] = [np.nan]
-
-    f.close()
+        # Group 1 Dimensions/Variables
+        grp1.createVariable("var1", "f8", ("step", "track"))
+        #
+        grp1["var1"][:] = [np.nan]
 
     return filepath
 
