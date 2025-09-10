@@ -206,10 +206,9 @@ def concat_with_duplicate_dims(dataarrays: list[xr.DataArray], concat_dim: str, 
 
     # reconstruct the old list of dimensions and coordinates with repeated dims
     old_dims = [dim.split("___", 1)[-1] for dim in concatenated_dataarray.dims]
-    dim_tuple = list(zip(old_dims, concatenated_dataarray.dims))
     old_coords = {
         old_dim: concatenated_dataarray.coords[new_dim].rename({new_dim: old_dim})
-        for old_dim, new_dim in dim_tuple
+        for old_dim, new_dim in zip(old_dims, concatenated_dataarray.dims)
         if new_dim in concatenated_dataarray.coords
     }
 
