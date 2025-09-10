@@ -226,7 +226,9 @@ def concat_with_duplicate_dims(dataarrays: list[xr.DataArray], concat_dim: str, 
     return dataarray_back
 
 
-def composite_concat(datasets, concat_dim: str, concat_kwargs: dict):
+def concat_datasets(datasets: list[xr.DataSet], concat_dim: str, concat_kwargs: dict):
+    """Concatenate datasets, handling variables with duplicate dimensions specially."""
+
     # Build base kwargs
     base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs}
 
