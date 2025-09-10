@@ -200,9 +200,8 @@ def concat_with_duplicate_dims(dataarrays: list[xr.DataArray], concat_dim: str, 
     # data_vars must be "all" when concatenating because there is only one data_var, DataArray itself
     base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs, "data_vars": "all"}
 
-    # construct a list of dataarrays with repeated dimensions renamed
+    # Rename duplicate dimensions, then concatenate
     new_dataarrays = [rename_to_uniq_dimensions(da) for da in dataarrays]
-    # concatenate the manually constructed dataarrays
     concatenated_dataarray = xr.concat(new_dataarrays, dim=concat_dim, **base_kwargs)
 
     # reconstruct the old list of dimensions and coordinates with repeated dims
