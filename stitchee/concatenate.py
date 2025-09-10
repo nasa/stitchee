@@ -141,8 +141,7 @@ def validate_concat_method_and_dim(concat_method: str, concat_dim: str | None = 
 
 
 def find_variables_with_duplicate_dimensions(dataset: xr.DataSet):
-    # find variables with duplicate dimensions
-    # by comparing dimension's index with its first occurrence
+    """Return variable names that have repeated dimensions."""
     duplicate_variables = [
         varname
         for varname in dataset.variables
