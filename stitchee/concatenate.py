@@ -149,7 +149,6 @@ def find_variables_with_duplicate_dimensions(dataset: xr.DataSet):
         if (
             (dims := dataset[varname].dims) and (
                 any(idim != dims.index(dim) for idim, dim in enumerate(dims))
-                or ('a' in varname and 'mirror_step' in dims)
             )
         )
     ]
