@@ -3,6 +3,7 @@ import pytest
 import xarray as xr
 
 from stitchee.concatenate import (
+    _concat_datasets,
     _concat_with_duplicate_dims,
     _find_variables_with_duplicate_dimensions,
     _rename_to_uniq_dimensions,
@@ -85,3 +86,37 @@ def test_concat_with_duplicate_dims():
     )
 
     assert total_da.identical(concatenated_da)
+
+def test_concat_datasets():
+    data2d_1 = np.random.rand(20, 30)
+    data4d_1 = np.random.rand(20, 30, 5, 5)
+    ds_1 = xr.Dataset({
+            "var2d": (("mirror_step", "xtrack"), data2d_1),
+            "var4d": (("mirror_step", "xtrack", "layer", "layer"), data4d_1)
+        },
+        coords={"mirror_step": np.arange(20), "xtrack": np.arange(30), "layer": np.arange(5)},
+    )
+
+    data2d_2 = np.random.rand(11, 30)
+    data4d_2 = np.random.rand(11, 30, 5, 5)
+    ds_2 = xr.Dataset({
+            "var2d": (("mirror_step", "xtrack"), data2d_2),
+            "var4d": (("mirror_step", "xtrack", "layer", "layer"), data4d_2)
+        },
+        coords={"mirror_step": np.arange(20,31), "xtrack": np.arange(30), "layer": np.arange(5)},
+    )
+
+    total_ds = xr.Dataset({
+            "var2d": (("mirror_step", "xtrack"), np.concatenate([data2d_1, data2d_2], axis=0),),
+            "var4d": (("mirror_step", "xtrack", "layer", "layer"), np.concatenate([data4d_1, data4d_2], axis=0),)
+        },
+        coords={"mirror_step": np.arange(31), "xtrack": np.arange(30), "layer": np.arange(5)},
+    )
+
+    concat_kwargs = {"data_vars": "minimal", "coords": "minimal", "compat": "override"}
+
+    concatenated_ds = _concat_datasets(
+        [ds_1, ds_2], concat_dim="mirror_step", concat_kwargs=concat_kwargs
+    )
+
+    assert total_ds.identical(concatenated_ds)
