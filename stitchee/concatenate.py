@@ -140,7 +140,7 @@ def validate_concat_method_and_dim(concat_method: str, concat_dim: str | None = 
         )
 
 
-def find_variables_with_duplicate_dimensions(dataset: xr.DataSet):
+def _find_variables_with_duplicate_dimensions(dataset: xr.DataSet):
     """Return variable names that have repeated dimensions."""
     duplicate_variables = [
         varname
@@ -151,18 +151,18 @@ def find_variables_with_duplicate_dimensions(dataset: xr.DataSet):
     return duplicate_variables
 
 
-def rename_to_uniq_dimensions(dataarray: xr.DataArray):
+def _rename_to_uniq_dimensions(dataarray: xr.DataArray):
     """Make duplicate dimension names unique by adding numeric prefixes.
-        
+
     Returns
     -------
     xr.DataArray
         New DataArray with unique dimension names and updated coordinates.
-        
+
     Examples
     --------
     >>> arr = xr.DataArray([[1, 2], [3, 4]], dims=['x', 'x'])
-    >>> result = rename_to_uniq_dimensions(arr)
+    >>> result = _rename_to_uniq_dimensions(arr)
     >>> result.dims
     ('x', '1___x')
     """
@@ -191,9 +191,11 @@ def rename_to_uniq_dimensions(dataarray: xr.DataArray):
     return new_dataarray
 
 
-def concat_with_duplicate_dims(dataarrays: list[xr.DataArray], concat_dim: str, concat_kwargs: dict):
+def _concat_with_duplicate_dims(
+    dataarrays: list[xr.DataArray], concat_dim: str, concat_kwargs: dict
+):
     """Concatenate DataArrays that may have duplicate dimension names.
-    
+
     Temporarily renames duplicate dimensions, concatenates, then restores original names.
     """
     # Prepare concatenation settings
@@ -201,7 +203,7 @@ def concat_with_duplicate_dims(dataarrays: list[xr.DataArray], concat_dim: str, 
     base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs, "data_vars": "all"}
 
     # Rename duplicate dimensions, then concatenate
-    new_dataarrays = [rename_to_uniq_dimensions(da) for da in dataarrays]
+    new_dataarrays = [_rename_to_uniq_dimensions(da) for da in dataarrays]
     concatenated_dataarray = xr.concat(new_dataarrays, dim=concat_dim, **base_kwargs)
 
     # reconstruct the old list of dimensions and coordinates with repeated dims
@@ -226,25 +228,25 @@ def concat_with_duplicate_dims(dataarrays: list[xr.DataArray], concat_dim: str, 
     return dataarray_back
 
 
-def concat_datasets(datasets: list[xr.DataSet], concat_dim: str, concat_kwargs: dict):
+def _concat_datasets(datasets: list[xr.DataSet], concat_dim: str, concat_kwargs: dict):
     """Concatenate datasets, handling variables with duplicate dimensions specially."""
 
     # Build base kwargs
     base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs}
 
     # Find all variables with duplicate dimensions using first dataset
-    duplicate_variables = find_variables_with_duplicate_dimensions(datasets[0])
+    duplicate_variables = _find_variables_with_duplicate_dimensions(datasets[0])
 
     if not duplicate_variables:
         return xr.concat(datasets, dim=concat_dim, **base_kwargs)
-        
+
     # Concatenate datarrays first without duplicate dimensions
     clean_datasets = [dataset.drop_vars(duplicate_variables) for dataset in datasets]
     concatenated_dataset = xr.concat(clean_datasets, dim=concat_dim, **base_kwargs)
-    
+
     # Process each duplicate variable separately
     for variable in duplicate_variables:
-        dataarray = concat_with_duplicate_dims(
+        dataarray = _concat_with_duplicate_dims(
             [dataset[variable] for dataset in datasets], concat_dim, concat_kwargs
         )
         concatenated_dataset = concatenated_dataset.assign({variable: dataarray})
@@ -261,7 +263,7 @@ def _create_concat_function(concat_method: str, concat_dim: str, concat_kwargs: 
 
     # Create appropriate function
     if concat_method == "xarray-concat":
-        return partial(concat_datasets, concat_dim=concat_dim, concat_kwargs=concat_kwargs)
+        return partial(_concat_datasets, concat_dim=concat_dim, concat_kwargs=concat_kwargs)
     else:  # concat_method == "xarray-combine"
         return partial(xr.combine_by_coords, **base_kwargs)
 
