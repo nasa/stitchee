@@ -151,8 +151,21 @@ def find_variables_with_duplicate_dimensions(dataset: xr.DataSet):
     return duplicate_variables
 
 
-def rename_to_uniq_dimensions(dataarray):
-    # find the repetition numbers for all dimensions
+def rename_to_uniq_dimensions(dataarray: xr.DataArray):
+    """Make duplicate dimension names unique by adding numeric prefixes.
+        
+    Returns
+    -------
+    xr.DataArray
+        New DataArray with unique dimension names and updated coordinates.
+        
+    Examples
+    --------
+    >>> arr = xr.DataArray([[1, 2], [3, 4]], dims=['x', 'x'])
+    >>> result = rename_to_uniq_dimensions(arr)
+    >>> result.dims
+    ('x', '1___x')
+    """
     iduplicates = [idim - dataarray.dims.index(dim) for idim, dim in enumerate(dataarray.dims)]
     # rename repeated dimensions with a prefix to each repeated dimension
     new_dims = [
