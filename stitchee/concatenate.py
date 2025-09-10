@@ -235,17 +235,19 @@ def concat_datasets(datasets: list[xr.DataSet], concat_dim: str, concat_kwargs: 
     # Find all variables with duplicate dimensions using first dataset
     duplicate_variables = find_variables_with_duplicate_dimensions(datasets[0])
 
-    # Concatenate datarrays manually for each variable with duplicate dimensions
-    if duplicate_variables:
-        cleaned_datasets = [dataset.drop_vars(duplicate_variables) for dataset in datasets]
-        concatenated_dataset = xr.concat(cleaned_datasets, dim=concat_dim, **base_kwargs)
-        for variable in duplicate_variables:
-            dataarray = concat_manually(
-                [dataset[variable] for dataset in datasets], concat_dim, concat_kwargs
-            )
-            concatenated_dataset = concatenated_dataset.assign({variable: dataarray})
-    else:
-        concatenated_dataset = xr.concat(datasets, dim=concat_dim, **base_kwargs)
+    if not duplicate_variables:
+        return xr.concat(datasets, dim=concat_dim, **base_kwargs)
+        
+    # Concatenate datarrays first without duplicate dimensions
+    clean_datasets = [dataset.drop_vars(duplicate_variables) for dataset in datasets]
+    concatenated_dataset = xr.concat(clean_datasets, dim=concat_dim, **base_kwargs)
+    
+    # Process each duplicate variable separately
+    for variable in duplicate_variables:
+        dataarray = concat_with_duplicate_dims(
+            [dataset[variable] for dataset in datasets], concat_dim, concat_kwargs
+        )
+        concatenated_dataset = concatenated_dataset.assign({variable: dataarray})
 
     return concatenated_dataset
 
