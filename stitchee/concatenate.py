@@ -261,7 +261,7 @@ def _create_concat_function(concat_method: str, concat_dim: str, concat_kwargs: 
 
     # Create appropriate function
     if concat_method == "xarray-concat":
-        return partial(composite_concat, concat_dim=concat_dim, concat_kwargs=concat_kwargs)
+        return partial(concat_datasets, concat_dim=concat_dim, concat_kwargs=concat_kwargs)
     else:  # concat_method == "xarray-combine"
         return partial(xr.combine_by_coords, **base_kwargs)
 
