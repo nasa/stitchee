@@ -191,11 +191,14 @@ def rename_to_uniq_dimensions(dataarray: xr.DataArray):
     return new_dataarray
 
 
-def concat_manually(dataarrays, concat_dim: str, concat_kwargs: dict):
-    # Build base kwargs
-    base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs}
-    # data_vars must be "all" when concatenating DataArrays because there is only one data_var, DataArray itself
-    base_kwargs.update({"data_vars": "all"})
+def concat_with_duplicate_dims(dataarrays: list[xr.DataArray], concat_dim: str, concat_kwargs: dict):
+    """Concatenate DataArrays that may have duplicate dimension names.
+    
+    Temporarily renames duplicate dimensions, concatenates, then restores original names.
+    """
+    # Prepare concatenation settings
+    # data_vars must be "all" when concatenating because there is only one data_var, DataArray itself
+    base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs, "data_vars": "all"}
 
     # construct a list of dataarrays with repeated dimensions renamed
     new_dataarrays = [rename_to_uniq_dimensions(da) for da in dataarrays]
