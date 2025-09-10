@@ -20,7 +20,8 @@ from stitchee.file_ops import (
 
 # Module constants
 SUPPORTED_CONCAT_METHODS = ("xarray-concat", "xarray-combine")
-DEFAULT_XARRAY_SETTINGS = {"data_vars": "minimal", "coords": "minimal"}
+# include compat="override" to handle inconsistent values of gas_names in O3PROF collection
+DEFAULT_XARRAY_SETTINGS = {"data_vars": "minimal", "coords": "minimal", "compat": "override"}
 DATATREE_OPEN_OPTIONS = {
     "decode_times": False,
     "decode_coords": False,
@@ -139,6 +140,101 @@ def validate_concat_method_and_dim(concat_method: str, concat_dim: str | None = 
         )
 
 
+def find_variables_with_duplicate_dimensions(dataset: xr.DataSet):
+    # find variables with duplicate dimensions
+    # by comparing dimension's index with its first occurrence
+    duplicate_variables = [
+        varname
+        for varname in dataset.variables
+        if (
+            (dims := dataset[varname].dims) and (
+                any(idim != dims.index(dim) for idim, dim in enumerate(dims))
+                or ('a' in varname and 'mirror_step' in dims)
+            )
+        )
+    ]
+
+    return duplicate_variables
+
+
+def rename_to_uniq_dimensions(dataarray):
+    # find the repetition numbers for all dimensions
+    iduplicates = [idim-dataarray.dims.index(dim) for idim,dim in enumerate(dataarray.dims)]
+    # rename repeated dimensions with a prefix to each repeated dimension
+    new_dims = [dim if idup==0 else f'{idup}___{dim}' for idup,dim in zip(iduplicates, dataarray.dims)]
+    dim_tuple = list(zip(dataarray.dims, new_dims))
+    # update coordinates with newly renamed dimensions
+    new_coords = {
+        new_dim: dataarray.coords[old_dim].rename({old_dim: new_dim})
+        for old_dim, new_dim in dim_tuple
+        if old_dim in dataarray.coords
+    }
+
+    # construct new DataArray with repeated dimensions
+    new_dataarray = xr.DataArray(
+        dataarray.to_numpy(),
+        dims = new_dims,
+        coords = new_coords,
+        name = dataarray.name,
+        attrs = dataarray.attrs,
+    )
+
+    return new_dataarray
+
+
+def concat_manually(dataarrays, concat_dim: str, concat_kwargs: dict):
+    # Build base kwargs
+    base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs}
+    # data_vars must be "all" when concatenating DataArrays because there is only one data_var, DataArray itself
+    base_kwargs.update({"data_vars": "all"})
+
+    # construct a list of dataarrays with repeated dimensions renamed
+    new_dataarrays = [rename_to_uniq_dimensions(da) for da in dataarrays]
+    # concatenate the manually constructed dataarrays
+    concatenated_dataarray = xr.concat(new_dataarrays, dim=concat_dim, **base_kwargs)
+
+    # reconstruct the old list of dimensions and coordinates with repeated dims
+    old_dims = [dim.split('___',1)[-1] for dim in concatenated_dataarray.dims]
+    dim_tuple = list(zip(old_dims, concatenated_dataarray.dims))
+    old_coords = {
+        old_dim: concatenated_dataarray.coords[new_dim].rename({new_dim: old_dim})
+        for old_dim, new_dim in dim_tuple
+        if new_dim in concatenated_dataarray.coords
+    }
+
+    # construct DataArray again with original dimension schema
+    dataarray_back = xr.DataArray(  
+        concatenated_dataarray.to_numpy(),
+        dims = old_dims,
+        coords = old_coords,
+        name = concatenated_dataarray.name,
+        attrs = concatenated_dataarray.attrs,
+    )
+    # preserve encoding for storage in NetCDF4
+    dataarray_back.encoding = dataarrays[0].encoding
+
+    return dataarray_back
+
+
+def composite_concat(datasets, concat_dim: str, concat_kwargs: dict):
+    # Build base kwargs
+    base_kwargs = {**DEFAULT_XARRAY_SETTINGS, **concat_kwargs}
+
+    # Find all variables with duplicate dimensions using first dataset
+    duplicate_variables = find_variables_with_duplicate_dimensions(datasets[0])
+
+    # Concatenate datarrays manually for each variable with duplicate dimensions
+    if duplicate_variables:
+        cleaned_datasets = [dataset.drop_vars(duplicate_variables) for dataset in datasets]
+        concatenated_dataset = xr.concat(cleaned_datasets, dim=concat_dim, **base_kwargs)
+        for variable in duplicate_variables:
+           dataarray = concat_manually([dataset[variable] for dataset in datasets], concat_dim, concat_kwargs)
+           concatenated_dataset = concatenated_dataset.assign({variable: dataarray})
+    else:
+        concatenated_dataset = xr.concat(datasets, dim=concat_dim, **base_kwargs)
+
+    return concatenated_dataset
+
 def _create_concat_function(concat_method: str, concat_dim: str, concat_kwargs: dict) -> Callable:
     """Create concatenation function after validating method and dimension requirements."""
     validate_concat_method_and_dim(concat_method, concat_dim)
@@ -148,7 +244,7 @@ def _create_concat_function(concat_method: str, concat_dim: str, concat_kwargs: 
 
     # Create appropriate function
     if concat_method == "xarray-concat":
-        return partial(xr.concat, dim=concat_dim, **base_kwargs)
+        return partial(composite_concat, concat_dim=concat_dim, concat_kwargs=concat_kwargs)
     else:  # concat_method == "xarray-combine"
         return partial(xr.combine_by_coords, **base_kwargs)
 
