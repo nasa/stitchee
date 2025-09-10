@@ -146,10 +146,7 @@ def find_variables_with_duplicate_dimensions(dataset: xr.DataSet):
     duplicate_variables = [
         varname
         for varname in dataset.variables
-        if (
-            (dims := dataset[varname].dims)
-            and (any(idim != dims.index(dim) for idim, dim in enumerate(dims)))
-        )
+        if (dims := dataset[varname].dims) and len(dims) != len(set(dims))
     ]
 
     return duplicate_variables
