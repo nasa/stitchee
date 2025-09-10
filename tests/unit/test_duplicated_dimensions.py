@@ -1,11 +1,11 @@
-import pytest
 import numpy as np
+import pytest
 import xarray as xr
 
 from stitchee.concatenate import (
+    _concat_with_duplicate_dims,
     _find_variables_with_duplicate_dimensions,
     _rename_to_uniq_dimensions,
-    _concat_with_duplicate_dims,
 )
 
 
