@@ -16,8 +16,8 @@ RUN apt-get update \
 # Create a new user
 RUN adduser --quiet --disabled-password --shell /bin/sh --home /home/dockeruser --gecos "" --uid 1000 dockeruser
 USER dockeruser
-ENV HOME /home/dockeruser
-ENV PYTHONPATH "${PYTHONPATH}:/home/dockeruser/.local/bin"
+ENV HOME=/home/dockeruser
+ENV PYTHONPATH="${PYTHONPATH}:/home/dockeruser/.local/bin"
 ENV PATH="/home/dockeruser/.local/bin:${PATH}"
 
 # The 'SOURCE' argument is what will be used in 'pip install'.
