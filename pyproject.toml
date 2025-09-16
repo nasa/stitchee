@@ -9,52 +9,55 @@ dynamic = [
     "classifiers"
 ]
 description = "NetCDF4 Along-existing-dimension Concatenation Service"
-license = "Apache-2.0"
+license = {file = "LICENSE"}
 readme = "README.md"
 requires-python = ">=3.12,<4"
 authors = [
     { name = "Daniel Kaufman", email = "daniel.kaufman@nasa.gov" }
 ]
 dependencies = [
-    "netcdf4 (>=1.6.5)",
-    "xarray (>=2024.3.0)",
-    "pystac (>=0.5.3)",
-    "importlib-metadata (>=8.4.0)",
+    "netcdf4>=1.6.5",
+    "xarray>=2024.3.0",
+    "pystac>=0.5.3",
+    "importlib-metadata>=8.4.0",
 ]
 
 [project.urls]
 Repository = "https://github.com/nasa/stitchee"
 Documentation = "https://stitchee.readthedocs.io"
 Changelog = "https://github.com/nasa/stitchee/blob/main/CHANGELOG.md"
+"Bug Tracker" = "https://github.com/nasa/stitchee/issues"
 
 [project.scripts]
 stitchee_harmony = 'stitchee.harmony.cli:main'
 stitchee = 'stitchee.cli:main'
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.1.1",
+    "mypy>=1.9.0",
+    "ruff>=0.5.0",
+    "pytest-cov>=5.0.0",
+    "mkdocs>=1.6.0",
+    "markdown-callouts>=0.4.0",
+    "markdown-include>=0.8.1",
+    "mkdocstrings>=0.25.1",
+    "mkdocs-jupyter>=0.24.7",
+    "mkdocs-material>=9.5.22",
+    "mkdocstrings-python>=1.16.12",
+]
+harmony = [
+    "harmony-service-lib>=2.0.0"
+]
+integration = [
+    "harmony-py>=0.4.15"
+]
+
 [tool.poetry]
-version = "1.7.0"
+version = "1.8.0rc5"
 packages = [
     { include = "stitchee" },
 ]
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=8.1.1"
-mypy = ">=1.9.0"
-ruff = ">=0.5.0"
-pytest-cov = ">=5.0.0"
-mkdocs = ">=1.6.0"
-markdown-callouts = ">=0.4.0"
-markdown-include = ">=0.8.1"
-mkdocstrings = ">=0.25.1"
-mkdocs-jupyter = ">=0.24.7"
-mkdocs-material = ">=9.5.22"
-mkdocstrings-python = ">=1.16.12"
-
-[tool.poetry.group.harmony.dependencies]
-harmony-service-lib = ">=2.0.0"
-
-[tool.poetry.group.integration.dependencies]
-harmony-py = ">=0.4.15"
 
 [[tool.mypy.overrides]]
 module = "netCDF4.*"
@@ -72,20 +75,20 @@ line-length = 100
 target-version = "py312"
 
 [tool.ruff.lint]
-# E402: module level import not at top of file
-# E501: line too long - let black worry about that
-# E731: do not assign a lambda expression, use a def
 ignore = [
-  "E402",
-  "E501",
-  "E731",
+    "E402",  # module level import not at top of file
+    "E501",  # line too long - let ruff format handle it
+    "E731",  # do not assign a lambda expression, use a def
 ]
 select = [
-  "F", # Pyflakes
-  "E", # Pycodestyle
-  "W",
-  "I", # isort
-  "UP", # Pyupgrade
+  "F",   # Pyflakes
+  "E",   # Pycodestyle errors
+  "W",   # Pycodestyle warnings
+  "I",   # isort
+  "UP",  # Pyupgrade
+  "B",   # Bugbear (catches common bugs)
+  "C4",  # Comprehensions
+  "SIM", # Simplifications
 ]
 
 [tool.coverage.run]
@@ -105,3 +108,6 @@ exclude_lines = [
     "if 0:",
     "if __name__ == .__main__.:"
 ]
+
+[tool.ruff.lint.isort]
+known-first-party = ["stitchee"]

@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2025-09-16
+
+### Fixed
+
+- Handle variables with duplicate dimensions ([#299](https://github.com/nasa/stitchee/pull/299))([**@ank1m**](https://github.com/ank1m))
+- Handle non-concatenating variables of the same name for potential conflict ([#299](https://github.com/nasa/stitchee/pull/299))([**@ank1m**](https://github.com/ank1m))
+
 ## [1.7.0] - 2025-07-07
 
 ### Changed
