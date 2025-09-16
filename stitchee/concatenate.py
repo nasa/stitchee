@@ -136,7 +136,8 @@ def validate_concat_method_and_dim(concat_method: str, concat_dim: str | None = 
     if concat_method == "xarray-combine" and concat_dim:
         warn(
             "'concat_dim' was specified but will not be used "
-            "because 'xarray-combine' method was selected."
+            "because 'xarray-combine' method was selected.",
+            stacklevel=2,
         )
 
 
@@ -169,9 +170,10 @@ def _rename_to_uniq_dimensions(dataarray: xr.DataArray):
     iduplicates = [idim - dataarray.dims.index(dim) for idim, dim in enumerate(dataarray.dims)]
     # rename repeated dimensions with a prefix to each repeated dimension
     new_dims = [
-        dim if idup == 0 else f"{idup}___{dim}" for idup, dim in zip(iduplicates, dataarray.dims)
+        dim if idup == 0 else f"{idup}___{dim}"
+        for idup, dim in zip(iduplicates, dataarray.dims, strict=False)
     ]
-    dim_tuple = list(zip(dataarray.dims, new_dims))
+    dim_tuple = list(zip(dataarray.dims, new_dims, strict=False))
     # update coordinates with newly renamed dimensions
     new_coords = {
         new_dim: dataarray.coords[old_dim].rename({old_dim: new_dim})
@@ -210,7 +212,7 @@ def _concat_with_duplicate_dims(
     old_dims = [dim.split("___", 1)[-1] for dim in concatenated_dataarray.dims]
     old_coords = {
         old_dim: concatenated_dataarray.coords[new_dim].rename({new_dim: old_dim})
-        for old_dim, new_dim in zip(old_dims, concatenated_dataarray.dims)
+        for old_dim, new_dim in zip(old_dims, concatenated_dataarray.dims, strict=False)
         if new_dim in concatenated_dataarray.coords
     }
 
