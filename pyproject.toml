@@ -111,4 +111,3 @@ exclude_lines = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["stitchee"]
-

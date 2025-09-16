@@ -47,7 +47,7 @@ jobs:
 
       - name: Install package
         run: poetry install --extras "dev integration"
-        
+
       - name: Test
         env:
           EDL_USER: ${{ secrets.DEK_EDL_USER }}
