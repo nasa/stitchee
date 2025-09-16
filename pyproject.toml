@@ -47,10 +47,10 @@ dev = [
     "mkdocstrings-python>=1.16.12",
 ]
 harmony = [
-    harmony-service-lib = ">=2.0.0"
+    "harmony-service-lib>=2.0.0"
 ]
 integration = [
-    harmony-py = ">=0.4.15"
+    "harmony-py>=0.4.15"
 ]
 
 [tool.poetry]
