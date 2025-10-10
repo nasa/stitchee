@@ -90,7 +90,8 @@ def concatenate(
     output_file = validate_output_path(output_file, overwrite=overwrite_output_file)
 
     if num_input_files == 1:
-        shutil.copyfile(input_files[0], output_file)
+        # shutil.copyfile(input_files[0], output_file)
+        xr.open_datatree(input_files[0]).to_netcdf(output_file)
         logger.info("Single workable file, copied to output path without modification.")
         return output_file
 
