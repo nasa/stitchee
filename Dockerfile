@@ -10,7 +10,6 @@ RUN apt-get update && \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-
 # Create user and workspace
 RUN adduser --quiet --disabled-password --shell /bin/sh \
         --home /home/dockeruser --gecos "" --uid 1000 dockeruser \
@@ -20,24 +19,20 @@ RUN adduser --quiet --disabled-password --shell /bin/sh \
 # Set working directory
 WORKDIR /worker
 
-# Install dependencies as root (needed for system-level packages)
-COPY pyproject.toml ./
+# Copy project files and install (as root for system-wide installation)
+COPY pyproject.toml README.md ./
+COPY stitchee/ ./stitchee/
 RUN poetry config virtualenvs.create false \
     && poetry install --with harmony --without integration
 
-# Copy application files
-#   Set DIST_PATH argument if running the pip install on a local directory, so
-#   the local dist files are copied into the container.
-ARG DIST_PATH
-COPY --chown=dockeruser:dockeruser $DIST_PATH $DIST_PATH
-COPY --chown=dockeruser:dockeruser ./docker-entrypoint.sh ./
-RUN chmod +x ./docker-entrypoint.sh
+# Copy and prepare entrypoint
+COPY docker-entrypoint.sh ./
+RUN chmod +x ./docker-entrypoint.sh \
+    && chown dockeruser:dockeruser ./docker-entrypoint.sh
 
 # Switch to non-root user for runtime
 USER dockeruser
 ENV HOME=/home/dockeruser \
-    PYTHONPATH="/home/dockeruser/.local/bin" \
-    PATH="/home/dockeruser/.local/bin:${PATH}"
+    PYTHONPATH="/worker"
 
-# Run the service
 ENTRYPOINT ["./docker-entrypoint.sh"]
