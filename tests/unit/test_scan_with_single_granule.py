@@ -1,6 +1,7 @@
 """Test for processing single granule scan."""
 
 import os
+
 import xarray as xr
 
 from stitchee.concatenate import concatenate
