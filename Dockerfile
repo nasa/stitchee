@@ -17,10 +17,10 @@ RUN adduser --quiet --disabled-password --shell /bin/sh \
     && mkdir -p /worker \
     && chown dockeruser /worker
 
-# Switch to non-root user and set environment (PYTHONPATH might not be set in the base image)
+# Switch to non-root user and set environment
 USER dockeruser
 ENV HOME=/home/dockeruser \
-    PYTHONPATH="${PYTHONPATH}:/home/dockeruser/.local/bin" \
+    PYTHONPATH="/home/dockeruser/.local/bin" \
     PATH="/home/dockeruser/.local/bin:${PATH}"
 
 # Build arguments
