@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Reprocess scan with single granule to prevent concatenation error in CONCISE ([#306](https://github.com/nasa/stitchee/pull/299))([**@ank1m**](https://github.com/ank1m))
+- Reprocess scan with single granule to prevent concatenation error in CONCISE ([#306](https://github.com/nasa/stitchee/issues/306))([**@ank1m**](https://github.com/ank1m))
 
 ## [1.8.0] - 2025-09-16
 
