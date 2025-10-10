@@ -15,7 +15,7 @@ RUN apt-get update && \
 RUN adduser --quiet --disabled-password --shell /bin/sh \
         --home /home/dockeruser --gecos "" --uid 1000 dockeruser \
     && mkdir -p /worker \
-    && chown dockeruser /worker \
+    && chown dockeruser /worker
 
 # Switch to non-root user and set environment (PYTHONPATH might not be set in the base image)
 USER dockeruser
