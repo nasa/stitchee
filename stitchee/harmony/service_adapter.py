@@ -131,10 +131,10 @@ class StitcheeAdapter(BaseHarmonyAdapter):
 
             # -- Output to STAC catalog --
             result.clear_items()
-            properties = dict(
-                start_datetime=datetimes["start_datetime"],
-                end_datetime=datetimes["end_datetime"],
-            )
+            properties = {
+                "start_datetime": datetimes["start_datetime"],
+                "end_datetime": datetimes["end_datetime"],
+            }
 
             item = Item(
                 str(uuid4()),

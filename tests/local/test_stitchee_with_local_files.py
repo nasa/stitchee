@@ -82,6 +82,7 @@ class TestConcat:
             for a, b in zip(
                 merged_data.variables[record_dim_name][:],
                 sorted(merged_data.variables[record_dim_name][:]),
+                strict=False,
             )
         )
 

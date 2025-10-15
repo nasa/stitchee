@@ -23,7 +23,7 @@ WORKDIR /worker
 COPY pyproject.toml README.md ./
 COPY stitchee/ ./stitchee/
 RUN poetry config virtualenvs.create false \
-    && poetry install --with harmony --without integration
+    && poetry install --extras "dev harmony"
 
 # Copy and prepare entrypoint
 COPY docker-entrypoint.sh ./

@@ -144,7 +144,7 @@ def _get_list_of_filepaths_from_file(file_with_paths: Path) -> list[str]:
                 if line and not line.startswith("#"):  # Skip empty lines and comments
                     paths.append(str(Path(line).resolve()))
     except Exception as e:
-        raise ValueError(f"Failed to read paths from {file_with_paths}: {e}")
+        raise ValueError(f"Failed to read paths from {file_with_paths}: {e}") from e
 
     return paths
 
@@ -168,7 +168,7 @@ def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
     bool
         True if dataset is empty, False if any variable contains data
     """
-    for var_name, var in parent_group.variables.items():
+    for _var_name, var in parent_group.variables.items():
         if var.size == 0:
             continue  # Empty variable, check next one
 
@@ -181,19 +181,16 @@ def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
         var_data = var[:]
 
         # Check if variable is non-empty using three different methods
-        if np.ma.isMaskedArray(var_data):
-            # Check 1: Are all values masked?
-            if not var_data.mask.all() and not np.all(np.isnan(var_data.data)):
-                return False  # Found a non-empty masked array
+        # Check 1: Are all values masked?
+        if np.ma.isMaskedArray(var_data) and (
+            not var_data.mask.all() and not np.all(np.isnan(var_data.data))
+        ):
+            return False  # Found a non-empty masked array
 
         # Check 2: Are all values equal to fill value?
         # Check 3: Are all values NaN?
         if not np.all(var_data.data == fill_or_null) and not np.all(np.isnan(var_data.data)):
             return False  # Found a non-empty variable
 
-    # Check all child groups recursively
-    for child_group in parent_group.groups.values():
-        if not _is_file_empty(child_group):
-            return False  # Found non-empty child group
-
-    return True  # All variables and groups are empty
+    # Check all child groups recursively, and return True if all variables and groups are empty.
+    return all(_is_file_empty(child_group) for child_group in parent_group.groups.values())

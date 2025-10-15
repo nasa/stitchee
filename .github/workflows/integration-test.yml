@@ -46,7 +46,7 @@ jobs:
           poetry-version: ${{ env.POETRY_VERSION }}
 
       - name: Install package
-        run: poetry install --with=integration --without harmony
+        run: poetry install --extras "dev integration"
 
       - name: Test
         env:
