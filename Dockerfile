@@ -20,7 +20,7 @@ RUN adduser --quiet --disabled-password --shell /bin/sh \
 WORKDIR /worker
 
 # Copy project files and install (as root for system-wide installation)
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md LICENSE ./
 COPY stitchee/ ./stitchee/
 RUN poetry config virtualenvs.create false \
     && poetry install --extras "dev harmony"

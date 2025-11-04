@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Common Changelog](https://common-changelog.org/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+
+- Add copy of license to Docker build step to fix error ([#311](https://github.com/nasa/stitchee/issues/311))([**@ank1m**](https://github.com/ank1m), [**@danielfromearth**](https://github.com/danielfromearth))
+
 ## [1.8.0] - 2025-09-16
 
 ### Fixed
