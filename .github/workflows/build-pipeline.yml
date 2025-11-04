@@ -128,7 +128,7 @@ jobs:
       - name: Build Python Artifact
         run: |
           poetry build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: python-artifact
           path: dist/*
