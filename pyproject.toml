@@ -54,7 +54,7 @@ integration = [
 ]
 
 [tool.poetry]
-version = "1.9.0rc1"
+version = "1.9.0rc2"
 packages = [
     { include = "stitchee" },
 ]
