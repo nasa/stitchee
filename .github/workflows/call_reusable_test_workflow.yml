@@ -2,6 +2,9 @@ name: Service Module Tests
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feature/**
 
 jobs:
   test-my-service:
