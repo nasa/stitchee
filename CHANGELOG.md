@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Add copy of license to Docker build step to fix error ([#311](https://github.com/nasa/stitchee/issues/311))([**@ank1m**](https://github.com/ank1m), [**@danielfromearth**](https://github.com/danielfromearth))
+- Add copy of license to Docker build step to fix error ([#313](https://github.com/nasa/stitchee/issues/313))([**@danielfromearth**](https://github.com/danielfromearth))
 
 ## [1.8.0] - 2025-09-16
 
