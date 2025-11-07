@@ -1,0 +1,15 @@
+name: Service Module Tests
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-my-service:
+    uses: nasa/.github/workflows/reusable_poetry_pkg_run_tests.yml@feature/issue-200-gha-workflow-streamlining
+    with:
+      package-name: "stitchee"
+      python-version: "3.9"
+      install-extras-names: "dev harmony"
+      test-path: "tests/unit"
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }} # Pass a specific secret if needed
