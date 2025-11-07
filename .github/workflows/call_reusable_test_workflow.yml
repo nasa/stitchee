@@ -14,5 +14,6 @@ jobs:
       python-version: "3.9"
       install-extras-names: "dev harmony"
       test-path: "tests/unit"
+      coverage-flags: "unittests"
     secrets:
       codecov_token: ${{ secrets.CODECOV_TOKEN }} # Pass a specific secret if needed
