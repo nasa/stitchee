@@ -30,9 +30,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Retrieve repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install Poetry
@@ -128,7 +128,7 @@ jobs:
       - name: Build Python Artifact
         run: |
           poetry build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: python-artifact
           path: dist/*
