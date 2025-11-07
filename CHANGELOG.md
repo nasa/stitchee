@@ -6,16 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-### Fixed
+## [1.9.0] - 2025-11-07
 
-- Add copy of license to Docker build step to fix error ([#311](https://github.com/nasa/stitchee/issues/311))([**@ank1m**](https://github.com/ank1m), [**@danielfromearth**](https://github.com/danielfromearth))
+### Changed
 
-## [1.8.0] - 2025-09-16
+- Avoid warnings from Dockerfile, and streamline Docker build ([#308](https://github.com/nasa/stitchee/issues/308))([**@danielfromearth**](https://github.com/danielfromearth))
+
+### Added
+
+- Add reference links to changelog for each release ([#315](https://github.com/nasa/stitchee/issues/315))([**@danielfromearth**](https://github.com/danielfromearth))
+- Add release process documentation (first draft) ([#313](https://github.com/nasa/stitchee/issues/313))([**@danielfromearth**](https://github.com/danielfromearth))
 
 ### Fixed
 
 - Reprocess scan with single granule to prevent concatenation error in CONCISE ([#306](https://github.com/nasa/stitchee/issues/306))([**@ank1m**](https://github.com/ank1m))
-- Avoid warnings from Dockerfile, and streamline Docker build ([#308](https://github.com/nasa/stitchee/issues/308))([**@danielfromearth**](https://github.com/danielfromearth))
+- Add copy of license to Docker build step to fix error ([#311](https://github.com/nasa/stitchee/issues/311))([**@ank1m**](https://github.com/ank1m), [**@danielfromearth**](https://github.com/danielfromearth))
 
 ## [1.8.0] - 2025-09-16
 
@@ -147,3 +152,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error with TEMPO ozone profile data because of duplicated dimension names ([#4](https://github.com/danielfromearth/stitchee/pull/4))([**@danielfromearth**](https://github.com/danielfromearth))
 - Fix conflicting dimensions on record dimension sorting ([#136](https://github.com/danielfromearth/stitchee/pull/136))([**@danielfromearth**](https://github.com/danielfromearth), [**@ank1m**](https://github.com/ank1m))
 - Concatenation dimension CLI argument is required but isn't listed as such in the help message ([#44](https://github.com/danielfromearth/stitchee/issues/44))([**@danielfromearth**](https://github.com/danielfromearth))
+
+[1.9.0]: https://github.com/nasa/stitchee/releases/tag/1.9.0
+[1.8.0]: https://github.com/nasa/stitchee/releases/tag/1.8.0
+[1.7.0]: https://github.com/nasa/stitchee/releases/tag/1.7.0
+[1.6.1]: https://github.com/nasa/stitchee/releases/tag/1.6.1
+[1.6.0]: https://github.com/nasa/stitchee/releases/tag/1.6.0
+[1.5.0]: https://github.com/nasa/stitchee/releases/tag/1.5.0
+[1.4.0]: https://github.com/nasa/stitchee/releases/tag/1.4.0
+[1.3.0]: https://github.com/nasa/stitchee/releases/tag/1.3.0
+[1.2.1]: https://github.com/nasa/stitchee/releases/tag/1.2.1
+[1.2.0]: https://github.com/nasa/stitchee/releases/tag/1.2.0
+[1.1.0]: https://github.com/nasa/stitchee/releases/tag/1.1.0
+[1.0.0]: https://github.com/nasa/stitchee/releases/tag/1.0.0
