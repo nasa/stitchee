@@ -12,16 +12,12 @@ build:
     python: "3.12"
   jobs:
     post_create_environment:
-      # Install poetry
-      # https://python-poetry.org/docs/#installing-manually
-      - pip install poetry
-      - poetry self add poetry-dynamic-versioning
-      # Tell poetry to not use a virtual environment
-      # - poetry config virtualenvs.create false
+      # Install uv
+      # https://docs.astral.sh/uv/
+      - pip install uv
     post_install:
-      # Install dependencies with 'docs' dependency group
-      # https://python-poetry.org/docs/managing-dependencies/#dependency-groups
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --extras "dev"
+      # Install dependencies with dev extras
+      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH uv sync --extra dev
 
 mkdocs:
   configuration: mkdocs.yml
