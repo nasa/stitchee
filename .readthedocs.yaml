@@ -12,12 +12,19 @@ build:
     python: "3.12"
   jobs:
     post_create_environment:
-      # Install uv
-      # https://docs.astral.sh/uv/
+      # Install uv (https://docs.astral.sh/uv/)
       - pip install uv
     post_install:
-      # Install dependencies with dev extras
+      # Install dependencies into the RTD virtualenv using uv
       - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH uv sync --extra dev
+    # Replace the 'mkdocs' key with a manual 'build' job
+    build:
+      html:
+        # Create the directory first to prevent errors
+        - mkdir -p $READTHEDOCS_OUTPUT/html/
+        # Build directly into the RTD output directory
+        - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH uv run mkdocs build --config-file mkdocs.yml --site-dir $READTHEDOCS_OUTPUT/html/
+
 
 mkdocs:
   configuration: mkdocs.yml
