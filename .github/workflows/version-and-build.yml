@@ -207,13 +207,13 @@ jobs:
       - name: Publish to Test PyPI
         if: steps.version.outputs.publish == 'true' && steps.version.outputs.venue == 'uat'
         env:
-          UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN_TESTPYPI }}
         run: uv publish --publish-url https://test.pypi.org/legacy/
 
       - name: Publish to PyPI
         if: steps.version.outputs.publish == 'true' && steps.version.outputs.venue == 'ops'
         env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN_PYPI }}
         run: uv publish
 
       # Docker image building
