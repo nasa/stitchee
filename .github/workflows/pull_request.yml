@@ -5,10 +5,7 @@ name: Receive PR
 on:
   pull_request:
     # Sequence of patterns matched against refs/heads
-    branches:
-      - feature/**
-      - issue/**
-      - issues/**
+    branches: [ feature/**, issue/** ]
 
 jobs:
   build_and_test:
