@@ -85,7 +85,7 @@ graph TB
         RP --> RQ{develop on release version?}
         RQ -->|Yes| RR[Bump develop to next minor<br/>1.11.0a5 → 1.12.0a1]
         RQ -->|No| RS[Skip - already bumped]
-        RR --> RT[Push with [skip ci]]
+        RR --> RT["Push with [skip ci]"]
     end
 
     subgraph "Production Release - publish.yml"
