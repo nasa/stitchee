@@ -1,33 +1,52 @@
 name: Version and Build
 
 on:
+  # Only run on protected branches (not feature/issue/docs branches)
   push:
-    branches: [develop, main, 'release/**', 'hotfix/**', 'feature/**', 'issue/**', 'issues/**', 'docs/**']
+    branches: [develop, main, 'release/**', 'hotfix/**']
   workflow_dispatch:
+    inputs:
+      force_bump:
+        description: 'Force version bump even if not a PR merge'
+        required: false
+        type: boolean
+        default: false
 
 env:
   PYTHON_VERSION: "3.12"
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  # First run tests
-  run_tests:
-    uses: ./.github/workflows/run_tests.yml
+  # Run integration tests on protected branches (unit tests already ran in PR)
+  integration_tests:
+    # Only run on develop and release branches
+    if: |
+      github.ref == 'refs/heads/develop' ||
+      startsWith(github.ref, 'refs/heads/release/')
+    uses: ./.github/workflows/integration-tests.yml
     secrets:
       codecov_token: ${{ secrets.CODECOV_TOKEN }}
+      DEK_EDL_USER: ${{ secrets.DEK_EDL_USER }}
+      DEK_EDL_PASSWORD: ${{ secrets.DEK_EDL_PASSWORD }}
 
   # Main build job
   build:
-    needs: run_tests
+    needs: [integration_tests]
+    # Run this job even if integration_tests was skipped (for branches like main that don't run them)
+    # but require success if integration tests did run
+    if: always() && (needs.integration_tests.result == 'success' || needs.integration_tests.result == 'skipped')
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write
       packages: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      venue: ${{ steps.version.outputs.venue }}
+      should_publish: ${{ steps.version.outputs.publish }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Need history for auto-bump script
 
@@ -37,9 +56,10 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+          cache-dependency-path: "pyproject.toml"
 
       - name: Install bump-my-version
         run: uv pip install --system bump-my-version
@@ -49,106 +69,62 @@ jobs:
           git config user.name "stitchee-bot"
           git config user.email "stitchee@noreply.github.com"
 
+      - name: Check if this is a PR merge
+        id: check_merge
+        run: |
+          # Check if the commit message indicates a PR merge
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [[ "$COMMIT_MSG" =~ ^Merge\ pull\ request ]] || [[ "${{ inputs.force_bump }}" == "true" ]]; then
+            echo "is_merge=true" >> $GITHUB_OUTPUT
+            echo "✅ This is a PR merge commit or force_bump=true"
+          else
+            echo "is_merge=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  This is a direct push (not a PR merge), skipping version bump"
+          fi
+
       - name: Bump version
         id: version
         run: |
-          BRANCH="${GITHUB_REF#refs/heads/}"
-          echo "Processing branch: $BRANCH"
+          if [[ "${{ steps.check_merge.outputs.is_merge }}" == "true" ]]; then
+            BRANCH="${GITHUB_REF#refs/heads/}"
+            bash scripts/version_bump.sh "$BRANCH"
+          else
+            # Not a PR merge, just capture current version without bumping
+            CURRENT=$(bump-my-version show current_version)
+            BRANCH="${GITHUB_REF#refs/heads/}"
 
-          case "$BRANCH" in
-            develop)
-              echo "📦 Bumping develop alpha"
-              bump-my-version bump pre_number
-              VENUE=sit
-              PUBLISH=true
-              ;;
+            # Determine venue based on branch
+            case "$BRANCH" in
+              develop) VENUE=sit ;;
+              main) VENUE=ops ;;
+              release/*) VENUE=uat ;;
+              hotfix/*) VENUE=ops ;;
+              *) VENUE=dev ;;
+            esac
 
-            release/*)
-              echo "🎯 Bumping release"
-              CURRENT=$(bump-my-version show current_version)
-
-              if [[ "$CURRENT" == *"a"* ]]; then
-                echo "  First release push: Alpha → RC1"
-                bump-my-version bump pre_label
-
-                # Auto-bump develop to next minor
-                echo ""
-                RELEASE_VERSION="${BRANCH#release/}"
-                bash scripts/bump_develop_after_release.sh "$RELEASE_VERSION"
-                echo ""
-
-                # Return to release branch
-                git checkout "$BRANCH"
-              else
-                echo "  Incrementing RC"
-                bump-my-version bump pre_number
-              fi
-
-              VENUE=uat
-              PUBLISH=true
-              ;;
-
-            main)
-              echo "🎉 Stripping to final release"
-              bump-my-version bump pre_label
-              VENUE=ops
-              PUBLISH=true
-              TAG=true
-              ;;
-
-            hotfix/*)
-              echo "🔧 Bumping hotfix patch"
-              CURRENT=$(bump-my-version show current_version)
-              if [[ "$CURRENT" == *"rc"* ]] || [[ "$CURRENT" == *"a"* ]]; then
-                echo "  Stripping pre-release label first"
-                bump-my-version bump pre_label
-              fi
-              bump-my-version bump patch
-              VENUE=ops
-              PUBLISH=true
-              ;;
-
-            feature/*|issue/*|issues/*|docs/*)
-              echo "🌟 Feature branch: adding local identifier"
-              CURRENT=$(bump-my-version show current_version)
-              LOCAL_ID="+$(git rev-parse --short ${GITHUB_SHA})"
-              VERSION="${CURRENT}${LOCAL_ID}"
-              VENUE=dev
-              PUBLISH=false
-              ;;
-
-            *)
-              echo "⏭️  Unknown branch, no version bump"
-              CURRENT=$(bump-my-version show current_version)
-              VERSION="$CURRENT"
-              VENUE=dev
-              PUBLISH=false
-              ;;
-          esac
-
-          # Set VERSION if not already set (for feature branches)
-          if [ -z "$VERSION" ]; then
-            VERSION=$(bump-my-version show current_version)
+            echo "version=$CURRENT" >> $GITHUB_OUTPUT
+            echo "venue=$VENUE" >> $GITHUB_OUTPUT
+            echo "publish=false" >> $GITHUB_OUTPUT
+            echo "already_committed=true" >> $GITHUB_OUTPUT
+            echo "📌 Current version: $CURRENT (no bump)"
           fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "venue=$VENUE" >> $GITHUB_OUTPUT
-          echo "publish=$PUBLISH" >> $GITHUB_OUTPUT
-          echo "tag=${TAG:-false}" >> $GITHUB_OUTPUT
-
-          echo ""
-          echo "📌 Version: $VERSION"
-          echo "🎯 Venue: $VENUE"
 
       - name: Commit version bump
         if: |
-          github.ref == 'refs/heads/develop' ||
-          github.ref == 'refs/heads/main' ||
-          startsWith(github.ref, 'refs/heads/release/') ||
-          startsWith(github.ref, 'refs/heads/hotfix/')
+          steps.check_merge.outputs.is_merge == 'true' &&
+          steps.version.outputs.already_committed == 'false' && (
+            github.ref == 'refs/heads/develop' ||
+            github.ref == 'refs/heads/main' ||
+            startsWith(github.ref, 'refs/heads/release/') ||
+            startsWith(github.ref, 'refs/heads/hotfix/')
+          )
         run: |
           if [[ -n $(git status -s) ]]; then
             git commit -am "Bump version to ${{ steps.version.outputs.version }} [skip ci]"
-            git push
+            git push || {
+              echo "❌ Failed to push to remote"
+              exit 1
+            }
             echo "✅ Version bumped and committed"
           else
             echo "ℹ️  No version changes to commit"
@@ -156,34 +132,65 @@ jobs:
 
       - name: Create Git tag
         if: |
-          github.ref == 'refs/heads/develop' ||
-          github.ref == 'refs/heads/main' ||
-          startsWith(github.ref, 'refs/heads/release/')
+          steps.check_merge.outputs.is_merge == 'true' && (
+            github.ref == 'refs/heads/develop' ||
+            github.ref == 'refs/heads/main' ||
+            startsWith(github.ref, 'refs/heads/release/')
+          )
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           git tag -a "$VERSION" -m "Version $VERSION"
           git push origin "$VERSION"
           echo "✅ Tagged $VERSION"
 
-      - name: Get project name
-        id: project
-        run: |
-          echo "name=$(grep '^name = ' pyproject.toml | sed 's/name = "\(.*\)"/\1/')" >> $GITHUB_OUTPUT
+      - name: Install dependencies
+        run: uv sync --extra dev --extra harmony --frozen
 
-      - name: Run Snyk as a blocking step
-        uses: snyk/actions/python-3.11@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Build package
+        run: uv build
+
+      - name: Upload Python artifact
+        uses: actions/upload-artifact@v6
         with:
-          command: test
-          args: >
-            --org=${{ secrets.SNYK_ORG_ID }}
-            --project-name=${{ github.repository }}
-            --severity-threshold=high
-            --fail-on=all
+          name: python-artifact
+          path: dist/*
 
-      - name: Run Snyk monitor
-        uses: snyk/actions/python-3.11@master
+      - name: Publish to Test PyPI
+        if: steps.check_merge.outputs.is_merge == 'true' && steps.version.outputs.publish == 'true'
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN_TESTPYPI }}
+        run: uv publish --publish-url https://test.pypi.org/legacy/
+
+  # Monitor security status in Snyk dashboard (after successful merge)
+  snyk-monitor:
+    needs: build
+    if: |
+      github.ref == 'refs/heads/develop' ||
+      github.ref == 'refs/heads/main' ||
+      startsWith(github.ref, 'refs/heads/release/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-path: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --extra dev --extra harmony --frozen
+
+      - name: Update Snyk monitoring dashboard
+        uses: snyk/actions/python@master
+        continue-on-error: true  # Don't block if monitoring fails
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -191,59 +198,16 @@ jobs:
           args: >
             --org=${{ secrets.SNYK_ORG_ID }}
             --project-name=${{ github.repository }}
+            --project-tags=branch=${{ github.ref_name }},venue=${{ needs.build.outputs.venue }}
 
-      - name: Install dependencies
-        run: uv sync --extra dev --extra harmony
-
-      - name: Build package
-        run: uv build
-
-      - name: Upload Python artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: python-artifact
-          path: dist/*
-
-      - name: Publish to Test PyPI
-        if: steps.version.outputs.publish == 'true' && steps.version.outputs.venue == 'uat'
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN_TESTPYPI }}
-        run: uv publish --publish-url https://test.pypi.org/legacy/
-
-      - name: Publish to PyPI
-        if: steps.version.outputs.publish == 'true' && steps.version.outputs.venue == 'ops'
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_TOKEN_PYPI }}
-        run: uv publish
-
-      # Docker image building
-      - name: Log in to Container registry
-        if: "!startsWith(github.ref, 'refs/heads/main/')"
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract Docker metadata
-        if: "!startsWith(github.ref, 'refs/heads/main/')"
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,pattern={{version}},value=${{ steps.version.outputs.version }}
-            type=raw,value=${{ steps.version.outputs.venue }}
-
-      - name: Build and push Docker image
-        if: "!startsWith(github.ref, 'refs/heads/main/')"
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          build-args: |
-            SOURCE=${{ steps.project.outputs.name }}[harmony]==${{ steps.version.outputs.version }}
-          push: true
-          pull: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+  # Build and push Docker images for develop and release branches
+  docker:
+    needs: build
+    if: |
+      github.ref == 'refs/heads/develop' ||
+      startsWith(github.ref, 'refs/heads/release/')
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      version: ${{ needs.build.outputs.version }}
+      venue: ${{ needs.build.outputs.venue }}
+      push: true

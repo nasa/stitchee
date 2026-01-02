@@ -13,7 +13,8 @@ _Summarize testing and verification you've done. This includes unit tests or tes
 _Explain how this change was integration tested. Provide screenshots or logs if appropriate. An example of this would be a local Harmony deployment._
 
 ## PR Acceptance Checklist
-* [ ] Unit tests added/updated and passing.
-* [ ] Integration testing
+* [ ] Unit tests added/updated and passing
+* [ ] Integration testing completed
 * [ ] `CHANGELOG.md` updated
-* [ ] Documentation updated (if needed).
+* [ ] Documentation updated (if needed)
+* [ ] Breaking changes documented (if any)

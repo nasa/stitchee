@@ -7,10 +7,12 @@ updates:
     groups:
       pip-dependencies:
         patterns:
-          - "*"
-    # Raise pull requests for version updates
-    # to pip against the `develop` branch
+          - "*"  # Groups all dependencies
     target-branch: "develop"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -18,5 +20,5 @@ updates:
     groups:
       gha-dependencies:
         patterns:
-          - "*"
+          - "*"  # Groups all GitHub Actions
     target-branch: "develop"

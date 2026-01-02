@@ -1,0 +1,35 @@
+name: Receive PR from External Contributors
+
+# This workflow provides basic validation for PRs from external forks.
+# External forks cannot access repository secrets (like EDL credentials),
+# so we only run unit tests (not integration tests) for these PRs.
+#
+# For PRs from within the same repo, pr-checks.yml handles all validation.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  # Only run if PR is from a fork (external contributor)
+  check-if-fork:
+    runs-on: ubuntu-latest
+    outputs:
+      is_fork: ${{ steps.check.outputs.is_fork }}
+    steps:
+      - name: Check if PR is from fork
+        id: check
+        run: |
+          if [[ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
+            echo "is_fork=true" >> $GITHUB_OUTPUT
+            echo "✅ PR from external fork detected"
+          else
+            echo "is_fork=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  PR from same repository (will be covered by pr-checks.yml)"
+          fi
+
+  build_and_test:
+    needs: check-if-fork
+    if: needs.check-if-fork.outputs.is_fork == 'true'
+    uses: ./.github/workflows/unit-tests.yml
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}

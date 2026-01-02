@@ -1,9 +1,7 @@
-# A reusable workflow to build and run the unit test suite
+# A reusable workflow to run the unit test suite
 #
-# This workflow will install Python dependencies, run tests,
-# and report test results and code coverage as artifacts. It will
-# be called by the workflow that run tests against new PRs and as
-# a first step in the workflow that publishes new Docker images.
+# This workflow runs pytest with coverage for unit tests only.
+# Linting and type checking should be done separately.
 name: Unit Tests
 
 on:
@@ -19,10 +17,11 @@ env:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Retrieve repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -30,16 +29,13 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+          cache-dependency-path: "pyproject.toml"
 
-      - name: Install package
-        run: uv sync --extra dev --extra harmony
-
-      - name: Run linting
-        run: |
-          uv run ruff check stitchee
+      - name: Install dependencies
+        run: uv sync --extra dev --extra harmony --frozen
 
       - name: Run tests and collect coverage
         run: uv run pytest --cov=stitchee --cov-report=xml tests/unit

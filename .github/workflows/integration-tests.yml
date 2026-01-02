@@ -1,21 +1,15 @@
 name: Integration Tests
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  workflow_call:
     secrets:
+      codecov_token:
+        required: true
       DEK_EDL_USER:
         required: true
       DEK_EDL_PASSWORD:
         required: true
-      codecov_token:
-        required: true
-  push:
-    branches:
-      - main
-      - develop
-      - release/**
-      - feature/**
+  workflow_dispatch:
 
 # When this workflow is queued, automatically cancel any previous running
 # or pending jobs from the same branch
@@ -29,10 +23,11 @@ env:
 jobs:
   integration-tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Retrieve repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -40,12 +35,13 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+          cache-dependency-path: "pyproject.toml"
 
-      - name: Install package
-        run: uv sync --extra dev --extra integration
+      - name: Install dependencies
+        run: uv sync --extra dev --extra integration --frozen
 
       - name: Test
         env:
