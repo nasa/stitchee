@@ -54,11 +54,20 @@ uv sync --extra dev --extra harmony
 uv run pytest tests/
 ```
 
-## Versioning
+## Contributing
 
-This project uses automated semantic versioning with Git Flow. CI automatically manages all version numbers - developers just write code and merge PRs.
+We welcome contributions! This project uses:
+- **Git Flow** branching strategy with automated semantic versioning
+- **CI/CD** for testing, security scanning, and deployment
+- **Protected branches** (main, develop, release/*, hotfix/*)
 
-See **[docs/VERSIONING.md](docs/VERSIONING.md)** for complete details including visual guides and workflows.
+**Quick workflow:**
+1. Create feature branch from `develop`: `git checkout -b feature/your-feature`
+2. Write code, tests, and update `CHANGELOG.md`
+3. Open PR to `develop` - CI runs tests and security scans
+4. After approval and merge, CI handles versioning automatically
+
+**For developers:** See **[docs/CI-CD-README.md](docs/CI-CD-README.md)** for complete CI/CD workflows and branching strategy.
 
 ## Usage
 

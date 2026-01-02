@@ -1,6 +1,30 @@
 # CI/CD and Branching Strategy
 
-A developer's guide to working with the stitchee repository's automated build, test, and deployment pipeline.
+Complete developer guide for stitchee's automated CI/CD pipeline, including versioning, testing, and deployment.
+
+---
+
+## Table of Contents
+
+**Quick Start**
+- [Branch Structure](#branch-structure-and-flow)
+- [Developer Workflows](#typical-development-workflow) (feature, release, hotfix)
+- [Quick Reference](#quick-reference) (checklist, commands, branch naming)
+
+**CI/CD Pipeline**
+- [Complete Pipeline](#complete-cicd-pipeline) (PR checks, post-merge, publishing)
+- [Publishing Environments](#publishing-environments) (PyPI, Docker, venues)
+- [External Contributors](#external-contributors-forks)
+
+**Versioning**
+- [Version Bumping Logic](#version-bumping-logic)
+- [Why This System Works](#why-this-system-works) (collision-proof design)
+- [Version Configuration](#version-configuration)
+- [Manual Version Commands](#manual-version-commands)
+
+**Troubleshooting**
+- [Common Issues](#troubleshooting)
+- [Advanced Scenarios](#advanced-scenarios)
 
 ---
 
@@ -715,6 +739,216 @@ git push
 
 ---
 
+## Why This System Works
+
+### 🛡️ Collision-Proof Design
+
+The key innovation: **develop auto-bumps to next minor when release is created**.
+
+```
+Before release creation:
+  main: 1.10.0
+  develop: 1.11.0a6
+
+After creating release/1.11.0:
+  main: 1.10.0
+  release/1.11.0: 1.11.0rc1
+  develop: 1.12.0a1  ← Auto-bumped!
+
+Now hotfixes are safe:
+  hotfix: 1.10.1, 1.10.2, etc.
+  All < 1.12.0a1, so no collision possible! ✓
+```
+
+### 📊 Proper Version Ordering (PEP 440)
+
+```
+1.10.0 < 1.10.1 < 1.10.2 < 1.11.0a1 < 1.11.0a2 < 1.11.0rc1 < 1.11.0 < 1.12.0a1
+```
+
+This ensures:
+- ✅ Hotfix `1.11.1` < next release `1.12.0a1`
+- ✅ Users get updates in correct order
+- ✅ Dependency resolution works correctly
+
+### 🔄 Clean Git History
+
+```
+main:     v1.10.0 ──── v1.11.0 ──── v1.11.1 ──── v1.12.0
+             │           │           │           │
+develop:     │      (1.12.0a1) ─ (1.12.0a2) ─ (1.12.0a3) ─ 1.13.0a1
+             │           │           │           │
+features:    │           │       feature/X ──── │
+             │           │           │           │
+release:     │       release/1.11.0 ─────────── │
+             │                                   │
+hotfix:      │                   hotfix/1.11.1 ─│
+```
+
+Every commit to main is a tagged release. Clean and traceable.
+
+---
+
+## Version Configuration
+
+### pyproject.toml
+
+```toml
+[tool.bumpversion]
+current_version = "1.10.0a2"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)((?P<pre_label>a|rc)(?P<pre_number>\\d+))?"
+serialize = [
+    "{major}.{minor}.{patch}{pre_label}{pre_number}",
+    "{major}.{minor}.{patch}",
+]
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+
+[tool.bumpversion.parts.pre_label]
+optional_value = "final"
+values = ["a", "rc", "final"]
+
+[tool.bumpversion.parts.pre_number]
+first_value = 1
+```
+
+### GitHub Secrets
+
+Required for publishing:
+- `PYPI_API_TOKEN` - Token for PyPI publishing
+- `TEST_PYPI_API_TOKEN` - Token for Test PyPI publishing
+- `DEK_EDL_USER` / `DEK_EDL_PASSWORD` - NASA Earthdata Login credentials
+
+### Branch Protection
+
+Recommended settings:
+- **develop**: Require PR reviews, allow stitchee-bot to push
+- **main**: Require PR reviews + status checks, allow stitchee-bot to push
+- **release/\***: Allow direct pushes for CI version bumps
+
+---
+
+## Manual Version Commands
+
+### Check Version Information
+
+```bash
+# Show current version
+bump-my-version show current_version
+
+# Show what would change (dry-run)
+bump-my-version bump --dry-run --verbose pre_number
+
+# Show all version parts
+bump-my-version show-bump
+```
+
+### Manual Bumping (Rarely Needed)
+
+```bash
+# Increment alpha: 1.11.0a5 → 1.11.0a6
+bump-my-version bump pre_number
+
+# Alpha to RC: 1.11.0a5 → 1.11.0rc1
+bump-my-version bump pre_label
+
+# RC to final: 1.11.0rc2 → 1.11.0
+bump-my-version bump pre_label
+
+# Bump minor: 1.11.0a5 → 1.12.0a1
+bump-my-version bump minor
+
+# Set specific version
+bump-my-version bump --new-version 2.0.0a1 major
+```
+
+### Install bump-my-version Locally
+
+```bash
+# Using uv (recommended)
+uv pip install bump-my-version
+
+# Using pip
+pip install bump-my-version
+```
+
+---
+
+## Advanced Scenarios
+
+### Multiple Hotfixes
+
+```bash
+# First hotfix
+git checkout main
+git checkout -b hotfix/1.11.1
+# ... fix ...
+gh pr merge  # main: 1.11.0 → 1.11.1
+
+# Second hotfix
+git checkout main
+git pull     # Now at 1.11.1
+git checkout -b hotfix/1.11.2
+# ... fix ...
+gh pr merge  # main: 1.11.1 → 1.11.2
+```
+
+### Long-Running Release Branch
+
+```bash
+# Release branch can accumulate many RCs
+release/1.11.0: rc1 → rc2 → rc3 → rc4 → rc5
+
+# develop continues independently
+develop: 1.12.0a1 → 1.12.0a2 → 1.12.0a3
+
+# No conflicts - branches are independent
+```
+
+### Hotfix Version Conflicts
+
+**Symptom:** Merge conflicts when merging hotfix back to develop
+
+**Fix:**
+```bash
+git checkout develop
+git pull
+git merge main
+# Resolve conflicts manually (typically just version in pyproject.toml)
+git add .
+git commit -m "Merge hotfix with conflict resolution"
+git push
+```
+
+### Wrong Version After Mistake
+
+**Fix:**
+```bash
+# Reset to correct version
+bump-my-version bump --new-version 1.11.0a5 patch
+git commit -am "Reset version [skip ci]"
+git push
+```
+
+### Manual Publish After Failed Release
+
+**Check:**
+1. PyPI tokens are correctly set in GitHub Secrets
+2. Package name doesn't conflict with existing PyPI package
+3. Version number isn't already published
+
+**Manual publish:**
+```bash
+git checkout v1.11.0  # Checkout the tagged version
+uv build
+uv publish  # With proper credentials
+```
+
+---
+
 ## Summary
 
 The stitchee CI/CD pipeline handles:
@@ -733,3 +967,5 @@ The stitchee CI/CD pipeline handles:
 5. Get code review
 6. Merge PR
 7. Pipeline handles versioning, testing, and deployment
+
+**Remember:** Focus on writing code and following Git Flow - CI handles versioning automatically! 🎉

@@ -1,34 +1,38 @@
 # Scripts
 
-## bump_develop_after_release.sh
+Automation scripts used by CI/CD workflows. Most are called automatically by GitHub Actions.
 
-Automatically bumps the develop branch to the next minor version when a release branch is created.
+## version_bump.sh
 
-**Usage:**
+Core version bumping logic used by CI. Handles all version transitions:
+- `develop`: Alpha increments (1.11.0a5 → 1.11.0a6)
+- `release/X.Y.Z`: Alpha to RC, then RC increments
+- `main`: Strip pre-release (1.11.0rc3 → 1.11.0)
+- `hotfix/X.Y.Z`: Patch increments (1.11.0 → 1.11.1)
+
+**Called by:** `.github/workflows/version-and-build.yml`
+
+**Manual usage** (rarely needed):
 ```bash
-./scripts/bump_develop_after_release.sh <release_version>
+./scripts/version_bump.sh
 ```
 
-**Example:**
-```bash
-./scripts/bump_develop_after_release.sh 1.11.0
-```
+## verify_tag.sh
 
-This script is called automatically by CI when a release branch is first pushed. It:
-1. Checks out develop
-2. Verifies develop is still on the version being released
-3. Bumps develop to the next minor alpha (e.g., `1.11.0a6 → 1.12.0a1`)
-4. Commits and pushes the change
+Verifies git tags match the version in `pyproject.toml` before publishing to PyPI.
 
-This prevents version collisions between hotfixes and develop.
+**Called by:** `.github/workflows/publish.yml`
 
-**Manual Usage:**
+## create-netrc
 
-If CI fails to auto-bump develop, you can run it manually:
+Creates `.netrc` file for EDL (Earthdata Login) authentication during integration tests.
 
-```bash
-git checkout release/1.11.0
-bash scripts/bump_develop_after_release.sh 1.11.0
-```
+**Called by:** `.github/workflows/integration-tests.yml`
 
-The script is idempotent - safe to run multiple times.
+**Requires:**
+- `EDL_USERNAME` environment variable
+- `EDL_PASSWORD` environment variable
+
+---
+
+**For complete CI/CD workflows:** See [docs/CI-CD-README.md](../docs/CI-CD-README.md)
