@@ -26,6 +26,13 @@ def validate_output_path(filepath: str, overwrite: bool = False) -> str:
     """
     path = Path(filepath).resolve()
 
+    # Ensure parent directory exists and is writable
+    if not path.parent.exists():
+        raise FileNotFoundError(f"Output directory does not exist: {path.parent}")
+
+    if not os.access(path.parent, os.W_OK):
+        raise PermissionError(f"Output directory is not writable: {path.parent}")
+
     if path.is_dir():
         raise TypeError(f"Output path '{path}' is a directory. Please specify a file path.")
 
