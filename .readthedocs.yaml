@@ -26,5 +26,3 @@ build:
         - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH uv run mkdocs build --config-file mkdocs.yml --site-dir $READTHEDOCS_OUTPUT/html/
 
 
-mkdocs:
-  configuration: mkdocs.yml

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Release tag to publish (e.g., v1.11.0)'
+        description: 'Release tag to publish (e.g., 1.11.0)'
         required: true
         type: string
 
@@ -55,7 +55,10 @@ jobs:
             VERSION="${VERSION#v}"  # Strip 'v' prefix if present
           else
             # Release event: github.ref is like refs/tags/v1.11.0
-            VERSION="${GITHUB_REF#refs/tags/v}"
+            VERSION="${GITHUB_REF#refs/tags/}"
+            
+            # Strip 'v' prefix if present (works for both cases)
+            VERSION="${VERSION#v}"
           fi
 
           echo "version=$VERSION" >> $GITHUB_OUTPUT

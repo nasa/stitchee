@@ -21,7 +21,7 @@ case "$BRANCH" in
     if [[ "$CURRENT" == *"a"* ]]; then
       echo "  Alpha → RC1"
       bump-my-version bump pre_label
-      git commit -am "Bump to RC1 [skip ci]" && git push
+      git commit -am "Bump to RC1 [skip ci]" && git push origin "$BRANCH"
       ALREADY_COMMITTED=true
 
       # Note: develop will be auto-bumped by auto-bump-develop.yml workflow

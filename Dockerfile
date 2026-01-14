@@ -22,7 +22,7 @@ WORKDIR /worker
 # Copy project files and install (as root for system-wide installation)
 COPY pyproject.toml README.md LICENSE ./
 COPY stitchee/ ./stitchee/
-RUN uv sync --extra dev --extra harmony
+RUN uv sync --extra harmony
 
 # Copy and prepare entrypoint
 COPY docker-entrypoint.sh ./

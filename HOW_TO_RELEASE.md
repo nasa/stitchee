@@ -60,7 +60,7 @@ When you run `git push -u origin release/1.11.0`, the following occurs automatic
 
     2. Select the tag created by the merge (e.g., `1.11.0`)
 
-    3. Set the release title (e.g., `v1.11.0`)
+    3. Set the release title (e.g., `1.11.0`)
 
     4. Write release notes:
        - Summarize major changes
