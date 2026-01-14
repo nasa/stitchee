@@ -24,5 +24,3 @@ build:
         - mkdir -p $READTHEDOCS_OUTPUT/html/
         # Build directly into the RTD output directory
         - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH uv run mkdocs build --config-file mkdocs.yml --site-dir $READTHEDOCS_OUTPUT/html/
-
-
