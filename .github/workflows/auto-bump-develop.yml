@@ -77,7 +77,7 @@ jobs:
 
             echo "Bumping: $CURRENT → $NEXT_VERSION"
 
-            bump-my-version bump --new-version "$NEXT_VERSION" minor
+            bump-my-version bump --new-version "$NEXT_VERSION"
             git commit -am "Start $NEXT_VERSION development [skip ci]"
             git push origin develop
 
