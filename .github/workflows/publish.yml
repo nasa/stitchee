@@ -12,8 +12,6 @@ on:
 
 env:
   PYTHON_VERSION: "3.12"
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-publish:
