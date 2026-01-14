@@ -6,7 +6,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gcc \
         libnetcdf-dev \
-    && pip3 install --upgrade pip cython poetry \
+    && pip3 install --upgrade pip cython uv \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -22,8 +22,7 @@ WORKDIR /worker
 # Copy project files and install (as root for system-wide installation)
 COPY pyproject.toml README.md LICENSE ./
 COPY stitchee/ ./stitchee/
-RUN poetry config virtualenvs.create false \
-    && poetry install --extras "dev harmony"
+RUN uv sync --extra harmony
 
 # Copy and prepare entrypoint
 COPY docker-entrypoint.sh ./

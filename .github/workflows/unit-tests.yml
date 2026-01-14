@@ -1,0 +1,48 @@
+# A reusable workflow to run the unit test suite
+#
+# This workflow runs pytest with coverage for unit tests only.
+# Linting and type checking should be done separately.
+name: Unit Tests
+
+on:
+  workflow_call:
+    secrets:
+      codecov_token:
+        required: true
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Retrieve repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-path: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --extra dev --extra harmony --frozen
+
+      - name: Run tests and collect coverage
+        run: uv run pytest --cov=stitchee --cov-report=xml tests/unit
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
+          flags: unittests

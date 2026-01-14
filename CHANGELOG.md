@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Changed
+
+- Implement uv dependency management and versioning with bump-my-version ([#321](https://github.com/nasa/stitchee/issues/321))([**@danielfromearth**](https://github.com/danielfromearth))
+
 ## [1.9.0] - 2025-11-07
 
 ### Changed

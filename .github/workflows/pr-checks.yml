@@ -1,0 +1,132 @@
+name: PR Validation Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  security-scan:
+    name: Security Scan (Snyk)
+    runs-on: ubuntu-latest
+    # Rationale: Fail fast on protected branches (enforce security)
+    # but allow feature branches to continue (early warning only)
+    # Protected branches (develop, main, release/*) will block merge on high severity issues
+    # Feature branches will show warnings but won't block (allows early visibility)
+    continue-on-error: ${{ !contains(fromJSON('["develop", "main"]'), github.base_ref) && !startsWith(github.base_ref, 'release/') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-path: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --extra dev --extra harmony --frozen
+
+      - name: Run Snyk Security Scan
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: >
+            --org=${{ secrets.SNYK_ORG_ID }}
+            --project-name=${{ github.repository }}
+            --severity-threshold=high
+            --fail-on=all
+
+      - name: Upload Snyk results to GitHub
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
+        continue-on-error: true
+
+  lint-and-type-check:
+    name: Linting and Type Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-path: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --extra dev --extra harmony --frozen
+
+      - name: Run ruff linting
+        run: uv run ruff check stitchee
+
+      - name: Run mypy type checking
+        run: uv run mypy stitchee
+        continue-on-error: true  # Don't block on type errors for now
+
+  validate-changelog:
+    name: Validate CHANGELOG Updated
+    runs-on: ubuntu-latest
+    # Only check for develop and main PRs
+    if: contains(fromJSON('["develop", "main"]'), github.base_ref) || startsWith(github.base_ref, 'release/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check CHANGELOG.md updated
+        run: |
+          if ! git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q "CHANGELOG.md"; then
+            echo "❌ CHANGELOG.md was not updated"
+            echo ""
+            echo "Please add an entry to CHANGELOG.md describing your changes."
+            echo "This is required for PRs to protected branches (develop, main, release/*)."
+            exit 1
+          else
+            echo "✅ CHANGELOG.md updated"
+          fi
+
+  unit-tests:
+    name: Unit Tests
+    uses: ./.github/workflows/unit-tests.yml
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
+
+  pr-summary:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [security-scan, lint-and-type-check, unit-tests, validate-changelog]
+    if: always()
+
+    steps:
+      - name: Generate summary
+        run: |
+          echo "### 📋 PR Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Linting & Type Checks | ${{ needs.lint-and-type-check.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| CHANGELOG Validation | ${{ needs.validate-changelog.result }} |" >> $GITHUB_STEP_SUMMARY

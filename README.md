@@ -33,32 +33,53 @@ _____
 _STITCHEE_ (STITCH by Extending a dimEnsion) is used for concatenating netCDF data *along an existing dimension*,
 and it is designed as both a standalone utility and for use as a service in [Harmony](https://harmony.earthdata.nasa.gov/).
 
-## Getting started, with poetry
+## Getting started, with uv
 
-1. Follow the instructions for installing `poetry` [here](https://python-poetry.org/docs/).
+1. Follow the instructions for installing `uv` [here](https://docs.astral.sh/uv/).
 2. Install `stitchee`, with its dependencies, by running the following from the repository directory:
 
 ```shell
-poetry install
+uv sync
+```
+
+To install with optional dependencies:
+
+```shell
+uv sync --extra dev --extra harmony
 ```
 
 ## How to test `stitchee` locally
 
 ```shell
-poetry run pytest tests/
+uv run pytest tests/
 ```
+
+## Contributing
+
+We welcome contributions! This project uses:
+- **Git Flow** branching strategy with automated semantic versioning
+- **CI/CD** for testing, security scanning, and deployment
+- **Protected branches** (main, develop, release/*, hotfix/*)
+
+**Quick workflow:**
+1. Create feature branch from `develop`: `git checkout -b feature/your-feature`
+2. Write code, tests, and update `CHANGELOG.md`
+3. Open PR to `develop` - CI runs tests and security scans
+4. After approval and merge, CI handles versioning automatically
+
+**For developers:** See **[docs/CI-CD-README.md](docs/CI-CD-README.md)** for complete CI/CD workflows and branching strategy.
 
 ## Usage
 
 For example:
 
 ```shell
-poetry run stitchee /path/to/files/directory -o output.nc --concat_method xarray-combine
+uv run stitchee /path/to/files/directory -o output.nc --concat_method xarray-combine
 ```
 
 Command line options:
 ```shell
-$ poetry run stitchee --help
+$ uv run stitchee --help
 usage: stitchee [-h] -o PATH [--concat_method {xarray-concat,xarray-combine}] [--concat_dim DIM] [--sorting_variable VAR] [--xarray_arg_compat COMPAT]
                 [--xarray_arg_combine_attrs ATTRS] [--xarray_arg_join JOIN] [-O] [-v]
                 INPUT [INPUT ...]

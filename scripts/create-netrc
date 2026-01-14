@@ -1,7 +1,20 @@
 #!/bin/bash
+set -euo pipefail
+
+# Validate required environment variables
+if [ -z "${EDL_USER:-}" ] || [ -z "${EDL_PASSWORD:-}" ]; then
+    echo "❌ Error: EDL_USER and EDL_PASSWORD environment variables must be set"
+    exit 1
+fi
 
 if [ -f ~/.netrc ]; then
     echo "Skipping generating ~/.netrc file because it already exists."
 else
-    echo -e "\nmachine urs.earthdata.nasa.gov login $EDL_USER password $EDL_PASSWORD\n" >> ~/.netrc
+    cat > ~/.netrc <<EOF
+machine urs.earthdata.nasa.gov
+	login $EDL_USER
+	password $EDL_PASSWORD
+EOF
+    chmod 600 ~/.netrc
+    echo "✅ Created ~/.netrc with secure permissions"
 fi
