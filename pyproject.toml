@@ -117,8 +117,6 @@ serialize = [
     "{major}.{minor}.{patch}{pre_label}{pre_number}",
     "{major}.{minor}.{patch}",
 ]
-search = "version = \"{current_version}\""
-replace = "version = \"{new_version}\""
 commit = false
 tag = false
 
