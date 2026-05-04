@@ -15,7 +15,7 @@ executes several services:
 - Panoply is unable to plot results when coordinate arrays contain null values on the edges.
 - Polygons and other Shapefile formats are not supported for subsetting. Support for this is in development.
 - A request for a single granule proceeds through the entire chain. Thus, the following modifications are made even though the data are not concatenated: (i) the filename is changed to the granule's collection ID + "_merged" and (ii) a history attribute is added.
-- Converting large NetCDF files can result in CSV files that are too large to be opened in Excel. For this reason, CONCISE cannot be used in the SAMBAH processing chain if CSV output is requested. If both concatenation and CSV output are included in the Harmony request, the concatenation request will be ignored. 
+- Converting large NetCDF files can result in CSV files that are too large to be opened in Excel. For this reason, CONCISE cannot be used in the SAMBAH processing chain if CSV output is requested. If both concatenation and CSV output are included in the Harmony request, the concatenation request will be ignored.
 
 ## Missions supported
 
