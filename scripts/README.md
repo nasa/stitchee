@@ -35,4 +35,4 @@ Creates `.netrc` file for EDL (Earthdata Login) authentication during integratio
 
 ---
 
-**For complete CI/CD workflows:** See [docs/CI-CD-README.md](../docs/CI-CD-README.md)
+**For complete CI/CD workflows:** See [.github/CI-CD-README.md](../.github/CI-CD-README.md)
