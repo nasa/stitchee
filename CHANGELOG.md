@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Changed
+- Added CASPER information to sambah_readme.md ([#340](https://github.com/nasa/stitchee/pull/340))([**kecunning**](https://github.com/kecunning))
 
 - Implement uv dependency management and versioning with bump-my-version ([#321](https://github.com/nasa/stitchee/issues/321))([**@danielfromearth**](https://github.com/danielfromearth))
 

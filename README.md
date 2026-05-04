@@ -67,7 +67,7 @@ We welcome contributions! This project uses:
 3. Open PR to `develop` - CI runs tests and security scans
 4. After approval and merge, CI handles versioning automatically
 
-**For developers:** See **[docs/CI-CD-README.md](docs/CI-CD-README.md)** for complete CI/CD workflows and branching strategy.
+**For developers:** See **[.github/CI-CD-README.md](.github/CI-CD-README.md)** for complete CI/CD workflows and branching strategy.
 
 ## Usage
 

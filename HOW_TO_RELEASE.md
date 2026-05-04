@@ -35,7 +35,7 @@ When you run `git push -u origin release/1.11.0`, the following occurs automatic
    - Click "Run workflow"
    - Enter the release version (e.g., `1.11.0`)
    - Click "Run workflow"
-   - See [docs/CI-CD-README.md](docs/CI-CD-README.md#-understanding-auto-bump-developyml-trigger) for details
+   - See [.github/CI-CD-README.md](.github/CI-CD-README.md#-understanding-auto-bump-developyml-trigger) for details
 
 ---
 
