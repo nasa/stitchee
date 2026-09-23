@@ -1,37 +1,37 @@
-
 FROM python:3.12-slim
 
-# System setup, package installation, and cleanup are run in a single layer
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        gcc \
-        libnetcdf-dev \
-    && pip3 install --upgrade pip cython uv \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Passing version
+ARG SERVICE_VERSION
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=$SERVICE_VERSION
 
-# Create user and workspace
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+    gcc \
+    libnetcdf-dev \
+    && pip3 install --no-cache-dir --upgrade pip cython \
+    && apt-get purge -y --auto-remove gcc \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Create a new user
 RUN adduser --quiet --disabled-password --shell /bin/sh \
-        --home /home/dockeruser --gecos "" --uid 1000 dockeruser \
-    && mkdir -p /worker \
-    && chown dockeruser:dockeruser /worker
+--home /home/dockeruser --gecos "" --uid 1000 dockeruser
 
-# Set working directory
+RUN mkdir -p /worker && chown dockeruser /worker
+
 WORKDIR /worker
 
-# Copy project files and install (as root for system-wide installation)
-COPY pyproject.toml README.md LICENSE ./
-COPY stitchee/ ./stitchee/
-RUN uv sync --extra harmony
+COPY --chown=dockeruser:dockeruser pyproject.toml README.md LICENSE ./
+COPY --chown=dockeruser:dockeruser stitchee ./stitchee
+COPY --chown=dockeruser:dockeruser uv.lock ./
+COPY --chown=dockeruser:dockeruser --chmod=755 docker-entrypoint.sh ./
 
-# Copy and prepare entrypoint
-COPY docker-entrypoint.sh ./
-RUN chmod +x ./docker-entrypoint.sh \
-    && chown dockeruser:dockeruser ./docker-entrypoint.sh
-
-# Switch to non-root user for runtime
 USER dockeruser
-ENV HOME=/home/dockeruser \
-    PYTHONPATH="/worker"
+RUN uv sync --frozen
+RUN uv tool run hatch version
+
+ENV HOME=/home/dockeruser
+ENV PATH="/worker/.venv/bin:$PATH"
 
 ENTRYPOINT ["./docker-entrypoint.sh"]

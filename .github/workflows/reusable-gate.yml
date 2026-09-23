@@ -1,0 +1,149 @@
+name: Reusable gate
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: false
+        type: boolean
+        default: false
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  validate_release:
+    if: ${{ (github.head_ref || github.ref_name) == 'main' }}
+    runs-on: ubuntu-latest
+    outputs:
+      next_tag: ${{ steps.validate.outputs.next_tag }}
+
+    steps:
+      - name: Retrieve repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Validate last RC tag
+        id: validate
+        run: |
+          # validate last rc tag
+          last_rc=$(git describe --tags --match "*rc*" --abbrev=0)
+
+          if [[ -z "${last_rc}" ]]; then
+            echo "No RC tags found"
+            exit 1
+          fi
+
+          if [[ "${last_rc}" =~ ^([0-9]+\.[0-9]+\.[0-9]+)rc([0-9]+)$ ]]; then
+            rc_base="${BASH_REMATCH[1]}"
+          else
+            echo "Could not parse RC tag: ${last_rc}"
+            exit 2
+          fi
+
+          if [[ -n "$(git tag --list "${rc_base}")" ]]; then
+            echo "Stable tag ${rc_base} already exists."
+            exit 3
+          fi
+
+          echo "Last RC tag: ${last_rc}"
+          echo "RC base version: ${rc_base}"
+
+          echo "next_tag=${rc_base}" >> "$GITHUB_OUTPUT"
+
+  validate_candidate:
+    if: ${{ startsWith(github.head_ref || github.ref_name, 'release/') }}
+    runs-on: ubuntu-latest
+    outputs:
+      next_tag: ${{ steps.validate.outputs.next_tag }}
+
+    steps:
+      - name: Retrieve repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Validate branch name
+        id: validate
+        run: |
+          # strictly validating the format of branch name
+          if [[ ! "${BRANCH_NAME}" =~ ^release/(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Invalid branch '${BRANCH_NAME}'. Expected 'release/X.Y.Z' (e.g. release/1.2.3)"
+            exit 1
+          fi
+
+          new_major="${BASH_REMATCH[1]}"
+          new_minor="${BASH_REMATCH[2]}"
+          new_patch="${BASH_REMATCH[3]}"
+          new_version="${new_major}.${new_minor}.${new_patch}"
+
+          highest_tag=$(git tag --list | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n1)
+
+          if [[ -z "${highest_tag}" ]]; then
+            echo "No valid semantic version tags found"
+            exit 2
+          fi
+
+          IFS='.' read -r old_major old_minor old_patch <<< "${highest_tag}"
+
+          allowed_patch="${old_major}.${old_minor}.$((old_patch + 1))"
+          allowed_minor="${old_major}.$((old_minor + 1)).0"
+          allowed_major="$((old_major + 1)).0.0"
+
+          if [[ "${new_version}" != "${allowed_patch}" && \
+                "${new_version}" != "${allowed_minor}" && \
+                "${new_version}" != "${allowed_major}" ]]; then
+            echo "Release version '${new_version}' is not exactly one valid increment from highest existing stable tag '${highest_tag}'."
+            echo "Allowed next versions are: ${allowed_patch}, ${allowed_minor}, ${allowed_major}."
+            exit 3
+          fi
+
+          echo "Highest existing stable tag: ${highest_tag}"
+          echo "Validated new release version: ${new_version}"
+
+          last_rc=$(git tag --list "${new_version}rc*" | sort -V | tail -n1)
+          if [[ -z "${last_rc}" ]]; then
+            next_tag="${new_version}rc1"
+          elif [[ "${last_rc}" =~ ^${new_version}rc([0-9]+)$ ]]; then
+            rc="${BASH_REMATCH[1]}"
+            next_tag="${new_version}rc$((rc+1))"
+          else
+            echo "Found matching tag candidate but could not parse RC number: ${last_rc}"
+            exit 4
+          fi
+
+          echo "Next RC tag: ${next_tag}"
+          echo "next_tag=${next_tag}" >> "$GITHUB_OUTPUT"
+
+  push_tag:
+    needs: [validate_release, validate_candidate]
+    if: |
+      always() &&
+      inputs.tag &&
+      (
+        needs.validate_release.outputs.next_tag != '' ||
+        needs.validate_candidate.outputs.next_tag != ''
+      )
+
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_TAG: >-
+        ${{ needs.validate_release.outputs.next_tag ||
+          needs.validate_candidate.outputs.next_tag }}
+
+    steps:
+      - name: Retrieve repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Push tag
+        run: |
+          # pushing the tag
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git tag -a "${NEXT_TAG}" -m "tag ${NEXT_TAG}"
+          git push origin "${NEXT_TAG}"

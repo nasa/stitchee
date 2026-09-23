@@ -1,3 +1,4 @@
 #!/bin/bash
 
-docker build -t "asdc-trade/stitchee:${VERSION-latest}" .
+export SERVICE_VERSION=`uv tool run hatch version`
+docker build -f Dockerfile --build-arg SERVICE_VERSION=$SERVICE_VERSION -t "harmony/stitchee:${VERSION-latest}" .

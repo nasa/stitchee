@@ -1,0 +1,79 @@
+name: Build and push release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: release-publish
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    uses: ./.github/workflows/reusable-tests.yml
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
+
+  build_docker:
+    needs: tests
+    uses: ./.github/workflows/reusable-docker.yml
+
+  validate:
+    needs: build_docker
+    permissions:
+      contents: write
+    uses: ./.github/workflows/reusable-gate.yml
+    with:
+      tag: true
+
+  push_docker:
+    needs: validate
+    permissions:
+      packages: write
+    uses: ./.github/workflows/reusable-docker.yml
+    with:
+      push: true
+
+  backmerge_main_to_develop:
+    needs: push_docker
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Create PR from main to develop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          current_tag=$(git tag --points-at HEAD --sort=creatordate | tail -n1)
+
+          gh pr create \
+            --base develop \
+            --head main \
+            --title "Backmerge main into develop after release ${current_tag}" \
+            --body "Automated backmerge PR from \`main\` into \`develop\` after release ${current_tag}."
+
+  create_new_release:
+    needs: push_docker
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          current_tag=$(git tag --points-at HEAD --sort=creatordate | tail -n1)
+
+          gh release create "${current_tag}" \
+            --title "Release ${current_tag}" \
+            --generate-notes \
+            --draft

@@ -1,0 +1,38 @@
+name: Build and push release candidate
+
+on:
+  push:
+    branches:
+      - 'release/*'
+
+concurrency:
+  group: release-publish
+  # Do not cancel in-progress runs: a cancelled release could leave a partial
+  # tag push or Docker image. New runs queue and wait for the current one to finish.
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    uses: ./.github/workflows/reusable-tests.yml
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
+
+  build_docker:
+    needs: tests
+    uses: ./.github/workflows/reusable-docker.yml
+
+  validate:
+    needs: build_docker
+    permissions:
+      contents: write
+    uses: ./.github/workflows/reusable-gate.yml
+    with:
+      tag: true
+
+  push_docker:
+    needs: validate
+    permissions:
+      packages: write
+    uses: ./.github/workflows/reusable-docker.yml
+    with:
+      push: true

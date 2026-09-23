@@ -2,9 +2,9 @@
 set -e
 
 if [ "$1" = 'stitchee' ]; then
-  exec stitchee "$@"
+  exec uv run stitchee "$@"
 elif [ "$1" = 'stitchee_harmony' ]; then
-  exec stitchee_harmony "$@"
+  exec uv run stitchee_harmony "$@"
 else
-  exec stitchee_harmony "$@"
+  exec uv run stitchee_harmony "$@"
 fi

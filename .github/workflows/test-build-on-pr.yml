@@ -1,0 +1,23 @@
+name: Test Docker build on PR
+
+on:
+  pull_request:
+    # Source files are intentionally excluded here;
+    # unit tests in test-on-pr.yml are expected to catch source-level failures.
+    # This workflow targets build-infrastructure changes only.
+    paths:
+      - 'Dockerfile'
+      - 'pyproject.toml'
+      - 'uv.lock'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  docker:
+    uses: ./.github/workflows/reusable-docker.yml
