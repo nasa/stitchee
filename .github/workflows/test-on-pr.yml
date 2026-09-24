@@ -1,0 +1,38 @@
+name: Run tests and linting on PR
+
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  validate_release_pr_target:
+    if: startsWith(github.head_ref, 'release/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate release PR target
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          if [[ "${BASE}" != "main" ]]; then
+            echo "PRs from release branches must target 'main'"
+            exit 1
+          else
+            echo "Valid: release branch PR targets main"
+          fi
+
+  validate:
+    if: ${{ startsWith(github.head_ref, 'release/') || (github.head_ref == 'main') }}
+    uses: ./.github/workflows/reusable-gate.yml
+
+  tests:
+    uses: ./.github/workflows/reusable-tests.yml
+    secrets:
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}

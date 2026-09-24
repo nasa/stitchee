@@ -1,0 +1,42 @@
+# This workflow will install Python dependencies, run tests,
+#   and report test results and code coverage as artifacts. It will
+#   be called by the workflow that runs tests against new PRs and as
+#   a first step in the workflow that publishes new Docker images.
+
+# Runs linting and unit tests on push, and reports
+# code coverage to Codecov.
+name: Reusable tests and linting workflow
+
+on:
+  workflow_call:
+    secrets:
+      codecov_token:
+        required: true
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Retrieve repository
+        uses: actions/checkout@v7
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --extra dev --frozen
+
+      - name: Run Linting
+        run: |
+          uv run ruff check stitchee
+
+      - name: Run tests with coverage
+        run: |
+          uv run pytest --cov=stitchee --cov-report=xml:build/reports/coverage.xml tests/unit/
