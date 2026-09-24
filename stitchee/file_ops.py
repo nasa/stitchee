@@ -180,6 +180,13 @@ def _is_file_empty(parent_group: nc.Dataset | nc.Group) -> bool:
         # Load the data
         var_data = var[:]
 
+        # Text has no NaN representation. Check its unmasked values and fill value.
+        if var.dtype is str or np.asarray(var_data).dtype.kind in ("S", "U"):
+            string_data = np.ma.asarray(var_data).compressed()
+            if string_data.size and not np.all(string_data == fill_or_null):
+                return False
+            continue
+
         # Check if variable is non-empty using three different methods
         # Check 1: Are all values masked?
         if np.ma.isMaskedArray(var_data) and (
