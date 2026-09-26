@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+- Preserve a single-object `history_json` record when collecting input provenance
+  for CLI and Harmony concatenation, rather than appending its property names.
+
+
 ### Changed
 - Implemented new streamlined release workflow. ([#368](https://github.com/nasa/stitchee/pull/368))([**@ank1m**](https://github.com/ank1m))
 
