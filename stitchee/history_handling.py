@@ -18,7 +18,7 @@ VERSION = importlib_metadata.distribution("stitchee").version
 module_logger = logging.getLogger(__name__)
 
 
-def retrieve_history(dataset: netCDF4.Dataset) -> dict:
+def retrieve_history(dataset: netCDF4.Dataset) -> list[dict]:
     """Retrieve history_json field from NetCDF dataset, if it exists.
 
     Parameters
@@ -27,12 +27,13 @@ def retrieve_history(dataset: netCDF4.Dataset) -> dict:
 
     Returns
     -------
-    A history_json field
+    A list of history records. A single record object is wrapped in a list
+    so callers can extend their history without iterating over object keys.
     """
     if "history_json" not in dataset.ncattrs():
-        return {}
-    history_json = dataset.getncattr("history_json")
-    return json.loads(history_json)
+        return []
+    history_json = json.loads(dataset.getncattr("history_json"))
+    return [history_json] if isinstance(history_json, dict) else history_json
 
 
 def construct_history(input_files: list, granule_urls: list) -> dict:
