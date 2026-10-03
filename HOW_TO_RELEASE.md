@@ -39,22 +39,36 @@ When you run `git push -u origin release/1.11.0`, the following occurs automatic
 
 ---
 
-3. Create a Pull Request from the `release/<version number>` branch to `main`
+3. Update the changelog with the new release version, date, and reference link at the bottom (fix any issues with the changelog)
+   - Commit the updated changelog to the release branch:
+     ```bash
+     git add CHANGELOG.md
+     git commit -m "Update changelog for <version number>"
+     git push
+     ```
+
+4. Create a Pull Request from the `release/<version number>` branch to `main`
 
     1. Use previous Release PRs as a template for the description of the new release PR (Ensure *all* check boxes are unchecked, remove any previous issue links, and remove any ReadTheDocs preview.)
 
     2. Determine which issues were addressed in this release version, and add links to them using the `Closes #<issue number>` pattern in the Release PR's description
 
-4. (Optional, if any new changes are desired, create PRs with target to release branch)
+5. Test in UAT (User Acceptance Testing)
 
-5. Merge the Release PR into `main`
+    1. When satisfied with release candidate updates, deploy the release candidate Docker container (that's already in GHCR) to UAT using a `curl` command (requires token).
+
+    2. Run any necessary tests on the new version in UAT.
+
+6. (Optional, if any new changes are desired, create PRs with target to release branch)
+
+7. Merge the Release PR into `main`
 
     - This triggers the final version bump (strips `rc` label)
     - Example: `1.11.0rc3` → `1.11.0`
     - A git tag is automatically created (e.g., `1.11.0`)
     - Builds Docker
 
-6. Create and Publish a GitHub Release
+8. Create and Publish a GitHub Release
 
     1. Navigate to: https://github.com/nasa/stitchee/releases/new
 
@@ -62,7 +76,7 @@ When you run `git push -u origin release/1.11.0`, the following occurs automatic
 
     3. Set the release title (e.g., `1.11.0`)
 
-    4. Write release notes:
+    4. Generate and write release notes:
        - Summarize major changes
        - Link to closed issues
        - Highlight breaking changes if any
@@ -74,7 +88,11 @@ When you run `git push -u origin release/1.11.0`, the following occurs automatic
        - ✅ Docker image build and push
        - ✅ Snyk security monitoring update
 
-7. Merge `main` back into `develop`
+9. Deploy package to Production
+
+    - Deploy the production release package/container to the Production environment.
+
+10. Merge `main` back into `develop`
 
     - This ensures `develop` has the final release version
     - Do via a local merge:
