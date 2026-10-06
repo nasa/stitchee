@@ -1,4 +1,4 @@
 #!/bin/bash
 
 export SERVICE_VERSION=`uv tool run hatch version`
-docker build -f Dockerfile --build-arg SERVICE_VERSION=$SERVICE_VERSION -t "harmony/stitchee:${VERSION-latest}" .
+docker build -f Dockerfile --build-arg SERVICE_VERSION=$SERVICE_VERSION -t "nasa/stitchee:${VERSION-latest}" .

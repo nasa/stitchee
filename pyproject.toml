@@ -18,8 +18,6 @@ dependencies = [
     "xarray>=2024.3.0",
     "pystac>=0.5.3",
     "importlib-metadata>=8.4.0",
-    "pytest>=9.0.3",
-    "pytest-cov>=7.0.0",
     "harmony-service-lib>=3.0.0",
 ]
 
