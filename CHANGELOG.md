@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+- Preserve nonempty NetCDF inputs containing string variables during empty-file detection. ([#369](https://github.com/nasa/stitchee/issues/369))
+
 ### Changed
 - Implemented new streamlined release workflow. ([#368](https://github.com/nasa/stitchee/pull/368))([**@ank1m**](https://github.com/ank1m))
 
